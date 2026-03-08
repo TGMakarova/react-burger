@@ -1,5 +1,5 @@
 import type { TIngredient } from '@utils/types';
-
+import { MyComponentUI } from '../mycomponent-ui/mycomponent-ui';
 import styles from './burger-constructor.module.css';
 
 type TBurgerConstructorProps = {
@@ -11,5 +11,7 @@ export const BurgerConstructor = ({
 }: TBurgerConstructorProps): React.JSX.Element => {
   console.log(ingredients);
 
-  return <section className={styles.burger_constructor}></section>;
+  return <section className={styles.burger_constructor}>
+    <MyComponentUI />
+  </section>;
 };

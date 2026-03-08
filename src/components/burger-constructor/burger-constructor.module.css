@@ -4,4 +4,19 @@
   width: 600px;
   padding-bottom: 20px;
   color: var(--text-primary-color);
+  
+  max-height: 400px; /* Задайте максимальную высоту */
+  overflow-y: auto;  /* Добавляет вертикальную прокрутку */
+  scrollbar-width: thin; /* Ширина скролла */
+  /* Дополнительные стили для скролла (например, цвет) */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+  }
 }
+

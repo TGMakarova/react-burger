@@ -1,0 +1,39 @@
+.ingredient_element {
+  display: flex;
+  flex-direction: column;
+  min-width: 400px;
+  color: var(--text-primary-color);
+  font-family: 'Jet Brains Mono', serif;
+  padding-top: 16px;
+  gap: 16px;
+}
+
+.ingredient_picture {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ingredient_price {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.ingredient_name {
+  padding-top: 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.ingredient_container {
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  grid-column-gap: 20px;
+  min-height: 20px;
+  min-width: 150px;
+  
+}

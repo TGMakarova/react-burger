@@ -1,0 +1,22 @@
+.constructor_element {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  justify-content: center;
+  align-content: center;
+}
+
+.constructor_padding {
+  gap: 16px;
+}
+
+.constructor_button {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.constructor_icon {
+  padding-right: 40px;
+}

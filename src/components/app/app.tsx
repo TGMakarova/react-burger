@@ -1,8 +1,10 @@
+import { BurgerIngredients } from '@/components/burger-ingredients/burger-ingredients';
+import { getIngredients } from '@/utils/api';
+import { useState, useEffect } from 'react';
+
 import { AppHeader } from '@components/app-header/app-header';
 import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
-import { BurgerIngredients } from '@/components/burger-ingredients/burger-ingredients';
-import { useState, useEffect } from 'react';
-import { getIngredients } from '@/utils/api';
+
 import styles from './app.module.css';
 
 export const App = (): React.JSX.Element => {

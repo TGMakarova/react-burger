@@ -1,8 +1,7 @@
-
 /*import { ingredients } from './ingredients';*/
 import type { TIngredient } from '@utils/types.ts';
 
- const ingredients: TIngredient[] = [
+const ingredients: TIngredient[] = [
   {
     _id: '60666c42cc7b410027a1a9b1',
     name: 'Краторная булка N-200i',
@@ -215,16 +214,15 @@ import type { TIngredient } from '@utils/types.ts';
   },
 ];
 
-
- export const groupedIngredients: { [key: string]: TIngredient[] } = ingredients.reduce(
-  (acc: { [key: string]: TIngredient[] }, ingredient) => {
+export const groupedIngredients: Record<string, TIngredient[]> = ingredients.reduce(
+  (acc: Record<string, TIngredient[]>, ingredient) => {
     if (!acc[ingredient.type]) {
       acc[ingredient.type] = [];
     }
     acc[ingredient.type].push(ingredient);
     return acc;
   },
-  {} as { [key: string]: TIngredient[] }
+  {} as Record<string, TIngredient[]>
 );
 
 console.log(groupedIngredients);

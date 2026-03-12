@@ -1,10 +1,11 @@
-import React from 'react';
+import type React from 'react';
+
 import styles from './modal-overlay.module.css';
 
-interface ModalOverlayProps {
+type ModalOverlayProps = {
   onClose: () => void;
   children: React.ReactNode;
-}
+};
 
 export const ModalOverlay = ({ onClose, children }: ModalOverlayProps) => {
   const handleOverlayClick = (e: React.MouseEvent) => {

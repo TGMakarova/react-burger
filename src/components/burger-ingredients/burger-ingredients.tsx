@@ -1,9 +1,10 @@
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
 
+import { IngredientsDetailsUI } from '../ingredients-details-ui/ingredients-details-ui';
+
 import type { TIngredient } from '@utils/types';
 
 import styles from './burger-ingredients.module.css';
-import { IngredientsDetailsUI } from '../ingredients-details-ui/ingredients-details-ui';
 
 type TBurgerIngredientsProps = {
   ingredients: TIngredient[];

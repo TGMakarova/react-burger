@@ -1,13 +1,15 @@
-import styles from './ingredients-details-ui.module.css';
 import { CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
-
-import type { TIngredient } from '@utils/types.ts';
 import { useState } from 'react';
+
 import { IngredientDetails } from '../ingredient-details/ingredient-details';
 
-interface IngredientsDetailsUIProps {
+import type { TIngredient } from '@utils/types.ts';
+
+import styles from './ingredients-details-ui.module.css';
+
+type IngredientsDetailsUIProps = {
   ingredients: TIngredient[];
-}
+};
 
 export const IngredientsDetailsUI = ({ ingredients }: IngredientsDetailsUIProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,7 +27,7 @@ export const IngredientsDetailsUI = ({ ingredients }: IngredientsDetailsUIProps)
     setSelectedIngredientId(null);
   };
 
-  const groupedIngredients = ingredients.reduce<{ [key: string]: TIngredient[] }>(
+  const groupedIngredients = ingredients.reduce<Record<string, TIngredient[]>>(
     (acc, item) => {
       const key = item.type;
       if (!acc[key]) {

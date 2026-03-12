@@ -1,9 +1,8 @@
 .constructor_element {
   display: flex;
   flex-direction: column;
+  place-content: center center;
   gap: 24px;
-  justify-content: center;
-  align-content: center;
 }
 
 .constructor_padding {
@@ -12,9 +11,9 @@
 
 .constructor_button {
   display: flex;
-  align-items: center;
   flex-direction: row;
   justify-content: flex-end;
+  align-items: center;
 }
 
 .constructor_icon {

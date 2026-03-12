@@ -1,12 +1,11 @@
 .ingredients_element {
   display: flex;
   flex-direction: column;
+  gap: 10px;
   max-width: 280px;
+  padding-top: 16px;
   color: var(--text-primary-color);
   font-family: 'Jet Brains Mono', serif;
-  padding-top: 16px;
-  gap: 10px;
-
 }
 
 .ingredients_picture {
@@ -24,14 +23,13 @@
 
 .ingredients_name {
   display: flex;
-  align-items: flex-start;
   justify-content: center;
+  align-items: flex-start;
 }
 
 .ingredients_grid {
-  display:grid;
+  display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px 10px;
+  gap: 10px;
   margin-bottom: 40px;
 }
- 

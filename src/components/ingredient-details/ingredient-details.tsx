@@ -1,15 +1,17 @@
-import styles from './ingredient-details.module.css';
-import type { TIngredient } from '@utils/types.ts';
 import { Modal } from '../modal/modal';
 
-interface IngredientDetailsProps {
+import type { TIngredient } from '@utils/types.ts';
+
+import styles from './ingredient-details.module.css';
+
+type IngredientDetailsProps = {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
   header?: string | null;
   ingredientId: string;
   ingredients: TIngredient[];
-}
+};
 
 export const IngredientDetails = ({
   children,

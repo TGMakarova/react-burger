@@ -1,17 +1,19 @@
-import React from 'react';
-import styles from './modal.module.css';
 import ReactDOM from 'react-dom';
+
 import { ModalOverlay } from '../modal-overlay/modal-overlay';
-import { useEffect } from 'react';
+
+import type React, { useEffect } from 'react';
+
+import styles from './modal.module.css';
 
 const modalRoot = document.getElementById('react-modals');
 
-interface ModalProps {
+type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
   header?: string | null;
-}
+};
 
 export const Modal = ({ isOpen, onClose, children, header }: ModalProps) => {
   useEffect(() => {

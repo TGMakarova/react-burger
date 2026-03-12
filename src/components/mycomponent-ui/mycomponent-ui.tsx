@@ -1,15 +1,15 @@
+import { ingredients } from '@/utils/ingredients';
 import {
   Button,
   ConstructorElement,
   DragIcon,
   CurrencyIcon,
 } from '@krgaa/react-developer-burger-ui-components';
-
-import { OtherDetails } from '../other-details/other-details';
-import styles from './mycomponent-ui.module.css';
 import { useState } from 'react';
 
-import { ingredients } from '@/utils/ingredients';
+import { OtherDetails } from '../other-details/other-details';
+
+import styles from './mycomponent-ui.module.css';
 
 export const MyComponentUI = (): React.JSX.Element => {
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -1,21 +1,84 @@
-.constructor_element {
+.burger_constructor {
   display: flex;
   flex-direction: column;
-  place-content: center center;
-  gap: 24px;
+  width: 100%;
+  max-height: 100%;
+  padding-bottom: 20px;
+  color: var(--text-primary-color);
+  align-items: end;
+  height: 100%;
 }
 
-.constructor_padding {
-  gap: 16px;
+.bun_top {
+  flex-shrink: 0; /* Запрещаем сжиматься */
+  padding: 0 16px 52px 16px;
+  height: 52px;
+}
+
+.bun_bottom {
+  flex-shrink: 0; /* Запрещаем сжиматься */
+  padding: 0 16px 40px 16px;
+  height: 52px;
+  margin-bottom: 40px;
+}
+
+.ingredients_container {
+  flex: 1 1 auto; /* Растягивается на всё доступное место */
+  overflow-y: auto; /* Только здесь скролл */
+  display: flex;
+  flex-direction: column;
+
+  padding: 16px 8px;
+
+  /* Стили для скролла */
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+  }
+}
+
+.ingredient_item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 52px;
+  padding-bottom: 60px;
+  padding-top: 16px;
 }
 
 .constructor_button {
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: center;
+}
+
+.total_price {
+  display: flex;
   align-items: center;
 }
 
 .constructor_icon {
-  padding-right: 40px;
+  padding-right: 10px;
+}
+
+.error {
+  color: #ff0000;
+  background-color: #ffeeee;
+  padding: 20px;
+  text-align: center;
+  font-size: 18px;
+  border: 2px solid #ff0000;
+  border-radius: 8px;
+  margin: 20px;
 }

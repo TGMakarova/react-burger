@@ -2,7 +2,8 @@ import ReactDOM from 'react-dom';
 
 import { ModalOverlay } from '../modal-overlay/modal-overlay';
 
-import type React, { useEffect } from 'react';
+import type React from 'react';
+import { useEffect } from 'react';
 
 import styles from './modal.module.css';
 
@@ -45,8 +46,10 @@ export const Modal = ({ isOpen, onClose, children, header }: ModalProps) => {
     <ModalOverlay onClose={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modal_header}>
-          <p>{header} </p>
-          <button onClick={onClose}> &times;</button>
+          <p className={`${styles.modal_header} text text_type_main-large `}>{header}</p>
+          <button onClick={onClose} className={styles.close_button} aria-label="Закрыть">
+            ×
+          </button>
         </div>
         <div className={styles.modal_content}>{children}</div>
       </div>

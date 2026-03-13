@@ -39,20 +39,36 @@ export const IngredientDetails = ({
         <div
           className={`${styles.ingredient_container} text text_type_main-default text_color_inactive`}
         >
-          <p>Калории,ккал</p>
-          <p>Белки, г</p>
-          <p>Жиры, г</p>
-          <p>Углеводы, г</p>
-          <p className={`${styles.ingredient_container} text text_type_digits-default `}>
+          <p
+            className={`${styles.ingredient_item} text text_type_main-default text_color_inactive `}
+          >
+            Калории,ккал
+          </p>
+          <p
+            className={`${styles.ingredient_item} text text_type_main-default text_color_inactive `}
+          >
+            Белки, г
+          </p>
+          <p
+            className={`${styles.ingredient_item} text text_type_main-default text_color_inactive `}
+          >
+            Жиры, г
+          </p>
+          <p
+            className={`${styles.ingredient_item} text text_type_main-default text_color_inactive `}
+          >
+            Углеводы, г
+          </p>
+          <p className={`${styles.ingredient_item} text text_type_digits-default `}>
             {ingredient.calories}
           </p>
-          <p className={`${styles.ingredient_container} text text_type_digits-default `}>
+          <p className={`${styles.ingredient_item} text text_type_digits-default `}>
             {ingredient.proteins}
           </p>
-          <p className={`${styles.ingredient_container} text text_type_digits-default `}>
+          <p className={`${styles.ingredient_item} text text_type_digits-default `}>
             {ingredient.fat}
           </p>
-          <p className={`${styles.ingredient_container} text text_type_digits-default `}>
+          <p className={`${styles.ingredient_item} text text_type_digits-default `}>
             {ingredient.carbohydrates}
           </p>
         </div>

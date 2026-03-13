@@ -43,21 +43,23 @@ export const IngredientsDetailsUI = ({ ingredients }: IngredientsDetailsUIProps)
 
   return (
     <>
-      <div className={styles.ingredients_element}>
+      <div className={styles.ingredients_container}>
         {sortedTypes.map((type) => {
           const ingredientsOfType = groupedIngredients[type];
           if (ingredientsOfType) {
             return (
               <div key={type}>
-                <h3>
+                <p
+                  className={`${styles.ingredients_name_container} text text_type_main-medium `}
+                >
                   {type === 'bun'
-                    ? 'БУЛКИ'
+                    ? 'Булки'
                     : type === 'main'
-                      ? 'ОСНОВНЫЕ'
+                      ? 'Основные'
                       : type === 'sauce'
-                        ? 'СОУСЫ'
+                        ? 'Соусы'
                         : type}
-                </h3>
+                </p>
                 <div className={styles.ingredients_grid}>
                   {ingredientsOfType.map((ingredient) => (
                     <div
@@ -70,11 +72,17 @@ export const IngredientsDetailsUI = ({ ingredients }: IngredientsDetailsUIProps)
                         src={ingredient.image_large}
                         alt="Пример изображения"
                       />
-                      <div className={styles.ingredients_price}>
+                      <div
+                        className={`${styles.ingredients_price} text text_type_digits-default`}
+                      >
                         <span>{ingredient.price}</span>
                         <CurrencyIcon type="primary" />
                       </div>
-                      <div className={styles.ingredients_name}>{ingredient.name}</div>
+                      <div
+                        className={`${styles.ingredients_name} text text_type_main-default `}
+                      >
+                        {ingredient.name}
+                      </div>
                     </div>
                   ))}
                 </div>

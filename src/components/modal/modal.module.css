@@ -5,9 +5,9 @@
   min-width: 400px;
   min-height: 400px;
   padding: 20px;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 20px;
+  background-color: #000000;
+  border: 1px solid #a090d4;
+  border-radius: 40px;
   transform: translate(-50%, -50%);
 }
 
@@ -38,4 +38,30 @@
   width: 100%;
   height: 100%;
   background-color: rgb(0 0 0 / 50%); /* Полупрозрачный черный фон */
+}
+
+.close_button {
+  background-color: black; /* Черный фон */
+  color: white; /* Белый крестик */
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 32px; /* Размер крестика */
+  font-weight: 300; /* Тонкий крестик (можно bold) */
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  padding: 0;
+}
+
+.close_button:hover {
+  background-color: #4c4cff; /* Сиреневый цвет Яндекс.Практикума при наведении */
+}
+
+.close_button:active {
+  background-color: #3a3acf; /* Темнее при клике */
 }

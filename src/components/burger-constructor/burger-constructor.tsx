@@ -15,7 +15,7 @@ export const BurgerConstructor = ({
 
   return (
     <section className={styles.burger_constructor}>
-      <MyComponentUI />
+      <MyComponentUI ingredients={ingredients} />
     </section>
   );
 };

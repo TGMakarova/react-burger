@@ -1,10 +1,11 @@
 .burger_constructor {
   display: flex;
   flex-direction: column;
-  width: 600px;
-  max-height: 400px; /* Задайте максимальную высоту */
+  max-width: 600px;
+  height: 98%;
+  max-height: 100vh; /* Задайте максимальную высоту */
   padding-bottom: 20px;
-  overflow-y: auto; /* Добавляет вертикальную прокрутку */
+  /* overflow-y: auto; /* Добавляет вертикальную прокрутку */
   color: var(--text-primary-color);
   scrollbar-width: thin; /* Ширина скролла */
 

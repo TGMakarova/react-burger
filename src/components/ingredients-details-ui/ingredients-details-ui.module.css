@@ -2,16 +2,27 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-width: 280px;
+  width: 100%;
+  max-width: 100%;
   padding-top: 16px;
   color: var(--text-primary-color);
   font-family: 'Jet Brains Mono', serif;
+  box-sizing: border-box;
+  cursor: pointer;
 }
 
 .ingredients_picture {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
+  padding-top: 24px;
+}
+
+.ingredients_picture img {
+  max-width: 100%; /* Картинка не выходит за пределы */
+  height: auto;
+  object-fit: contain;
 }
 
 .ingredients_price {
@@ -19,17 +30,37 @@
   justify-content: center;
   align-items: center;
   gap: 10px;
+  padding-top: 4px;
+  padding-bottom: 4px;
 }
 
 .ingredients_name {
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  text-align: center; /* Добавляем центрирование текста */
+  word-break: break-word; /* Перенос длинных слов */
 }
 
 .ingredients_grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  box-sizing: border-box;
   margin-bottom: 40px;
+  padding-left: 16px;
+  gap: 24px 40px;
+}
+
+.ingredients_container {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+  padding-top: 40px;
+}
+
+.ingredients_name_container {
+  padding-left: 0;
 }

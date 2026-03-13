@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 120px;
+  padding-top: 60px;
 }
 
 .other_details_id {
@@ -10,15 +10,18 @@
 }
 
 .other_details_id_text {
+  display: flex;
   padding-top: 32px;
   padding-bottom: 60px;
 }
 
 .other_details_order_text {
   padding-top: 60px;
+  display: flex;
 }
 
 .other_details_finish_text {
+  display: flex;
   padding-top: 8px;
   padding-bottom: 120px;
 }

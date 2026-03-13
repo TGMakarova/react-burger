@@ -3,6 +3,7 @@
   flex-direction: column;
   gap: 16px;
   min-width: 400px;
+
   padding-top: 16px;
   color: var(--text-primary-color);
   font-family: 'Jet Brains Mono', serif;
@@ -35,4 +36,14 @@
   min-width: 150px;
   min-height: 20px;
   column-gap: 20px;
+  padding-top: 32px;
+  padding-bottom: 20px;
+}
+
+.ingredient_item {
+  display: flex;
+  flex-direction: colomn;
+  justify-content: center;
+  align-content: center;
+  padding-top: 8px;
 }

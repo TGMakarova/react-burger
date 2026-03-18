@@ -1,28 +1,44 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getIngredients } from '../utils/api'; // предполагаем, что у вас есть API функция
+import { getIngredients } from '../utils/api'; 
+import type { TIngredient } from '@utils/types';
 
-// Асинхронный экшен для получения ингредиентов
-export const fetchIngredients = createAsyncThunk(
+// Тип для состояния
+interface IngredientsState {
+  items: TIngredient[];
+  loading: boolean;
+  error: string | null;
+}
+
+// Асинхронный экшен
+export const fetchIngredients = createAsyncThunk<
+  TIngredient[],
+  void,
+  { rejectValue: string }
+>(
   'ingredients/fetchIngredients',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await getIngredients();
-      return response.data; // предполагаем, что данные находятся в response.data
+      const ingredients = await getIngredients();
+      return ingredients as TIngredient[];
     } catch (error) {
-      return rejectWithValue(error.message);
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue('Произошла неизвестная ошибка');
     }
   }
 );
 
+const initialState: IngredientsState = {
+  items: [],
+  loading: false,
+  error: null,
+};
+
 const ingredientsSlice = createSlice({
   name: 'ingredients',
-  initialState: {
-    items: [],
-    loading: false,
-    error: null,
-  },
+  initialState,
   reducers: {
-    // Синхронные редьюсеры (если нужны)
     clearIngredients: (state) => {
       state.items = [];
     },

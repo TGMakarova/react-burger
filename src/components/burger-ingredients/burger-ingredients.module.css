@@ -34,3 +34,9 @@
   list-style-type: none;
   width: 100%;
 }
+
+.ingredients_scroll_container {
+  height: calc(100vh - 300px);
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}

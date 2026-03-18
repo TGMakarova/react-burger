@@ -1,5 +1,5 @@
 import { CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 import { IngredientDetails } from '../ingredient-details/ingredient-details';
 
@@ -9,11 +9,36 @@ import styles from './ingredients-details-ui.module.css';
 
 type IngredientsDetailsUIProps = {
   ingredients: TIngredient[];
+  setCategoryRef: (type: 'bun' | 'sauce' | 'main', element: HTMLDivElement | null) => void;
 };
 
-export const IngredientsDetailsUI = ({ ingredients }: IngredientsDetailsUIProps) => {
+export const IngredientsDetailsUI = ({ ingredients, setCategoryRef }: IngredientsDetailsUIProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedIngredientId, setSelectedIngredientId] = useState<string | null>(null);
+
+//Создаем локальные рефы
+
+  const bunTitleRef = useRef<HTMLDivElement>(null);
+  const sauceTitleRef = useRef<HTMLDivElement>(null);
+  const mainTitleRef = useRef<HTMLDivElement>(null);
+
+  //Передаем рефы в родительский компонент
+
+  useEffect(() => {
+    setCategoryRef('bun', bunTitleRef.current);
+    setCategoryRef('sauce', sauceTitleRef.current);
+    setCategoryRef('main', mainTitleRef.current);
+
+    //  Очистка при размонтировании
+    return () => {
+      setCategoryRef('bun', null);
+      setCategoryRef('sauce', null);
+      setCategoryRef('main', null);
+    }
+
+  }, [setCategoryRef]
+  )
+
   // Обработчик клика по ингредиенту
 
   const handleIngredientClick = (ingredientId: string) => {
@@ -39,27 +64,35 @@ export const IngredientsDetailsUI = ({ ingredients }: IngredientsDetailsUIProps)
     {}
   );
 
-  const sortedTypes = ['bun', 'sauce', 'main'];
+  const sortedTypes = ['bun',  'main', 'sauce'];
 
   return (
     <>
-      <div className={styles.ingredients_container}>
+      <div  className={styles.ingredients_container}>
         {sortedTypes.map((type) => {
           const ingredientsOfType = groupedIngredients[type];
           if (ingredientsOfType) {
+            //Выбираем нужный реф в зависимости от типа
+    
+            const titleRef =
+              type === 'bun' ? bunTitleRef :
+                type === 'main' ? mainTitleRef :
+                  sauceTitleRef;
+            
             return (
               <div key={type}>
-                <p
+                <div ref = {titleRef}
+                
                   className={`${styles.ingredients_name_container} text text_type_main-medium `}
                 >
                   {type === 'bun'
                     ? 'Булки'
                     : type === 'main'
-                      ? 'Основные'
+                      ? 'Начинки'
                       : type === 'sauce'
                         ? 'Соусы'
                         : type}
-                </p>
+                </div>
                 <div className={styles.ingredients_grid}>
                   {ingredientsOfType.map((ingredient) => (
                     <div

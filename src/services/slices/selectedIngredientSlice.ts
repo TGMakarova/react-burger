@@ -14,9 +14,12 @@ const selectedIngredientSlice = createSlice({
   name: 'selectedIngredient',
   initialState,
   reducers: {
+    //Добавление данных об ингредиенте для просмотра
     setSelectedIngredient: (state, action: PayloadAction<TIngredient | null>) => {
       state.ingredient = action.payload;
     },
+
+    //Удаление данных при закрытии модального окна
     clearSelectedIngredient: (state) => {
       state.ingredient = null;
     },

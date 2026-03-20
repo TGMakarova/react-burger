@@ -1,8 +1,8 @@
 import { CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
 import { useRef, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import type { AppDispatch } from '@/store';
-import { setSelectedIngredient } from '@/store/slices/selectedIngredientSlice';
+import type { AppDispatch } from '@/services/store';
+import { setSelectedIngredient } from '@/services/slices/selectedIngredientSlice';
 import type { TIngredient } from '@utils/types.ts';
 
 import styles from './ingredients-details-ui.module.css';

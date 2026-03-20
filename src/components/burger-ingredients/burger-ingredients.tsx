@@ -4,8 +4,8 @@ import { IngredientsDetailsUI } from '../ingredients-details-ui/ingredients-deta
 import type { TIngredient } from '@utils/types';
 import styles from './burger-ingredients.module.css';
 import { useDispatch } from 'react-redux';
-import { setSelectedIngredient } from '@/store/slices/selectedIngredientSlice';
-import type { AppDispatch } from '@/store';
+import { setSelectedIngredient } from '@/services/slices/selectedIngredientSlice';
+import type { AppDispatch } from '@/services/store';
 
 type TBurgerIngredientsProps = {
   ingredients: TIngredient[];

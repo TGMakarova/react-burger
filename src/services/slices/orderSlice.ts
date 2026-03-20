@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createOrder } from '../../utils/api';
+import type { RootState } from '@/services/store';
 
 interface OrderState {
   orderNumber: number | null;
@@ -70,3 +71,8 @@ const orderSlice = createSlice({
 
 export const { clearOrder } = orderSlice.actions;
 export default orderSlice.reducer;
+
+// Селекторы
+export const selectOrderNumber = (state: RootState) => state.order.orderNumber;
+export const selectOrderLoading = (state: RootState) => state.order.loading;
+export const selectOrderError = (state: RootState) => state.order.error;

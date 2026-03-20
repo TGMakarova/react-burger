@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { MyComponentUI } from '../mycomponent-ui/mycomponent-ui';
 import { OtherDetails } from '../other-details/other-details';
-import { submitOrder, clearOrder } from '../../store/slices/orderSlice'; // Импортируем экшены
+import { submitOrder, clearOrder } from '../../services/slices/orderSlice'; // Импортируем экшены
 import type { TIngredient } from '@utils/types';
-import type { AppDispatch, RootState } from '../../store'; // Импортируем типы
+import type { AppDispatch, RootState } from '../../services/store'; // Импортируем типы
 import styles from './burger-constructor.module.css';
 
 type TBurgerConstructorProps = {

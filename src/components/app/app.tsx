@@ -2,10 +2,10 @@ import { BurgerIngredients } from '@/components/burger-ingredients/burger-ingred
 import { AppHeader } from '@components/app-header/app-header';
 import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
 import { IngredientDetails } from '@/components/ingredient-details/ingredient-details';
-import type { AppDispatch, RootState } from 'src/store/index';
+import type { AppDispatch, RootState } from '@/services/store/index';
 import styles from './app.module.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchIngredients } from '@/store/slices/ingredientsSlice';
+import { fetchIngredients } from '@/services/slices/ingredientsSlice';
 import { useEffect, useState } from 'react';
 
 export const App = (): React.JSX.Element => {

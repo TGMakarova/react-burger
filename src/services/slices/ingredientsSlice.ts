@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getIngredients } from '../../utils/api'; 
+import type { PayloadAction } from '@reduxjs/toolkit';
 import type { TIngredient } from '@utils/types';
+import type { RootState } from '@/services/store';
 
 // Тип для состояния
 interface IngredientsState {
@@ -60,5 +62,8 @@ const ingredientsSlice = createSlice({
   },
 });
 
-export const { clearIngredients } = ingredientsSlice.actions;
+//export const { clearIngredients } = ingredientsSlice.actions;
 export default ingredientsSlice.reducer;
+// Селекторы
+export const selectIngredients = (state: RootState) => state.ingredients.items;
+export const selectIngredientsLoading = (state: RootState) => state.ingredients.loading;

@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from 'react-redux';
-import type { RootState, AppDispatch } from 'src/store';
-import { clearSelectedIngredient } from '@/store/slices/selectedIngredientSlice';
+import type { RootState, AppDispatch } from '@/services/store';
+import { clearSelectedIngredient } from '@/services/slices/selectedIngredientSlice';
 import { Modal } from '../modal/modal';
 
 import type { TIngredient } from '@utils/types.ts';

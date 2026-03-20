@@ -1,3 +1,6 @@
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState, AppDispatch } from 'src/store';
+import { clearSelectedIngredient } from '@/store/slices/selectedIngredientSlice';
 import { Modal } from '../modal/modal';
 
 import type { TIngredient } from '@utils/types.ts';
@@ -7,25 +10,32 @@ import styles from './ingredient-details.module.css';
 type IngredientDetailsProps = {
   isOpen: boolean;
   onClose: () => void;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   header?: string | null;
-  ingredientId: string;
-  ingredients: TIngredient[];
+  
+  
 };
 
 export const IngredientDetails = ({
   children,
-  ingredientId,
-  ingredients,
-  ...modalProps
+  header,
+  isOpen,
+  onClose
 }: IngredientDetailsProps): React.JSX.Element => {
-  const ingredient = ingredients.find((item) => item._id === ingredientId);
 
+  const dispatch = useDispatch<AppDispatch>();
+  const ingredient = useSelector(
+    (state: RootState) => state.selectedIngredient.ingredient);
+   
+  const handleClose = () => {
+    dispatch(clearSelectedIngredient());
+    onClose();
+}
   if (!ingredient) {
     return <></>;
   }
   return (
-    <Modal {...modalProps}>
+    <Modal isOpen= {isOpen} onClose={handleClose} header ={header}>
       <div className={styles.ingredient_element}>
         <img
           className={styles.ingredient_picture}
@@ -72,6 +82,7 @@ export const IngredientDetails = ({
             {ingredient.carbohydrates}
           </p>
         </div>
+        {children}
       </div>
     </Modal>
   );

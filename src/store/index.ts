@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
-import ingredientsReducer from './ingredientsSlice';
-//import selectedIngredientReducer from './selectedIngredientSlice'; // Исправьте имя!
+import ingredientsReducer from './slices/ingredientsSlice';
+import selectedIngredientReducer from './slices/selectedIngredientSlice'; 
+import orderReducer from './slices/orderSlice';
 
 export const store = configureStore({
   reducer: {
     ingredients: ingredientsReducer,
-    //selectedIngredient: selectedIngredientReducer // Было setSelectedIngredient
+    selectedIngredient: selectedIngredientReducer,
+    order: orderReducer,
   },
 });
 

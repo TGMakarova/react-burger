@@ -3,6 +3,9 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { IngredientsDetailsUI } from '../ingredients-details-ui/ingredients-details-ui';
 import type { TIngredient } from '@utils/types';
 import styles from './burger-ingredients.module.css';
+import { useDispatch } from 'react-redux';
+import { setSelectedIngredient } from '@/store/slices/selectedIngredientSlice';
+import type { AppDispatch } from '@/store';
 
 type TBurgerIngredientsProps = {
   ingredients: TIngredient[];
@@ -14,8 +17,8 @@ export const BurgerIngredients = ({
   ingredients,
 }: TBurgerIngredientsProps): React.JSX.Element => {
   const [currentTab, setCurrentTab] = useState<CategoryType>('bun');
-
-  // ✅ Исправление: используем useRef вместо useState
+  
+  
   const categoryRefs = useRef<{
     bun: HTMLDivElement | null;
     sauce: HTMLDivElement | null;
@@ -27,6 +30,10 @@ export const BurgerIngredients = ({
   });
 
   const containerRef = useRef<HTMLDivElement>(null);
+ //Обработчик клика по ингредиенту
+
+ 
+  
 
   // Функция для установки рефов
   const setCategoryRef = useCallback((type: CategoryType, element: HTMLDivElement | null) => {

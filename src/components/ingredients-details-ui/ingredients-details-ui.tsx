@@ -1,8 +1,8 @@
 import { CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
-import { useState, useRef, useEffect } from 'react';
-
-import { IngredientDetails } from '../ingredient-details/ingredient-details';
-
+import { useRef, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import type { AppDispatch } from '@/store';
+import { setSelectedIngredient } from '@/store/slices/selectedIngredientSlice';
 import type { TIngredient } from '@utils/types.ts';
 
 import styles from './ingredients-details-ui.module.css';
@@ -13,8 +13,8 @@ type IngredientsDetailsUIProps = {
 };
 
 export const IngredientsDetailsUI = ({ ingredients, setCategoryRef }: IngredientsDetailsUIProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedIngredientId, setSelectedIngredientId] = useState<string | null>(null);
+  const dispatch =useDispatch<AppDispatch>()
+  
 
 //Создаем локальные рефы
 
@@ -41,16 +41,13 @@ export const IngredientsDetailsUI = ({ ingredients, setCategoryRef }: Ingredient
 
   // Обработчик клика по ингредиенту
 
-  const handleIngredientClick = (ingredientId: string) => {
-    setSelectedIngredientId(ingredientId);
-    setIsModalOpen(true);
+  const handleIngredientClick = (ingredient: TIngredient) => {
+    dispatch(setSelectedIngredient(ingredient));
+    //setIsModalOpen(true);
   };
 
   // Обработчик закрытия модального окна
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedIngredientId(null);
-  };
+ 
 
   const groupedIngredients = ingredients.reduce<Record<string, TIngredient[]>>(
     (acc, item) => {
@@ -98,7 +95,7 @@ export const IngredientsDetailsUI = ({ ingredients, setCategoryRef }: Ingredient
                     <div
                       key={ingredient._id}
                       className={styles.ingredients_element}
-                      onClick={() => handleIngredientClick(ingredient._id)}
+                      onClick={() => handleIngredientClick(ingredient)}
                     >
                       <img
                         className={styles.ingredients_picture}
@@ -125,17 +122,7 @@ export const IngredientsDetailsUI = ({ ingredients, setCategoryRef }: Ingredient
           return null;
         })}
       </div>
-      {selectedIngredientId && (
-        <IngredientDetails
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          ingredientId={selectedIngredientId}
-          ingredients={ingredients}
-          header="Детали ингредиента"
-        >
-          <p>Содержимое модального окна</p>
-        </IngredientDetails>
-      )}
+      
     </>
   );
 };

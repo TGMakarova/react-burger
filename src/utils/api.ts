@@ -23,3 +23,40 @@ export const getIngredients = async () => {
     throw error;
   }
 };
+ const orderIngredientsIds = [
+'692889f16bf770001bfeb4cc',
+'692889f16bf770001bfeb4d2',
+'692889f16bf770001bfeb4d6',
+'692889f16bf770001bfeb4cc',
+]
+ 
+// Функция создания заказа
+export const createOrder = async (ingredientsIds: string[]) => {
+  try {
+    const res = await fetch(`${BURGER_API_URL}/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ingredients: ingredientsIds,
+      }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.message || `Ошибка HTTP: ${res.status}`);
+    }
+
+    const data = await res.json();
+    console.log('Ответ от сервера (заказ):', data);
+
+    return data;
+  } catch (error) {
+    console.error('Ошибка в createOrder:', error);
+    throw error;
+  }
+};
+
+createOrder(orderIngredientsIds);
+

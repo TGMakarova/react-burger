@@ -13,11 +13,13 @@ import { useEffect, useState } from 'react';
 export const App = (): React.JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  const { items: ingredients, loading, error } = useSelector(
-    (state: RootState) => state.ingredients
-  );
-  
+
+  const {
+    items: ingredients,
+    loading,
+    error,
+  } = useSelector((state: RootState) => state.ingredients);
+
   const selectedIngredient = useSelector(
     (state: RootState) => state.selectedIngredient.ingredient
   );
@@ -43,7 +45,7 @@ export const App = (): React.JSX.Element => {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className={styles.error}>
@@ -63,7 +65,7 @@ export const App = (): React.JSX.Element => {
           <BurgerIngredients ingredients={ingredients} />
           <BurgerConstructor />
         </main>
-        <IngredientDetails 
+        <IngredientDetails
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           header="Детали ингредиента"

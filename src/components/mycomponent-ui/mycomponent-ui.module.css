@@ -113,7 +113,7 @@
   width: 120px;
   height: 120px;
   margin: 60px auto;
-  background: #4C4CFF;
+  background: #4c4cff;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -232,9 +232,10 @@
 }
 
 .hover {
-  opacity: 0.9};
+  opacity: 0.9;
+}
 
-  .burger_constructor {
+.burger_constructor {
   display: flex;
   flex-direction: column;
   gap: 16px;

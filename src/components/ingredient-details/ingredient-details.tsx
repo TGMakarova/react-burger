@@ -12,30 +12,28 @@ type IngredientDetailsProps = {
   onClose: () => void;
   children?: React.ReactNode;
   header?: string | null;
-  
-  
 };
 
 export const IngredientDetails = ({
   children,
   header,
   isOpen,
-  onClose
+  onClose,
 }: IngredientDetailsProps): React.JSX.Element => {
-
   const dispatch = useDispatch<AppDispatch>();
   const ingredient = useSelector(
-    (state: RootState) => state.selectedIngredient.ingredient);
-   
+    (state: RootState) => state.selectedIngredient.ingredient
+  );
+
   const handleClose = () => {
     dispatch(clearSelectedIngredient());
     onClose();
-}
+  };
   if (!ingredient) {
     return <></>;
   }
   return (
-    <Modal isOpen= {isOpen} onClose={handleClose} header ={header}>
+    <Modal isOpen={isOpen} onClose={handleClose} header={header}>
       <div className={styles.ingredient_element}>
         <img
           className={styles.ingredient_picture}

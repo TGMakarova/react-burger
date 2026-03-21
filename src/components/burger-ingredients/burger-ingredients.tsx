@@ -3,9 +3,6 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { IngredientsDetailsUI } from '../ingredients-details-ui/ingredients-details-ui';
 import type { TIngredient } from '@utils/types';
 import styles from './burger-ingredients.module.css';
-import { useDispatch } from 'react-redux';
-import { setSelectedIngredient } from '@/services/slices/selectedIngredientSlice';
-import type { AppDispatch } from '@/services/store';
 
 type TBurgerIngredientsProps = {
   ingredients: TIngredient[];
@@ -17,8 +14,7 @@ export const BurgerIngredients = ({
   ingredients,
 }: TBurgerIngredientsProps): React.JSX.Element => {
   const [currentTab, setCurrentTab] = useState<CategoryType>('bun');
-  
-  
+
   const categoryRefs = useRef<{
     bun: HTMLDivElement | null;
     sauce: HTMLDivElement | null;
@@ -26,28 +22,28 @@ export const BurgerIngredients = ({
   }>({
     bun: null,
     sauce: null,
-    main: null
+    main: null,
   });
 
   const containerRef = useRef<HTMLDivElement>(null);
- //Обработчик клика по ингредиенту
-
- 
-  
+  //Обработчик клика по ингредиенту
 
   // Функция для установки рефов
-  const setCategoryRef = useCallback((type: CategoryType, element: HTMLDivElement | null) => {
-    categoryRefs.current[type] = element;
-  }, []);
+  const setCategoryRef = useCallback(
+    (type: CategoryType, element: HTMLDivElement | null) => {
+      categoryRefs.current[type] = element;
+    },
+    []
+  );
 
   const handleScroll = useCallback((): void => {
     const container = containerRef.current;
     const refs = categoryRefs.current;
-    
+
     if (!container || !refs.bun || !refs.sauce || !refs.main) return;
 
     const containerTop = container.getBoundingClientRect().top;
-    
+
     const bunTop = Math.abs(refs.bun.getBoundingClientRect().top - containerTop);
     const sauceTop = Math.abs(refs.sauce.getBoundingClientRect().top - containerTop);
     const mainTop = Math.abs(refs.main.getBoundingClientRect().top - containerTop);

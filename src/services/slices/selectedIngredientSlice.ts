@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { TIngredient } from '@utils/types';
-import type {PayloadAction} from  '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
 
 interface SelectedIngredientState {
   ingredient: TIngredient | null;
@@ -26,5 +26,6 @@ const selectedIngredientSlice = createSlice({
   },
 });
 
-export const { setSelectedIngredient, clearSelectedIngredient } = selectedIngredientSlice.actions;
+export const { setSelectedIngredient, clearSelectedIngredient } =
+  selectedIngredientSlice.actions;
 export default selectedIngredientSlice.reducer;

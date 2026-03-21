@@ -12,13 +12,12 @@ type OtherDetailsProps = {
   error?: string | null; // добавляем пропс для ошибки
 };
 
-export const OtherDetails = ({ 
-  children, 
-  orderNumber, 
+export const OtherDetails = ({
+  children,
+  orderNumber,
   error,
-  ...modalProps 
+  ...modalProps
 }: OtherDetailsProps) => {
-  
   // Если есть ошибка, показываем её
   if (error) {
     return (
@@ -48,7 +47,9 @@ export const OtherDetails = ({
           <h3 className={`${styles.other_details_order_text} text text_type_main-small`}>
             Ваш заказ начали готовить
           </h3>
-          <h3 className={`${styles.other_details_finish_text} text text_type_main-default text_color_inactive`}>
+          <h3
+            className={`${styles.other_details_finish_text} text text_type_main-default text_color_inactive`}
+          >
             Дождитесь готовности на орбитальной станции
           </h3>
         </div>
@@ -59,9 +60,7 @@ export const OtherDetails = ({
   // Если нет ни ошибки, ни номера заказа, показываем children
   return (
     <Modal {...modalProps}>
-      <div className={styles.other_details_content}>
-        {children}
-      </div>
+      <div className={styles.other_details_content}>{children}</div>
     </Modal>
   );
 };

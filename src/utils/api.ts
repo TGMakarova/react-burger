@@ -23,13 +23,7 @@ export const getIngredients = async () => {
     throw error;
   }
 };
- const orderIngredientsIds = [
-'692889f16bf770001bfeb4cc',
-'692889f16bf770001bfeb4d2',
-'692889f16bf770001bfeb4d6',
-'692889f16bf770001bfeb4cc',
-]
- 
+
 // Функция создания заказа
 export const createOrder = async (ingredientsIds: string[]) => {
   try {
@@ -58,5 +52,4 @@ export const createOrder = async (ingredientsIds: string[]) => {
   }
 };
 
-createOrder(orderIngredientsIds);
-
+//createOrder(orderIngredientsIds);

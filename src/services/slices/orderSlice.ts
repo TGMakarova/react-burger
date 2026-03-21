@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk} from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createOrder } from '../../utils/api';
 import type { RootState } from '@/services/store';
@@ -29,17 +29,14 @@ export const submitOrder = createAsyncThunk<
   OrderResponse,
   string[],
   { rejectValue: string }
->(
-  'order/submitOrder',
-  async (ingredientsIds: string[], { rejectWithValue }) => {
-    try {
-      const response = await createOrder(ingredientsIds);
-      return response;
-    } catch (error) {
-      return rejectWithValue((error as Error).message);
-    }
+>('order/submitOrder', async (ingredientsIds: string[], { rejectWithValue }) => {
+  try {
+    const response = await createOrder(ingredientsIds);
+    return response;
+  } catch (error) {
+    return rejectWithValue((error as Error).message);
   }
-);
+});
 
 const orderSlice = createSlice({
   name: 'order',

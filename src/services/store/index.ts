@@ -4,10 +4,10 @@ import ingredientsReducer from '../slices/ingredientsSlice';
 import burgerConstructorReducer from '../slices/burgerConstructorSlice';
 import selectedIngredientReducer from '../slices/selectedIngredientSlice';
 import orderReducer from '../slices/orderSlice';
-import { 
-  apiMiddleware, 
-  localStorageMiddleware, 
-  performanceMiddleware 
+import {
+  apiMiddleware,
+  localStorageMiddleware,
+  performanceMiddleware,
 } from '../middleware/apiMiddleware';
 
 export const store = configureStore({
@@ -17,7 +17,7 @@ export const store = configureStore({
     selectedIngredient: selectedIngredientReducer,
     order: orderReducer,
   },
-  middleware: (getDefaultMiddleware) => 
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: ['burgerConstructor/addIngredient'],
@@ -26,7 +26,7 @@ export const store = configureStore({
       .concat(apiMiddleware)
       .concat(localStorageMiddleware)
       .concat(performanceMiddleware),
-  
+
   devTools: process.env.NODE_ENV !== 'production',
 });
 

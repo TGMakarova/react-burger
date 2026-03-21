@@ -1,86 +1,122 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createSelector } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { TIngredient } from '@utils/types';
-import type { RootState } from '@/services/store';
+import type { RootState } from '../store';
 
-// Расширенный тип ингредиента с уникальным ID для конструктора
-export interface ConstructorIngredient extends TIngredient {
-  constructorId: string; // Добавляем уникальный ID для каждого экземпляра
-}
+export type ConstructorIngredient = TIngredient & {
+  constructorId: string;
+};
 
 interface BurgerConstructorState {
-  bun: ConstructorIngredient | null; // Используем расширенный тип для булки
-  ingredients: ConstructorIngredient[]; // Используем расширенный тип
-  loading: boolean;
-  error: string | null;
+  bun: ConstructorIngredient | null;
+  ingredients: ConstructorIngredient[];
 }
 
 const initialState: BurgerConstructorState = {
   bun: null,
   ingredients: [],
-  loading: false,
-  error: null,
 };
 
 const burgerConstructorSlice = createSlice({
   name: 'burgerConstructor',
   initialState,
   reducers: {
-    // Добавление ингредиента в конструктор
     addIngredient: (state, action: PayloadAction<ConstructorIngredient>) => {
-      if (action.payload.type === 'bun') {
-        state.bun = action.payload;
+      const ingredient = action.payload;
+
+      if (ingredient.type === 'bun') {
+        state.bun = ingredient;
       } else {
-        state.ingredients.push(action.payload);
+        state.ingredients.push(ingredient);
       }
-      // Сохраняем в localStorage
-      localStorage.setItem('burgerConstructor', JSON.stringify({
-        bun: state.bun,
-        ingredients: state.ingredients
-      }));
     },
-    
-    // Удаление ингредиента из конструктора
+
     removeIngredient: (state, action: PayloadAction<string>) => {
+      const constructorId = action.payload;
       state.ingredients = state.ingredients.filter(
-        item => item.constructorId !== action.payload
+        (item) => item.constructorId !== constructorId
       );
-      // Сохраняем в localStorage
-      localStorage.setItem('burgerConstructor', JSON.stringify({
-        bun: state.bun,
-        ingredients: state.ingredients
-      }));
     },
-    
-    // Перемещение ингредиента
-    moveIngredient: (state, action: PayloadAction<{ dragIndex: number; hoverIndex: number }>) => {
+
+    moveIngredient: (
+      state,
+      action: PayloadAction<{ dragIndex: number; hoverIndex: number }>
+    ) => {
       const { dragIndex, hoverIndex } = action.payload;
-      const newIngredients = [...state.ingredients];
-      const draggedItem = newIngredients[dragIndex];
-      newIngredients.splice(dragIndex, 1);
-      newIngredients.splice(hoverIndex, 0, draggedItem);
-      state.ingredients = newIngredients;
-      
-      localStorage.setItem('burgerConstructor', JSON.stringify({
-        bun: state.bun,
-        ingredients: state.ingredients
-      }));
+      const ingredients = [...state.ingredients];
+      const draggedItem = ingredients[dragIndex];
+      ingredients.splice(dragIndex, 1);
+      ingredients.splice(hoverIndex, 0, draggedItem);
+      state.ingredients = ingredients;
     },
-    
-    // Очистка конструктора
-    clearBurgerConstructor: (state) => {
+
+    clearConstructor: (state) => {
       state.bun = null;
       state.ingredients = [];
-      localStorage.removeItem('burgerConstructor');
     },
   },
 });
 
-export const { 
-  addIngredient, 
-  removeIngredient, 
-  moveIngredient, 
-  clearBurgerConstructor 
-} = burgerConstructorSlice.actions;
+export const { addIngredient, removeIngredient, moveIngredient, clearConstructor } =
+  burgerConstructorSlice.actions;
 
 export default burgerConstructorSlice.reducer;
+
+// Мемоизированный селектор для получения ингредиентов с счётчиками
+export const selectIngredientsWithCounts = createSelector(
+  [
+    (state: RootState) => state.ingredients.items,
+    (state: RootState) => state.burgerConstructor,
+  ],
+  (allIngredients: TIngredient[], burgerConstructor: BurgerConstructorState) => {
+    // Создаём карту для подсчёта
+    const countMap = new Map<string, number>();
+
+    // Инициализируем все ингредиенты нулями
+    allIngredients.forEach((ingredient: TIngredient) => {
+      countMap.set(ingredient._id, 0);
+    });
+
+    // Подсчитываем булку (2 штуки)
+    if (burgerConstructor.bun) {
+      const bunId = burgerConstructor.bun._id;
+      countMap.set(bunId, (countMap.get(bunId) || 0) + 2);
+    }
+
+    // Подсчитываем обычные ингредиенты
+    burgerConstructor.ingredients.forEach((ingredient: ConstructorIngredient) => {
+      const ingredientId = ingredient._id;
+      countMap.set(ingredientId, (countMap.get(ingredientId) || 0) + 1);
+    });
+
+    // Возвращаем ингредиенты с актуальными счётчиками
+    return allIngredients.map((ingredient: TIngredient) => ({
+      ...ingredient,
+      count: countMap.get(ingredient._id) || 0,
+    }));
+  }
+);
+
+// Селектор для общей стоимости
+export const selectTotalPrice = createSelector(
+  [(state: RootState) => state.burgerConstructor],
+  (burgerConstructor: BurgerConstructorState) => {
+    let total = 0;
+
+    if (burgerConstructor.bun) {
+      total += burgerConstructor.bun.price * 2;
+    }
+
+    total += burgerConstructor.ingredients.reduce(
+      (sum: number, item: ConstructorIngredient) => sum + item.price,
+      0
+    );
+
+    return total;
+  }
+);
+
+// Тип для ингредиента с счётчиком
+export type TIngredientWithCount = TIngredient & {
+  count: number;
+};

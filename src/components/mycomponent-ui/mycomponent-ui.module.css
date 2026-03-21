@@ -149,3 +149,271 @@
   background: #1c1c21;
   border-radius: 40px;
 }
+
+.empty_bun_placeholder {
+  padding: 20px;
+  text-align: center;
+  background-color: #2f2f37;
+  border-radius: 40px;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #8585ad;
+  margin-left: 32px;
+}
+
+.empty_bun_top_placeholder {
+  border-radius: 88px 88px 40px 40px;
+}
+
+.empty_bun_bottom_placeholder {
+  border-radius: 40px 40px 88px 88px;
+}
+
+.empty_ingredients_placeholder {
+  padding: 60px 20px;
+  text-align: center;
+  background-color: #2f2f37;
+  border-radius: 40px;
+  border: 2px dashed #8585ad;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Заглушка для пустой булки */
+.empty_bun {
+  padding: 20px;
+  text-align: center;
+  background-color: #2f2f37;
+  border-radius: 40px;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #8585ad;
+  margin-left: 32px;
+}
+
+.empty_bun_top {
+  border-radius: 88px 88px 40px 40px;
+}
+
+.empty_bun_bottom {
+  border-radius: 40px 40px 88px 88px;
+}
+
+.empty_ingredients {
+  padding: 60px 20px;
+  text-align: center;
+  background-color: #2f2f37;
+  border-radius: 40px;
+  border: 2px dashed #8585ad;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.order_section {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 40px;
+  margin-top: 16px;
+}
+
+.price_container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hover {
+  opacity: 0.9};
+
+  .burger_constructor {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.bun_top,
+.bun_bottom {
+  margin-left: 32px;
+  width: calc(100% - 32px);
+}
+
+/* Заглушка для булки */
+.empty_bun {
+  padding: 16px 24px;
+  text-align: center;
+  background-color: #2f2f37;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #8585ad;
+  margin-left: 32px;
+  width: calc(100% - 32px);
+  min-height: 80px;
+  box-sizing: border-box;
+}
+
+.empty_bun_top {
+  border-radius: 88px 88px 40px 40px;
+}
+
+.empty_bun_bottom {
+  border-radius: 40px 40px 88px 88px;
+}
+
+.empty_bun p {
+  margin: 0;
+}
+
+/* Контейнер для ингредиентов */
+.ingredients_container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 464px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.ingredients_container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ingredients_container::-webkit-scrollbar-track {
+  background: #2f2f37;
+}
+
+.ingredients_container::-webkit-scrollbar-thumb {
+  background: #8585ad;
+}
+
+/* Элемент ингредиента */
+.ingredient_item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: move;
+  width: 100%;
+}
+
+.ingredient_item > div:last-child {
+  flex: 1;
+  width: 100%;
+}
+
+/* Заглушка для пустых ингредиентов */
+.empty_ingredients {
+  padding: 20px 24px;
+  text-align: center;
+  background-color: #2f2f37;
+  border-radius: 40px;
+  border: 2px dashed #8585ad;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.empty_ingredients p {
+  margin: 0;
+}
+
+/* Общая заглушка для пустого состояния */
+.empty_state {
+  padding: 60px 20px;
+  text-align: center;
+  background-color: #2f2f37;
+  border-radius: 40px;
+  border: 2px dashed #8585ad;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.order_section {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 40px;
+  margin-top: 16px;
+}
+
+.price_container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hover {
+  opacity: 0.9;
+  background-color: rgba(76, 76, 255, 0.05);
+  border-radius: 40px;
+}
+
+.empty_bun {
+  margin-left: 32px;
+  width: calc(100% - 32px);
+  min-height: 80px;
+  padding: 16px 24px;
+  background-color: #2f2f37;
+  border: 2px dashed #8585ad;
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.empty_bun_top {
+  border-radius: 88px 88px 40px 40px;
+}
+
+.empty_bun_bottom {
+  border-radius: 40px 40px 88px 88px;
+}
+
+/* Заглушка для ингредиента - точные размеры как у ConstructorElement */
+.empty_ingredients {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 24px;
+  background-color: #2f2f37;
+  border: 2px dashed #8585ad;
+  border-radius: 40px;
+  min-height: 80px;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Добавляем псевдоэлемент для имитации иконки DragIcon */
+.empty_ingredients::before {
+  content: '⋮⋮';
+  font-size: 24px;
+  color: #8585ad;
+  margin-right: 8px;
+  width: 24px;
+  text-align: center;
+  opacity: 0.5;
+}
+
+.empty_ingredients p {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}

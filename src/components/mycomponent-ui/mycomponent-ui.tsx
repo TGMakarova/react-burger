@@ -1,10 +1,15 @@
+import { useRef } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
 import {
   Button,
   ConstructorElement,
   DragIcon,
   CurrencyIcon,
 } from '@krgaa/react-developer-burger-ui-components';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { removeIngredient, moveIngredient } from '../../services/slices/burgerConstructorSlice';
+import type { AppDispatch, RootState } from '../../services/store';
+import type { ConstructorIngredient } from '../../services/slices/burgerConstructorSlice';
 import styles from './mycomponent-ui.module.css';
 import type { TIngredient } from '@utils/types.ts';
 
@@ -19,68 +24,99 @@ export const MyComponentUI = ({
   onOrderClick,
   isLoading,
 }: MyComponentUIProps): React.JSX.Element => {
-  // Разделяем булки и остальные ингредиенты
-  const bun = ingredients.find(item => item.type === 'bun');
-  const otherIngredients = ingredients.filter(item => item.type !== 'bun');
-
+  const dispatch = useDispatch<AppDispatch>();
+  
+  // Получаем данные напрямую из Redux store
+  const { bun, ingredients: storeIngredients } = useSelector(
+    (state: RootState) => {
+      console.log('📦 MyComponentUI Redux state:', {
+        bun: state.burgerConstructor.bun?.name,
+        ingredientsCount: state.burgerConstructor.ingredients.length
+      });
+      return state.burgerConstructor;
+    }
+  );
+  
+  console.log('🍔 Bun from Redux:', bun);
+  console.log('📋 Store ingredients:', storeIngredients);
+  console.log('🎨 Props ingredients (display):', ingredients);
+  
+  // Для отображения используем данные из Redux
+  const displayBun = bun;
+  const displayIngredients = storeIngredients;
+  
   // Подсчет общей стоимости
-  const totalPrice = (bun?.price || 0) * 2 + 
-    otherIngredients.reduce((sum, item) => sum + item.price, 0);
+  const totalPrice = (displayBun?.price || 0) * 2 + 
+    displayIngredients.reduce((sum, item) => sum + item.price, 0);
 
-  // Проверка на наличие ингредиентов
-  if (!ingredients || ingredients.length === 0) {
-    return (
-      <div className={styles.empty_state}>
-        <p className="text text_type_main-default text_color_inactive">
-          Добавьте ингредиенты в конструктор
-        </p>
-      </div>
-    );
-  }
+  const handleRemove = (constructorId: string) => {
+    console.log('🗑️ Removing ingredient with constructorId:', constructorId);
+    dispatch(removeIngredient(constructorId));
+  };
+
+  const handleMove = (dragIndex: number, hoverIndex: number) => {
+    dispatch(moveIngredient({ dragIndex, hoverIndex }));
+  };
 
   return (
     <div className={styles.burger_constructor}>
-      {/* Верхняя булка */}
-      {bun && (
+      {/* Верхняя булка - заглушка или реальная булка */}
+      {!displayBun ? (
+        <div className={`${styles.empty_bun} ${styles.empty_bun_top}`}>
+          <p className="text text_type_main-default text_color_inactive">
+            Перетащите булку сюда (верх)
+          </p>
+        </div>
+      ) : (
         <div className={styles.bun_top}>
           <ConstructorElement
             handleClose={() => {}}
             isLocked={true}
-            price={bun.price}
-            text={`${bun.name} (верх)`}
-            thumbnail={bun.image}
+            price={displayBun.price}
+            text={`${displayBun.name} (верх)`}
+            thumbnail={displayBun.image}
             type="top"
           />
         </div>
       )}
 
       {/* Контейнер для ингредиентов */}
-      {otherIngredients.length > 0 && (
-        <div className={styles.ingredients_container}>
-          {otherIngredients.map((ingredient, index) => (
-            <div key={`${ingredient._id}-${index}`} className={styles.ingredient_item}>
-              <DragIcon type="secondary" />
-              <ConstructorElement
-                handleClose={() => {}}
-                isLocked={false}
-                price={ingredient.price}
-                text={ingredient.name}
-                thumbnail={ingredient.image}
-              />
-            </div>
-          ))}
-        </div>
-      )}
+      <div className={styles.ingredients_container}>
+        {displayIngredients.length === 0 ? (
+          <div className={styles.empty_ingredients}>
+            <p className="text text_type_main-default text_color_inactive">
+              Перетащите начинку сюда
+            </p>
+          </div>
+        ) : (
+          displayIngredients.map((ingredient, index) => (
+            <DraggableIngredient
+              key={ingredient.constructorId}
+              ingredient={ingredient}
+              constructorId={ingredient.constructorId}
+              index={index}
+              onRemove={handleRemove}
+              onMove={handleMove}
+            />
+          ))
+        )}
+      </div>
 
       {/* Нижняя булка */}
-      {bun && (
+      {!displayBun ? (
+        <div className={`${styles.empty_bun} ${styles.empty_bun_bottom}`}>
+          <p className="text text_type_main-default text_color_inactive">
+            Перетащите булку сюда (низ)
+          </p>
+        </div>
+      ) : (
         <div className={styles.bun_bottom}>
           <ConstructorElement
             handleClose={() => {}}
             isLocked={true}
-            price={bun.price}
-            text={`${bun.name} (низ)`}
-            thumbnail={bun.image}
+            price={displayBun.price}
+            text={`${displayBun.name} (низ)`}
+            thumbnail={displayBun.image}
             type="bottom"
           />
         </div>
@@ -98,11 +134,84 @@ export const MyComponentUI = ({
           type="primary"
           size="large"
           onClick={onOrderClick}
-          disabled={isLoading || !bun || otherIngredients.length === 0}
+          disabled={isLoading || !displayBun || displayIngredients.length === 0}
         >
           {isLoading ? 'Оформляем...' : 'Оформить заказ'}
         </Button>
       </div>
+    </div>
+  );
+};
+
+// Компонент перетаскиваемого ингредиента
+const DraggableIngredient = ({ 
+  ingredient, 
+  constructorId, 
+  index, 
+  onRemove, 
+  onMove 
+}: { 
+  ingredient: ConstructorIngredient;
+  constructorId: string;
+  index: number;
+  onRemove: (id: string) => void;
+  onMove: (dragIndex: number, hoverIndex: number) => void;
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+  
+  const [{ isDragging }, drag] = useDrag({
+    type: 'constructor-ingredient',
+    item: { index, type: 'constructor-ingredient' },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  const [, drop] = useDrop({
+    accept: 'constructor-ingredient',
+    hover: (item: { index: number }, monitor) => {
+      if (!ref.current) return;
+      
+      const dragIndex = item.index;
+      const hoverIndex = index;
+      
+      if (dragIndex === hoverIndex) return;
+      
+      const hoverBoundingRect = ref.current.getBoundingClientRect();
+      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      const clientOffset = monitor.getClientOffset();
+      const hoverClientY = (clientOffset?.y || 0) - hoverBoundingRect.top;
+      
+      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return;
+      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return;
+      
+      onMove(dragIndex, hoverIndex);
+      item.index = hoverIndex;
+    },
+  });
+
+  drag(drop(ref));
+
+  const handleRemoveClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    console.log('❌ Remove button clicked for:', ingredient.name, constructorId);
+    onRemove(constructorId);
+  };
+
+  return (
+    <div
+      ref={ref}
+      className={styles.ingredient_item}
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+    >
+      <DragIcon type="secondary" />
+      <ConstructorElement
+        handleClose={handleRemoveClick}
+        isLocked={false}
+        price={ingredient.price}
+        text={ingredient.name}
+        thumbnail={ingredient.image}
+      />
     </div>
   );
 };

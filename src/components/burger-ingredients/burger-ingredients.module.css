@@ -40,3 +40,30 @@
   overflow-y: auto;
   scroll-behavior: smooth;
 }
+
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 24px;
+}
+
+.error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  gap: 16px;
+  color: #ff0000;
+}
+
+.error button {
+  padding: 8px 16px;
+  background-color: #4c4cff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}

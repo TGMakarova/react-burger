@@ -114,7 +114,7 @@ export const IngredientsDetailsUI = ({ setCategoryRef }: IngredientsDetailsUIPro
     {}
   );
 
-  const sortedTypes = ['bun', 'main', 'sauce'];
+  const sortedTypes = ['bun', 'sauce', 'main'];
 
   return (
     <div className={styles.ingredients_container}>
@@ -124,9 +124,9 @@ export const IngredientsDetailsUI = ({ setCategoryRef }: IngredientsDetailsUIPro
           const titleRef =
             type === 'bun'
               ? bunTitleRef
-              : type === 'main'
-                ? mainTitleRef
-                : sauceTitleRef;
+              : type === 'sauce'
+                ? sauceTitleRef
+                : mainTitleRef;
 
           return (
             <div key={type}>
@@ -136,11 +136,9 @@ export const IngredientsDetailsUI = ({ setCategoryRef }: IngredientsDetailsUIPro
               >
                 {type === 'bun'
                   ? 'Булки'
-                  : type === 'main'
-                    ? 'Начинки'
-                    : type === 'sauce'
-                      ? 'Соусы'
-                      : type}
+                  : type === 'sauce'
+                    ? 'Соусы'
+                    : 'Начинки'}
               </div>
               <div className={styles.ingredients_grid}>
                 {ingredientsOfType.map((ingredient) => (

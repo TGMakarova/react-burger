@@ -1,12 +1,21 @@
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux'; // Добавлен импорт для Redux
 import { IngredientsDetailsUI } from '../ingredients-details-ui/ingredients-details-ui';
+import { fetchIngredients } from '../../services/slices/ingredientsSlice'; // Импорт для загрузки ингредиентов
+import type { AppDispatch, RootState } from '../../services/store';
 import styles from './burger-ingredients.module.css';
 
 type CategoryType = 'bun' | 'sauce' | 'main';
 
 export const BurgerIngredients = (): React.JSX.Element => {
+  const dispatch = useDispatch<AppDispatch>();
   const [currentTab, setCurrentTab] = useState<CategoryType>('bun');
+  
+  // Получаем ингредиенты из Redux
+  const { items: ingredients, loading, error } = useSelector(
+    (state: RootState) => state.ingredients
+  );
 
   const categoryRefs = useRef<{
     bun: HTMLDivElement | null;
@@ -19,6 +28,13 @@ export const BurgerIngredients = (): React.JSX.Element => {
   });
 
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Загружаем ингредиенты при монтировании компонента
+  useEffect(() => {
+    if (ingredients.length === 0 && !loading) {
+      dispatch(fetchIngredients());
+    }
+  }, [dispatch, ingredients.length, loading]);
 
   // Функция для установки рефов
   const setCategoryRef = useCallback(
@@ -66,6 +82,29 @@ export const BurgerIngredients = (): React.JSX.Element => {
     }
   };
 
+  // Отображение состояния загрузки
+  if (loading && ingredients.length === 0) {
+    return (
+      <section className={styles.burger_ingredients}>
+        <div className={styles.loader}>Загрузка ингредиентов...</div>
+      </section>
+    );
+  }
+
+  // Отображение ошибки
+  if (error) {
+    return (
+      <section className={styles.burger_ingredients}>
+        <div className={styles.error}>
+          Ошибка: {error}
+          <button onClick={() => dispatch(fetchIngredients())}>
+            Попробовать снова
+          </button>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className={styles.burger_ingredients}>
       <nav>
@@ -78,23 +117,22 @@ export const BurgerIngredients = (): React.JSX.Element => {
             Булки
           </Tab>
           <Tab
-            value="main"
-            active={currentTab === 'main'}
-            onClick={() => scrollToCategory('main')}
-          >
-            Начинки
-          </Tab>
-          <Tab
             value="sauce"
             active={currentTab === 'sauce'}
             onClick={() => scrollToCategory('sauce')}
           >
             Соусы
           </Tab>
+          <Tab
+            value="main"
+            active={currentTab === 'main'}
+            onClick={() => scrollToCategory('main')}
+          >
+            Начинки
+          </Tab>
         </ul>
       </nav>
       <div ref={containerRef} className={styles.ingredients_scroll_container}>
-        {/* Больше не передаем ingredients */}
         <IngredientsDetailsUI setCategoryRef={setCategoryRef} />
       </div>
     </section>

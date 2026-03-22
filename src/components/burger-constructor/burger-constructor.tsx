@@ -5,13 +5,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { MyComponentUI } from '../mycomponent-ui/mycomponent-ui';
 import { OtherDetails } from '../other-details/other-details';
 import { submitOrder, clearOrder } from '../../services/slices/orderSlice';
-import { addIngredient } from '../../services/slices/burgerConstructorSlice';
+import { addIngredient, clearConstructor } from '../../services/slices/burgerConstructorSlice';
 import type { TIngredient } from '@utils/types';
 import type { ConstructorIngredient } from '../../services/slices/burgerConstructorSlice';
 import type { AppDispatch, RootState } from '../../services/store';
 import styles from './burger-constructor.module.css';
 
-// Удаляем типизацию пропсов - компонент не принимает props
 export const BurgerConstructor = (): React.JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
   const dropRef = useRef<HTMLElement>(null);
@@ -84,6 +83,11 @@ export const BurgerConstructor = (): React.JSX.Element => {
 
       if (submitOrder.fulfilled.match(resultAction)) {
         console.log('✅ Order successful!');
+        
+        // 🔥 ВАЖНО: Очищаем конструктор после успешного заказа
+        dispatch(clearConstructor());
+        
+        // Открываем модальное окно с номером заказа
         setIsModalOpen(true);
       } else if (submitOrder.rejected.match(resultAction)) {
         console.error('❌ Order failed:', resultAction.error);

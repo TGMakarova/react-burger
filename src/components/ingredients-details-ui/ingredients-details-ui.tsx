@@ -10,19 +10,18 @@ import type { TIngredient } from '@utils/types';
 import styles from './ingredients-details-ui.module.css';
 
 type IngredientsDetailsUIProps = {
-  ingredients: TIngredient[];
   setCategoryRef: (
     type: 'bun' | 'sauce' | 'main',
     element: HTMLDivElement | null
   ) => void;
 };
 
-export const IngredientsDetailsUI = ({
-  ingredients,
-  setCategoryRef,
-}: IngredientsDetailsUIProps) => {
+export const IngredientsDetailsUI = ({ setCategoryRef }: IngredientsDetailsUIProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
+  // Получаем ингредиенты из Redux store
+  const ingredients = useSelector((state: RootState) => state.ingredients.items);
+  
   // Используем мемоизированный селектор для получения ингредиентов с счётчиками
   const ingredientsWithCounts = useSelector(selectIngredientsWithCounts);
 
@@ -60,7 +59,7 @@ export const IngredientsDetailsUI = ({
 
     const [{ isDragging }, drag] = useDrag({
       type: 'ingredient',
-      item: (): TIngredient => ({ ...ingredient }), // ← Явно указываем тип возвращаемого значения
+      item: (): TIngredient => ({ ...ingredient }),
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
@@ -102,6 +101,7 @@ export const IngredientsDetailsUI = ({
     );
   };
 
+  // Группируем ингредиенты по типам
   const groupedIngredients = ingredients.reduce<Record<string, TIngredient[]>>(
     (acc, item) => {
       const key = item.type;
@@ -120,7 +120,7 @@ export const IngredientsDetailsUI = ({
     <div className={styles.ingredients_container}>
       {sortedTypes.map((type) => {
         const ingredientsOfType = groupedIngredients[type];
-        if (ingredientsOfType) {
+        if (ingredientsOfType && ingredientsOfType.length > 0) {
           const titleRef =
             type === 'bun'
               ? bunTitleRef

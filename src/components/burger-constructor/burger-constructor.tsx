@@ -11,6 +11,7 @@ import type { ConstructorIngredient } from '../../services/slices/burgerConstruc
 import type { AppDispatch, RootState } from '../../services/store';
 import styles from './burger-constructor.module.css';
 
+// Удаляем типизацию пропсов - компонент не принимает props
 export const BurgerConstructor = (): React.JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
   const dropRef = useRef<HTMLElement>(null);

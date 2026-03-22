@@ -15,7 +15,6 @@ export const App = (): React.JSX.Element => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
-    items: ingredients,
     loading,
     error,
   } = useSelector((state: RootState) => state.ingredients);
@@ -62,7 +61,7 @@ export const App = (): React.JSX.Element => {
           Соберите бургер
         </h1>
         <main className={`${styles.main} pl-5 pr-5`}>
-          <BurgerIngredients ingredients={ingredients} />
+          <BurgerIngredients />
           <BurgerConstructor />
         </main>
         <IngredientDetails

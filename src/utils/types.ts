@@ -12,3 +12,13 @@ export type TIngredient = {
   image_mobile: string;
   __v: number;
 };
+
+export type TOrder = {
+  _id: string;
+  ingredients: string[];
+  status: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+  number: number;
+};

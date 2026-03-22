@@ -1,0 +1,31 @@
+.other_details_content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 60px;
+}
+
+.other_details_id {
+  display: flex;
+}
+
+.other_details_id_text {
+  display: flex;
+  padding-top: 32px;
+  padding-bottom: 60px;
+}
+
+.other_details_order_text {
+  padding-top: 60px;
+  display: flex;
+}
+
+.other_details_finish_text {
+  display: flex;
+  padding-top: 8px;
+  padding-bottom: 120px;
+}
+
+.icon_container {
+  margin-bottom: 60px;
+}

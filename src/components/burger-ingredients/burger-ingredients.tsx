@@ -1,18 +1,11 @@
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { IngredientsDetailsUI } from '../ingredients-details-ui/ingredients-details-ui';
-import type { TIngredient } from '@utils/types';
 import styles from './burger-ingredients.module.css';
-
-type TBurgerIngredientsProps = {
-  ingredients: TIngredient[];
-};
 
 type CategoryType = 'bun' | 'sauce' | 'main';
 
-export const BurgerIngredients = ({
-  ingredients,
-}: TBurgerIngredientsProps): React.JSX.Element => {
+export const BurgerIngredients = (): React.JSX.Element => {
   const [currentTab, setCurrentTab] = useState<CategoryType>('bun');
 
   const categoryRefs = useRef<{
@@ -26,7 +19,6 @@ export const BurgerIngredients = ({
   });
 
   const containerRef = useRef<HTMLDivElement>(null);
-  //Обработчик клика по ингредиенту
 
   // Функция для установки рефов
   const setCategoryRef = useCallback(
@@ -102,10 +94,8 @@ export const BurgerIngredients = ({
         </ul>
       </nav>
       <div ref={containerRef} className={styles.ingredients_scroll_container}>
-        <IngredientsDetailsUI
-          ingredients={ingredients}
-          setCategoryRef={setCategoryRef}
-        />
+        {/* Больше не передаем ingredients */}
+        <IngredientsDetailsUI setCategoryRef={setCategoryRef} />
       </div>
     </section>
   );

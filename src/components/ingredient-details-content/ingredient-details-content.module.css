@@ -1,0 +1,49 @@
+.ingredient_element {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 400px;
+
+  padding-top: 16px;
+  color: var(--text-primary-color);
+  font-family: 'Jet Brains Mono', serif;
+}
+
+.ingredient_picture {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/*.ingredient_price {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}*/
+
+.ingredient_name {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 16px;
+}
+
+.ingredient_container {
+  display: grid;
+  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(4, 1fr);
+  min-width: 150px;
+  min-height: 20px;
+  column-gap: 20px;
+  padding-top: 32px;
+  padding-bottom: 20px;
+}
+
+.ingredient_item {
+  display: flex;
+  flex-direction: colomn;
+  justify-content: center;
+  align-content: center;
+  padding-top: 8px;
+}

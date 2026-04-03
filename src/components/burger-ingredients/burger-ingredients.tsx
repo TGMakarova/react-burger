@@ -1,8 +1,8 @@
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux'; // Добавлен импорт для Redux
+import { useDispatch, useSelector } from 'react-redux';
 import { IngredientsDetailsUI } from '../ingredients-details-ui/ingredients-details-ui';
-import { fetchIngredients } from '../../services/slices/ingredientsSlice'; // Импорт для загрузки ингредиентов
+import { fetchIngredients } from '../../services/slices/ingredientsSlice';
 import type { AppDispatch, RootState } from '../../services/store';
 import styles from './burger-ingredients.module.css';
 

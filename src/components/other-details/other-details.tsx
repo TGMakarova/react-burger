@@ -1,15 +1,15 @@
 
 import { Modal } from '../modal/modal';
+import { OtherDetailsContent } from '../other-details-content/other-details-content';
 import styles from './other-details.module.css';
-import {OtherDetailsContent} from '../other-details-content/other-details-content'
 
 type OtherDetailsProps = {
   isOpen: boolean;
   onClose: () => void;
-  children?: React.ReactNode; // делаем children опциональным
+  children?: React.ReactNode;
   header?: string | null;
-  orderNumber?: number | null; // добавляем пропс для номера заказа
-  error?: string | null; // добавляем пропс для ошибки
+  orderNumber?: number | null;
+  error?: string | null;
 };
 
 export const OtherDetails = ({
@@ -22,7 +22,7 @@ export const OtherDetails = ({
   if (error) {
     return (
       <Modal {...modalProps}>
-        <div className={styles.other_details_content}>
+        <div className={styles.error_content}>
           <h2 className="text text_type_main-medium mb-6">Ошибка</h2>
           <p className="text text_type_main-default mb-10">{error}</p>
         </div>
@@ -34,7 +34,7 @@ export const OtherDetails = ({
   if (orderNumber) {
     return (
       <Modal {...modalProps}>
-       <OtherDetailsContent orderNumber={orderNumber} />
+        <OtherDetailsContent orderNumber={orderNumber} />
       </Modal>
     );
   }

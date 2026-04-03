@@ -2,7 +2,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 60px;
+  /*padding-top: 60px;
+   align-items: center;*/
+  justify-content: center;
+  text-align: center;
+  padding: 20px 0;
+  min-width: 520px;
+  min-height: 460px;
 }
 
 .other_details_id {

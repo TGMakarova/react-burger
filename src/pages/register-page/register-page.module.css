@@ -1,0 +1,49 @@
+.register_container {
+    display: flex;
+    width: 480px;
+    height: 478px;
+    flex-direction: column;
+    margin: auto;
+    border: 1px solid red;
+    color:white; 
+}
+
+.mail_container {
+    display: flex;
+    padding-top:24px;
+    padding-bottom: 80px;
+    gap:24px;
+    border: 1px solid yellow;
+    flex-direction: column;
+}
+
+.size_button {
+    display: flex;
+    border: 1px solid blanchedalmond;
+    width: 50%;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.registration_container {
+    display: grid;
+    grid-template-columns: 1fx 1fx;
+    flex-direction: row;
+    width:100%;
+    column-gap: 10px;
+   
+}
+
+.grid_item_1 {
+grid-row: 1;
+grid-column: 1;
+text-align: end;
+}
+
+.grid_item_2 {
+grid-row: 1;
+grid-column: 2;
+}
+

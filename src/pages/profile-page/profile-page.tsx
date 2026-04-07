@@ -1,56 +1,94 @@
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { BurgerIngredients } from '@/components/burger-ingredients/burger-ingredients';
-import { AppHeader } from '@components/app-header/app-header';
-import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
-import type { AppDispatch, RootState } from '@/services/store/index';
-import styles from './home.module.css';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchIngredients } from '@/services/slices/ingredientsSlice';
-import { useEffect } from 'react';
-// Убираем useNavigate и useLocation - они не нужны
+import {
+  Button,
+  EmailInput,
+  PasswordInput,
+  Input,
+} from '@krgaa/react-developer-burger-ui-components';
 
-export const Home = (): React.JSX.Element => {
-  const dispatch = useDispatch<AppDispatch>();
+import { checkResponse } from '@/utils/api';
+import styles from './profile-page.module.css';
+import { useState } from 'react';
 
-  const {
-    loading,
-    error,
-  } = useSelector((state: RootState) => state.ingredients);
-
-  useEffect(() => {
-    dispatch(fetchIngredients());
-  }, [dispatch]);
-
-  if (loading) {
-    return (
-      <div className={styles.loading}>
-        <p className="text text_type_main-large">Загрузка ингредиентов...</p>
-      </div>
+interface RegisterResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+export const ProfilePage = (): React.JSX.Element => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const handleRegister = async () => {
+    const response = await fetch(
+      'https://new-stellarburgers.education-services.ru/api/auth/register',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
+      }
     );
-  }
+    try {
+      const data: RegisterResponse = await checkResponse(response);
+      const { accessToken, refreshToken } = data;
 
-  if (error) {
-    return (
-      <div className={styles.error}>
-        <p className="text text_type_main-large">Ошибка: {error}</p>
-      </div>
-    );
-  }
+      if (accessToken && refreshToken) {
+        // Сохраняем токен в localStorage
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        console.log('Токены успешно сохранены:', accessToken, refreshToken);
+      } else {
+        console.error('Токены не найдены в ответе сервера');
+      }
+      console.log('Регистрация прошла успешно:', data);
+    } catch (error) {
+      console.error('Ошибка регистрации:', error);
+    }
+  };
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className={styles.app}>
-       
-        <h1 className={`${styles.title} text text_type_main-large mt-10 mb-5 pl-5`}>
-          Соберите бургер
-        </h1>
-        <main className={`${styles.main} pl-5 pr-5`}>
-          <BurgerIngredients />
-          <BurgerConstructor />
-        </main>
-        {/* IngredientDetails больше не рендерится здесь */}
+    <div className={styles.register_container}>
+      <div>
+        <div className={styles.header_container}>
+          <p className={`text text_type_main-medium mb-6`}> Профиль </p>
+          <p className={`text text_type_main-medium mb-6 text_color_inactive `}>
+            {' '}
+            История заказов{' '}
+          </p>
+          <p className={`text text_type_main-medium mb-6 text_color_inactive `}>
+            {' '}
+            Выход
+          </p>
+        </div>
+        <p className={`text text_type_main-medium mb-6  text_color_inactive`}>
+          В этом разделе вы можете изменить свои персональные данные
+        </p>
       </div>
-    </DndProvider>
+      <div className={styles.mail_container}>
+        <EmailInput
+          errorText="Ошибка"
+          isIcon
+          name="name"
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Имя"
+          size="default"
+          value={name}
+        />
+        <EmailInput
+          isIcon
+          name="email"
+          placeholder="Логин"
+          onChange={(e) => setEmail(e.target.value)}
+          value={email}
+        />
+        <EmailInput
+          isIcon
+          name="password"
+          placeholder="Пароль"
+          onChange={(e) => setPassword(e.target.value)}
+          value={password}
+        />
+      </div>
+    </div>
   );
 };

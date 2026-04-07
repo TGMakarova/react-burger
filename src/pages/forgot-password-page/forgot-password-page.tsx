@@ -1,56 +1,80 @@
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { BurgerIngredients } from '@/components/burger-ingredients/burger-ingredients';
-import { AppHeader } from '@components/app-header/app-header';
-import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
-import type { AppDispatch, RootState } from '@/services/store/index';
-import styles from './home.module.css';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchIngredients } from '@/services/slices/ingredientsSlice';
-import { useEffect } from 'react';
-// Убираем useNavigate и useLocation - они не нужны
+import {
+  Button,
+  EmailInput,
+  PasswordInput,
+} from '@krgaa/react-developer-burger-ui-components';
+import styles from './forgot-password-page.module.css';
+import { checkResponse } from '@/utils/api';
 
-export const Home = (): React.JSX.Element => {
-  const dispatch = useDispatch<AppDispatch>();
+import { useState } from 'react';
 
-  const {
-    loading,
-    error,
-  } = useSelector((state: RootState) => state.ingredients);
+interface RegisterResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+export const ForgotPasswordPage = (): React.JSX.Element => {
+  const [email, setEmail] = useState('');
 
-  useEffect(() => {
-    dispatch(fetchIngredients());
-  }, [dispatch]);
 
-  if (loading) {
-    return (
-      <div className={styles.loading}>
-        <p className="text text_type_main-large">Загрузка ингредиентов...</p>
-      </div>
+  const handleRegister = async () => {
+    const response = await fetch(
+      'https://new-stellarburgers.education-services.ru/api/password-reset',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email}),
+      }
     );
-  }
+    try {
+      const data: RegisterResponse = await checkResponse(response);
+      const { accessToken, refreshToken } = data;
 
-  if (error) {
-    return (
-      <div className={styles.error}>
-        <p className="text text_type_main-large">Ошибка: {error}</p>
-      </div>
-    );
-  }
-
+      if (accessToken && refreshToken) {
+        // Перезаписываем  токены в localStorage
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        console.log('Токены успешно сохранены:', accessToken, refreshToken);
+      } else {
+        console.error('Токены не найдены в ответе сервера');
+      }
+      console.log('Регистрация прошла успешно:', data);
+    } catch (error) {
+      console.error('Ошибка регистрации:', error);
+    }
+  };
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className={styles.app}>
-       
-        <h1 className={`${styles.title} text text_type_main-large mt-10 mb-5 pl-5`}>
-          Соберите бургер
-        </h1>
-        <main className={`${styles.main} pl-5 pr-5`}>
-          <BurgerIngredients />
-          <BurgerConstructor />
-        </main>
-        {/* IngredientDetails больше не рендерится здесь */}
+    <div className={styles.login_container}>
+      <h1 className={styles.header} >Восстановление пароля</h1>
+      <div className={styles.mail_container}>
+        <EmailInput
+          name="email"
+          placeholder='Укажите e-mail'
+          onChange={(e) => setEmail(e.target.value)}
+          value={email}
+        />
+        
+        <div className={styles.size_button}>
+          <Button onClick={handleRegister} size="large" type="primary">
+            {' '}
+            Восстановить
+          </Button>
+        </div>
       </div>
-    </DndProvider>
+      <div className={styles.registration_container}>
+        <p className={`${styles.grid_item_1} text text_type_main-default`}>
+          {' '}
+          Вспомнили пароль?{' '}
+        </p>
+        <p
+          className={`${styles.grid_item_2} text text_type_main-default text_color_inactive `}
+        >
+          {' '}
+          Войти
+        </p>
+       
+      </div>
+    </div>
   );
 };

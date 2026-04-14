@@ -1,94 +1,162 @@
-import {
-  Button,
-  EmailInput,
-  PasswordInput,
-  Input,
-} from '@krgaa/react-developer-burger-ui-components';
-
-import { checkResponse } from '@/utils/api';
+import { EmailInput, Button } from '@krgaa/react-developer-burger-ui-components';
 import styles from './profile-page.module.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-interface RegisterResponse {
-  accessToken: string;
-  refreshToken: string;
+// Предполагаемая структура данных пользователя
+
+interface UserData {
+  name: string;
+  email: string;
+  password?: string;
 }
+
+// Пример получения данных пользователя (замените на вашу реализацию)
+const getUserData = (): UserData => {
+  // Здесь могут быть данные из localStorage, контекста, Redux и т.д.
+  return {
+    name: 'Иван Иванов',
+    email: 'ivan@example.com',
+    password: '', // пароль не заполняем
+  };
+};
+
 export const ProfilePage = (): React.JSX.Element => {
+  // Состояния для полей формы
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const handleRegister = async () => {
-    const response = await fetch(
-      'https://new-stellarburgers.education-services.ru/api/auth/register',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password }),
-      }
-    );
-    try {
-      const data: RegisterResponse = await checkResponse(response);
-      const { accessToken, refreshToken } = data;
 
-      if (accessToken && refreshToken) {
-        // Сохраняем токен в localStorage
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
-        console.log('Токены успешно сохранены:', accessToken, refreshToken);
-      } else {
-        console.error('Токены не найдены в ответе сервера');
+  // Состояния для отслеживания изменений и загрузки
+  const [isEdited, setIsEdited] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Исходные данные пользователя
+  const [originalUser, setOriginalUser] = useState<UserData | null>(null);
+
+  // Загрузка данных пользователя при монтировании компонента
+  useEffect(() => {
+    const userData = getUserData();
+    setName(userData.name);
+    setEmail(userData.email);
+    setPassword(''); // Поле пароля всегда пустое
+    setOriginalUser(userData);
+  }, []);
+
+  // Отслеживание изменений в полях
+  useEffect(() => {
+    if (originalUser) {
+      const hasChanges =
+        name !== originalUser.name || email !== originalUser.email || password !== '';
+
+      setIsEdited(hasChanges);
+    }
+  }, [name, email, password, originalUser]);
+
+  // Обработчик отмены редактирования
+  const handleCancel = () => {
+    if (originalUser) {
+      setName(originalUser.name);
+      setEmail(originalUser.email);
+      setPassword(''); // Пароль всегда сбрасывается в пустую строку
+      setIsEdited(false);
+    }
+  };
+
+  // Обработчик сохранения
+  const handleSave = async () => {
+    setIsLoading(true);
+
+    try {
+      // Подготовка данных для отправки
+      const updateData = {
+        name: name,
+        email: email,
+        password: password, // Если пароль не редактировался, будет пустая строка
+      };
+
+      // Отправка запроса на обновление
+      const response = await fetch(
+        'https://new-stellarburgers.education-services.ru/api/auth/user',
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updateData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Ошибка при обновлении данных');
       }
-      console.log('Регистрация прошла успешно:', data);
+
+      const updatedUser = await response.json();
+
+      // Обновляем исходные данные
+      setOriginalUser({
+        name: updatedUser.name,
+        email: updatedUser.email,
+        password: '',
+      });
+
+      // Очищаем поле пароля после успешного сохранения
+      setPassword('');
+      setIsEdited(false);
+
+      // Опционально: показать уведомление об успехе
+      console.log('Данные успешно обновлены');
     } catch (error) {
-      console.error('Ошибка регистрации:', error);
+      console.error('Ошибка при сохранении:', error);
+      // Опционально: показать уведомление об ошибке
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className={styles.register_container}>
-      <div>
-        <div className={styles.header_container}>
-          <p className={`text text_type_main-medium mb-6`}> Профиль </p>
-          <p className={`text text_type_main-medium mb-6 text_color_inactive `}>
-            {' '}
-            История заказов{' '}
-          </p>
-          <p className={`text text_type_main-medium mb-6 text_color_inactive `}>
-            {' '}
-            Выход
-          </p>
+    <div className={styles.mail_container}>
+      <EmailInput
+        isIcon
+        name="name"
+        placeholder="Имя"
+        onChange={(e) => setName(e.target.value)}
+        value={name}
+      />
+      <EmailInput
+        isIcon
+        name="email"
+        placeholder="Логин"
+        onChange={(e) => setEmail(e.target.value)}
+        value={email}
+      />
+      <EmailInput
+        isIcon
+        name="password"
+        placeholder="Пароль"
+        onChange={(e) => setPassword(e.target.value)}
+        value={password}
+      />
+
+      {isEdited && (
+        <div className={styles.buttons_container}>
+          <Button
+            type="secondary"
+            onClick={handleCancel}
+            disabled={isLoading}
+            htmlType="button"
+          >
+            Отмена
+          </Button>
+          <Button
+            type="primary"
+            onClick={handleSave}
+            disabled={isLoading}
+            htmlType="button"
+          >
+            {isLoading ? 'Сохранение...' : 'Сохранить'}
+          </Button>
         </div>
-        <p className={`text text_type_main-medium mb-6  text_color_inactive`}>
-          В этом разделе вы можете изменить свои персональные данные
-        </p>
-      </div>
-      <div className={styles.mail_container}>
-        <EmailInput
-          errorText="Ошибка"
-          isIcon
-          name="name"
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Имя"
-          size="default"
-          value={name}
-        />
-        <EmailInput
-          isIcon
-          name="email"
-          placeholder="Логин"
-          onChange={(e) => setEmail(e.target.value)}
-          value={email}
-        />
-        <EmailInput
-          isIcon
-          name="password"
-          placeholder="Пароль"
-          onChange={(e) => setPassword(e.target.value)}
-          value={password}
-        />
-      </div>
+      )}
     </div>
   );
 };

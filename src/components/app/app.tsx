@@ -10,8 +10,15 @@ import { ResetPasswordPage } from '@/pages/reset-password-page/reset-password-pa
 import { AppHeader } from '../app-header/app-header';
 import { ForgotPasswordPage } from '@/pages/forgot-password-page/forgot-password-page';
 import { ProfileOrderPage } from '@/pages/profile-order-page/profile-order-page';
+import { ProfileLayout } from '@/pages/profile-layout/profile-layout';
+import ProtectedRoute from '../protected-route/propected-route';
+import PublicRoute from '../public-route/public-route';
 
-import { NotFoundPage } from '@/pages/not-found-page copy/not-found-page'; 
+<Route path="profile" element={<ProfileLayout />}>
+  <Route index element={<ProfilePage />} />
+  <Route path="orders" element={<ProfileOrderPage />} />
+</Route>;
+import { NotFoundPage } from '@/pages/not-found-page copy/not-found-page';
 
 export function App() {
   const location = useLocation();
@@ -20,16 +27,64 @@ export function App() {
   return (
     <>
       <AppHeader />
+
       <Routes location={background || location}>
+        {/* Открытые маршруты — для всех пользователей */}
         <Route path="/" element={<Home />} />
         <Route path="ingredients/:id" element={<IngredientPage />} />
-        <Route path="login-page" element={<LoginPage />} />
-        <Route path="register-page" element={<RegisterPage />} />
-        <Route path="forgot-password-page" element={<ForgotPasswordPage />} />
-        <Route path="reset-password-page" element={<ResetPasswordPage />} />
         <Route path="feed" element={<FeedPage />} />
-        <Route path="profile" element={<ProfilePage />} />
-        <Route path="profile/orders" element={<ProfileOrderPage />} />
+        <Route
+          path="login-page"
+          element={
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="register-page"
+          element={
+            <PublicRoute>
+              <RegisterPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="forgot-password-page"
+          element={
+            <PublicRoute>
+              <ForgotPasswordPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="reset-password-page"
+          element={
+            <PublicRoute>
+              <ResetPasswordPage />
+            </PublicRoute>
+          }
+        />
+
+        <Route path="profile" element={<ProfileLayout />}>
+          <Route
+            index
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="orders"
+            element={
+              <ProtectedRoute>
+                <ProfileOrderPage />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
 

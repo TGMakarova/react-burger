@@ -1,0 +1,46 @@
+.profile_container {
+  display: flex;
+  width: 83%;
+  margin: auto;
+  gap: 60px;
+  color: white;
+  /* border: 1px solid red; - можно убрать после настройки */
+}
+
+.header_container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 30px;
+  padding-top: 40px;
+  padding-bottom: 80px;
+  /* border: 1px solid greenyellow; - для отладки */
+}
+
+/* Левая часть с меню */
+.profile_sidebar {
+  flex: 0 0 320px;
+}
+
+/* Пояснительный текст */
+.description_text {
+  max-width: 320px;
+  opacity: 0.8;
+}
+
+/* Правая часть для контента (Outlet) */
+.profile_content {
+  flex: 1;
+  max-width: 480px;
+}
+
+/* Для обратной совместимости - если используешь mail_container в ProfilePage */
+.mail_container {
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  gap: 24px;
+  /* border: 1px solid yellow; - для отладки */
+}

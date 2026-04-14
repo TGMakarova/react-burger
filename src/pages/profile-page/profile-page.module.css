@@ -4,7 +4,7 @@
     flex-direction: row;
     grid-template-columns: 1fr 1fr 1fr;
     margin: auto;
-    border: 1px solid red;
+  
     color:white; 
 }
 
@@ -13,7 +13,6 @@
     padding-top: 40px;
     flex-direction: column;
     align-items: flex-start ;
-    border: 1px solid greenyellow;
     gap:30px;
     padding-bottom: 80px;
 }
@@ -25,13 +24,11 @@
     padding-top:24px;
     padding-bottom: 24px;
     gap:24px;
-    border: 1px solid yellow;
     flex-direction: column;
 }
 
 .size_button {
     display: flex;
-    border: 1px solid blanchedalmond;
     width: 50%;
     align-items: center;
     justify-content: center;
@@ -58,5 +55,12 @@ text-align: end;
 .grid_item_2 {
 grid-row: 1;
 grid-column: 2;
+}
+
+.buttons_container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 24px;
 }
 

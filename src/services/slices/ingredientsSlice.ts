@@ -3,7 +3,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { burgerApi } from '../../utils/burger-api';
 import type { TIngredient } from '../../utils/types';
 import type { RootState } from '../store';
-import type { ingredients } from '@/utils/ingredients';
+
 
 interface IngredientsState {
   items: TIngredient[];
@@ -21,9 +21,9 @@ export const fetchIngredients = createAsyncThunk(
   'ingredients/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const data = await burgerApi.getIngredients();
-      console.log(data);
-      return data.data;
+      const response = await burgerApi.getIngredients();
+      // response = { data: TIngredient[] }
+      return response.data;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Ошибка загрузки ингредиентов');
     }

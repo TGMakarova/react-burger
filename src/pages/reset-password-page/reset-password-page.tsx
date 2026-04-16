@@ -1,21 +1,24 @@
 import {
   Button,
-  EmailInput,
   PasswordInput,
+  Input,
 } from '@krgaa/react-developer-burger-ui-components';
 import styles from './reset-password-page.module.css';
-import { checkResponse } from '@/utils/api';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { burgerApi } from '@utils/burger-api';
 
-interface RegisterResponse {
-  accessToken: string;
-  refreshToken: string;
+// Правильный интерфейс для ответа сброса пароля
+interface ResetPasswordResponse {
+  success: boolean;
+  message: string;
 }
 
 export const ResetPasswordPage = (): React.ReactNode => {
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [token, setToken] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   // Проверяем флаг в useEffect, а не при рендере
@@ -27,42 +30,49 @@ export const ResetPasswordPage = (): React.ReactNode => {
     }
   }, [navigate]);
 
-  const handleRegister = async () => {
-    const response = await fetch(
-      'https://new-stellarburgers.education-services.ru/api/password-reset/reset',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        // ВНИМАНИЕ: API восстановления пароля обычно ожидает password и token, а не email и password
-        body: JSON.stringify({ password, token: email }), // email здесь используется как токен
-      }
-    );
-
+  const handleResetPassword = async () => {
+    if (!password || !token) {
+      setError('Заполните все поля');
+      return;
+    }
+    
+    setIsLoading(true);
+    setError('');
+    
     try {
-      const data: RegisterResponse = await checkResponse(response);
-      const { accessToken, refreshToken } = data;
-
-      if (accessToken && refreshToken) {
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
+      // Используем burgerApi вместо fetch
+      const data = await burgerApi.post<ResetPasswordResponse>('/auth/password-reset/reset', {
+        password: password,
+        token: token
+      });
+      
+      if (data.success) {
+        console.log('Пароль успешно изменен:', data.message);
         // Очищаем флаг после успешного сброса
         localStorage.removeItem('passwordResetRequested');
-        console.log('Токены успешно сохранены:', accessToken, refreshToken);
+        // Перенаправляем на страницу входа
         navigate('/login-page');
       } else {
-        console.error('Токены не найдены в ответе сервера');
+        setError(data.message || 'Ошибка при сбросе пароля');
       }
-      console.log('Пароль успешно изменен:', data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Ошибка изменения пароля:', error);
+      setError(error.message || 'Не удалось изменить пароль. Попробуйте позже.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className={styles.login_container}>
       <h1 className={styles.header}>Восстановление пароля</h1>
+      
+      {error && (
+        <div className={styles.error_message}>
+          {error}
+        </div>
+      )}
+      
       <div className={styles.mail_container}>
         <PasswordInput
           icon="ShowIcon"
@@ -70,20 +80,29 @@ export const ResetPasswordPage = (): React.ReactNode => {
           placeholder="Введите новый пароль"
           onChange={(e) => setPassword(e.target.value)}
           value={password}
+          disabled={isLoading}
         />
-        <EmailInput
+        <Input
           name="token"
           placeholder="Введите код из письма"
-          onChange={(e) => setEmail(e.target.value)}
-          value={email}
+          onChange={(e) => setToken(e.target.value)}
+          value={token}
+          disabled={isLoading}
         />
 
         <div className={styles.size_button}>
-          <Button onClick={handleRegister} size="large" type="primary" htmlType="button">
-            Сохранить
+          <Button 
+            onClick={handleResetPassword} 
+            size="large" 
+            type="primary" 
+            htmlType="button"
+            disabled={isLoading || !password || !token}
+          >
+            {isLoading ? 'Сохранение...' : 'Сохранить'}
           </Button>
         </div>
       </div>
+      
       <div className={styles.registration_container}>
         <p className={`${styles.grid_item_1} text text_type_main-default`}>
           Вспомнили пароль?

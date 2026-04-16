@@ -1,9 +1,11 @@
 import { checkResponse } from './api';
-
+import { BURGER_API_URL } from './burger-api';
 interface RegisterResponse {
   accessToken: string;
   refreshToken: string;
 }
+
+
 export const refreshTokens = async (): Promise<boolean> => {
   const refreshToken = localStorage.getItem('refreshToken');
 
@@ -14,7 +16,8 @@ export const refreshTokens = async (): Promise<boolean> => {
 
   try {
     const response = await fetch(
-      'https://new-stellarburgers.education-services.ru/api/auth/refresh',
+      `${BURGER_API_URL}/auth/refresh`,
+
       {
         method: 'POST',
         headers: {

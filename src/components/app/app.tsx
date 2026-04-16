@@ -13,23 +13,33 @@ import { ProfileOrderPage } from '@/pages/profile-order-page/profile-order-page'
 import { ProfileLayout } from '@/pages/profile-layout/profile-layout';
 import ProtectedRoute from '../protected-route/propected-route';
 import PublicRoute from '../public-route/public-route';
-
-<Route path="profile" element={<ProfileLayout />}>
-  <Route index element={<ProfilePage />} />
-  <Route path="orders" element={<ProfileOrderPage />} />
-</Route>;
 import { NotFoundPage } from '@/pages/not-found-page copy/not-found-page';
+import { useEffect } from 'react';
 
 export function App() {
   const location = useLocation();
   const background = location.state?.background;
+
+  // Очищаем localStorage при закрытии попапа
+  useEffect(() => {
+    if (!background) {
+      // Не очищаем сразу, даем время на восстановление
+      const timer = setTimeout(() => {
+        if (!localStorage.getItem('popupRestored')) {
+          localStorage.removeItem('popupIngredientId');
+          localStorage.removeItem('popupBackgroundPath');
+        }
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [background]);
 
   return (
     <>
       <AppHeader />
 
       <Routes location={background || location}>
-        {/* Открытые маршруты — для всех пользователей */}
         <Route path="/" element={<Home />} />
         <Route path="ingredients/:id" element={<IngredientPage />} />
         <Route path="feed" element={<FeedPage />} />
@@ -96,7 +106,13 @@ export function App() {
             element={
               <IngredientDetails
                 isOpen={true}
-                onClose={() => window.history.back()}
+                onClose={() => {
+                  // Очищаем все данные при закрытии
+                  localStorage.removeItem('popupIngredientId');
+                  localStorage.removeItem('popupBackgroundPath');
+                  localStorage.removeItem('popupRestored');
+                  window.history.back();
+                }}
                 header={'Детали ингредиента'}
               />
             }

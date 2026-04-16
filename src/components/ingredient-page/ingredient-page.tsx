@@ -8,20 +8,13 @@ import { fetchIngredients } from '@/services/slices/ingredientsSlice';
 
 export const IngredientPage = () => {
   const { id } = useParams();
-  const dispatch = useDispatch<AppDispatch>();
+  //const dispatch = useDispatch<AppDispatch>();
 
-   const ingredients = useSelector((state: RootState) => state.ingredients.items);
+  const ingredients = useSelector((state: RootState) => state.ingredients.items);
   const loading = useSelector((state: RootState) => state.ingredients.loading);
   const error = useSelector((state: RootState) => state.ingredients.error);
-  
-  
-  useEffect(() => {
-    if (ingredients.length === 0 && !loading && !error) {
-      dispatch(fetchIngredients());
-    }
-  }, [dispatch, ingredients.length, loading, error]);
-  
-  const ingredient = ingredients.find(item => item._id === id);
+
+  const ingredient = ingredients.find((item) => item._id === id);
 
   if (loading) {
     return <div className={styles.not_found}>Загрузка...</div>;
@@ -50,9 +43,7 @@ export const IngredientPage = () => {
   return (
     <div className={styles.ingredient_page}>
       <div className={styles.container}>
-        <h1 className="text text_type_main-large mb-5">
-          Детали ингредиента
-        </h1>
+        <h1 className="text text_type_main-large mb-5">Детали ингредиента</h1>
         <IngredientDetailsContent ingredient={ingredient} />
       </div>
     </div>

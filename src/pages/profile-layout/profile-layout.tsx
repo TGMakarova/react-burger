@@ -1,25 +1,64 @@
 import { useNavigate } from 'react-router-dom';
 import { Outlet, NavLink } from 'react-router-dom';
 import styles from './profile-layout.module.css';
+import { burgerApi } from '@utils/burger-api';
+import { useState } from 'react';
+
+interface LogoutResponse {
+  success: boolean;
+  message?: string;
+}
 
 export function ProfileLayout() {
-  const navigate = useNavigate(); // Обновлённый хук
+  const navigate = useNavigate();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [error, setError] = useState('');
 
   const handleLogout = async () => {
+    if (isLoggingOut) return;
+    
+    setIsLoggingOut(true);
+    setError('');
+    
     try {
-      await fetch('https://new-stellarburgers.education-services.ru/api/auth/logout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
+      const refreshToken = localStorage.getItem('refreshToken');
+      
+      if (!refreshToken) {
+        console.warn('Нет refreshToken для выхода');
+        // Если нет токена, просто очищаем localStorage
+        localStorage.clear();
+        navigate('/login-page');
+        return;
+      }
+      
+      // Используем burgerApi для выхода
+      const data = await burgerApi.post<LogoutResponse>('/auth/logout', {
+        token: refreshToken
       });
-
-      localStorage.removeItem('accessToken');
-
+      
+      if (data.success) {
+        console.log('Выход выполнен успешно');
+      }
+      
+      // Полная очистка localStorage
+      localStorage.clear();
+      
+      // Перенаправляем на страницу входа
       navigate('/login-page');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Ошибка при выходе:', error);
+      setError(error.message || 'Ошибка при выходе');
+      
+      // Даже при ошибке очищаем токены
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      
+      // Небольшая задержка перед редиректом, чтобы пользователь увидел ошибку
+      setTimeout(() => {
+        navigate('/login-page');
+      }, 2000);
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -48,10 +87,19 @@ export function ProfileLayout() {
           <button
             className="text text_type_main-medium text_color_inactive"
             onClick={handleLogout}
+            disabled={isLoggingOut}
+            style={{ cursor: isLoggingOut ? 'not-allowed' : 'pointer' }}
           >
-            Выход
+            {isLoggingOut ? 'Выход...' : 'Выход'}
           </button>
         </div>
+        
+        {error && (
+          <div className={styles.error_message}>
+            {error}
+          </div>
+        )}
+        
         <p
           className={`text text_type_main-default text_color_inactive ${styles.description_text}`}
         >

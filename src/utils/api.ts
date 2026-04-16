@@ -1,19 +1,20 @@
+import { BURGER_API_URL } from './burger-api';
+
 export const checkResponse = async <T>(response: Response): Promise<T> => {
-  const data = await response.json() as T;
+  const data = (await response.json()) as T;
 
   if (!response.ok) {
     const error = {
       status: response.status,
       statusText: response.statusText,
-      message: `Ошибка ${response.status}: ${response.statusText}`, // не используем data.message
-      data: data
+      message: `Ошибка ${response.status}: ${response.statusText}`, 
+      data: data,
     };
     return Promise.reject(error);
   }
 
   return data;
 };
- 
 
 export const sendAuthRequest = async <T>(
   url: string,
@@ -30,12 +31,12 @@ export const sendAuthRequest = async <T>(
     method,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`
+      Authorization: `Bearer ${accessToken}`,
     },
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  return checkResponse(response); // Используем вашу существующую функцию
+  return checkResponse(response); 
 };
 
 export const sendWithTokenRefresh = async <T>(
@@ -48,12 +49,12 @@ export const sendWithTokenRefresh = async <T>(
       headers: {
         ...options.headers,
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-      }
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
     });
 
     return checkResponse(response);
-  } catch (error:any) {
+  } catch (error: any) {
     if (error.status === 401) {
       // Токен истёк — обновляем его
       await refreshAccessToken();
@@ -75,13 +76,12 @@ const refreshAccessToken = async () => {
   const refreshToken = localStorage.getItem('refreshToken');
   if (!refreshToken) throw new Error('Refresh token не найден');
 
-  const response = await fetch('https://new-stellarburgers.education-services.ru/api/auth/token', {
+  const response = await fetch(`${BURGER_API_URL}/auth/token`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refreshToken })
+    body: JSON.stringify({ refreshToken }),
   });
 
   const data = await checkResponse<TokenResponse>(response); // указываем ожидаемый тип
   localStorage.setItem('accessToken', data.accessToken); // теперь TypeScript знает, что accessToken есть
 };
- 

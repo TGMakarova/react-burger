@@ -6,7 +6,7 @@ import type { AppDispatch, RootState } from '@/services/store';
 import { setSelectedIngredient } from '@/services/slices/selectedIngredientSlice';
 import { selectIngredientsWithCounts } from '@/services/slices/burgerConstructorSlice';
 import type { TIngredient } from '@utils/types';
-import { useNavigate, useLocation } from 'react-router-dom'; // Добавляем
+import { useNavigate, useLocation } from 'react-router-dom';
 import styles from './ingredients-details-ui.module.css';
 
 type IngredientsDetailsUIProps = {
@@ -18,13 +18,11 @@ type IngredientsDetailsUIProps = {
 
 export const IngredientsDetailsUI = ({ setCategoryRef }: IngredientsDetailsUIProps) => {
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate(); // Добавляем
-  const location = useLocation(); // Добавляем
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Получаем ингредиенты из Redux store
   const ingredients = useSelector((state: RootState) => state.ingredients.items);
-  
-  // Убираем useParams - теперь этот компонент только для списка
   
   // Используем мемоизированный селектор для получения ингредиентов с счётчиками
   const ingredientsWithCounts = useSelector(selectIngredientsWithCounts);
@@ -48,12 +46,17 @@ export const IngredientsDetailsUI = ({ setCategoryRef }: IngredientsDetailsUIPro
   }, [setCategoryRef]);
 
   const handleIngredientClick = (ingredient: TIngredient) => {
+    // Сохраняем данные для восстановления после перезагрузки
+    localStorage.setItem('popupIngredientId', ingredient._id);
+    localStorage.setItem('popupBackgroundPath', location.pathname);
+    localStorage.removeItem('popupRestored'); // Убираем флаг восстановления при новом клике
+    
     // Сохраняем в Redux
     dispatch(setSelectedIngredient(ingredient));
     
     // Переходим на маршрут с ингредиентом
     navigate(`/ingredients/${ingredient._id}`, {
-      state: { background: location.pathname }
+      state: { background: location }
     });
   };
 

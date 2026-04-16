@@ -1,7 +1,7 @@
 import { checkResponse } from './api';
 import type { TIngredient, TOrder } from './types';
 
-const BURGER_API_URL = 'https://new-stellarburgers.education-services.ru/api';
+export const BURGER_API_URL = 'https://new-stellarburgers.education-services.ru/api';
 
 class BurgerApi {
   private baseUrl: string;

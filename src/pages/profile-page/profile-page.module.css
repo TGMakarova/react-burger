@@ -1,60 +1,59 @@
 .register_container {
-    display: grid;
-    width: 83%;
-    flex-direction: row;
-    grid-template-columns: 1fr 1fr 1fr;
-    margin: auto;
-  
-    color:white; 
+  display: grid;
+  width: 83%;
+  flex-direction: row;
+  grid-template-columns: 1fr 1fr 1fr;
+  margin: auto;
+
+  color: white;
 }
 
 .header_container {
-    display:flex;
-    padding-top: 40px;
-    flex-direction: column;
-    align-items: flex-start ;
-    gap:30px;
-    padding-bottom: 80px;
+  display: flex;
+  padding-top: 40px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 30px;
+  padding-bottom: 80px;
 }
 
 .mail_container {
-    max-width: 480px;
-    display: flex;
-    flex-direction: column;
-    padding-top:24px;
-    padding-bottom: 24px;
-    gap:24px;
-    flex-direction: column;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  gap: 24px;
+  flex-direction: column;
 }
 
 .size_button {
-    display: flex;
-    width: 50%;
-    align-items: center;
-    justify-content: center;
-    margin-left: auto;
-    margin-right: auto;
-    padding-bottom: 80px;
+  display: flex;
+  width: 50%;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 80px;
 }
 
 .registration_container {
-    display: grid;
-    grid-template-columns: 1fx 1fx;
-    flex-direction: row;
-    width:100%;
-    column-gap: 10px;
-   
+  display: grid;
+  grid-template-columns: 1fx 1fx;
+  flex-direction: row;
+  width: 100%;
+  column-gap: 10px;
 }
 
 .grid_item_1 {
-grid-row: 1;
-grid-column: 1;
-text-align: end;
+  grid-row: 1;
+  grid-column: 1;
+  text-align: end;
 }
 
 .grid_item_2 {
-grid-row: 1;
-grid-column: 2;
+  grid-row: 1;
+  grid-column: 2;
 }
 
 .buttons_container {
@@ -64,3 +63,11 @@ grid-column: 2;
   margin-top: 24px;
 }
 
+.error_message {
+}
+
+.loading_message {
+}
+
+.success_message {
+}

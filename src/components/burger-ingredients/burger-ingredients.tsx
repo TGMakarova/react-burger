@@ -29,13 +29,6 @@ export const BurgerIngredients = (): React.JSX.Element => {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Загружаем ингредиенты при монтировании компонента
-  useEffect(() => {
-    if (ingredients.length === 0 && !loading) {
-      dispatch(fetchIngredients());
-    }
-  }, [dispatch, ingredients.length, loading]);
-
   // Функция для установки рефов
   const setCategoryRef = useCallback(
     (type: CategoryType, element: HTMLDivElement | null) => {

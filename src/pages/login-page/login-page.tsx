@@ -1,18 +1,22 @@
+import { burgerApi } from '@utils/burger-api';
 import {
   Button,
   EmailInput,
   PasswordInput,
 } from '@krgaa/react-developer-burger-ui-components';
 import styles from './login-page.module.css';
-import { checkResponse } from '@/utils/api';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
-interface RegisterResponse {
+interface LoginResponse {
+  success: boolean;
   accessToken: string;
   refreshToken: string;
+  user: {
+    email: string;
+    name: string;
+  };
 }
-
 export const LoginPage = (): React.JSX.Element => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,28 +34,21 @@ export const LoginPage = (): React.JSX.Element => {
 
   const handleLogin = async () => {
     if (isLoading) return; // Предотвращаем двойной клик
-    
+
     setIsLoading(true);
     try {
-      const response = await fetch(
-        'https://new-stellarburgers.education-services.ru/api/auth/login',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, password }),
-        }
-      );
-      
-      const data: RegisterResponse = await checkResponse(response);
+      const data = await burgerApi.post<LoginResponse>('/auth/login', {
+        email,
+        password,
+      });
+
       const { accessToken, refreshToken } = data;
 
       if (accessToken && refreshToken) {
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
         console.log('Токены успешно сохранены');
-        
+
         // Проверяем, есть ли сохраненный маршрут
         const returnTo = localStorage.getItem('returnTo');
         if (returnTo) {
@@ -70,7 +67,7 @@ export const LoginPage = (): React.JSX.Element => {
       setIsLoading(false);
     }
   };
-  
+
   const handleRegister = () => {
     navigate('/register-page');
   };
@@ -95,9 +92,9 @@ export const LoginPage = (): React.JSX.Element => {
           value={password}
         />
         <div className={styles.size_button}>
-          <Button 
-            onClick={handleLogin} 
-            size="large" 
+          <Button
+            onClick={handleLogin}
+            size="large"
             type="primary"
             disabled={isLoading}
             htmlType="button"

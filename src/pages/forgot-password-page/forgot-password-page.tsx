@@ -1,75 +1,97 @@
 import { Button, EmailInput } from '@krgaa/react-developer-burger-ui-components';
 import styles from './forgot-password-page.module.css';
-import { checkResponse } from '@/utils/api';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { burgerApi } from '@utils/burger-api';
 
-interface RegisterResponse {
-  accessToken: string;
-  refreshToken: string;
+// Правильный интерфейс для ответа forgot-password
+interface ForgotPasswordResponse {
+  success: boolean;
+  message: string;
 }
 
 export const ForgotPasswordPage = (): React.JSX.Element => {
   const [email, setEmail] = useState('');
-  const navigate = useNavigate(); // Инициализируем хук
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleRegister = async () => {
-    const response = await fetch(
-      'https://new-stellarburgers.education-services.ru/api/password-reset/reset',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      }
-    );
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError('Введите email');
+      return;
+    }
+    
+    setIsLoading(true);
+    setError('');
+    
     try {
-      const data: RegisterResponse = await checkResponse(response);
-      const { accessToken, refreshToken } = data;
-
-      if (accessToken && refreshToken) {
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
-        console.log('Токены успешно сохранены:', accessToken, refreshToken);
+      // Правильный эндпоинт для запроса сброса пароля
+      const data = await burgerApi.post<ForgotPasswordResponse>('/auth/password-reset', {
+        email
+      });
+      
+      if (data.success) {
+        console.log('Инструкция отправлена:', data.message);
+        // Сохраняем флаг, что запрос отправлен
         localStorage.setItem('passwordResetRequested', 'true');
-        navigate('/reset-password-page'); // Перенаправляем на страницу восстановления пароля
+        // Перенаправляем на страницу ввода нового пароля
+        navigate('/reset-password-page');
       } else {
-        console.error('Токены не найдены в ответе сервера');
+        setError(data.message || 'Ошибка при отправке запроса');
       }
-      console.log('Регистрация прошла успешно:', data);
-    } catch (error) {
-      console.error('Ошибка регистрации:', error);
+    } catch (error: any) {
+      console.error('Ошибка при запросе сброса пароля:', error);
+      setError(error.message || 'Не удалось отправить запрос. Попробуйте позже.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const handleLoginClick = () => {
+    navigate('/login-page');
+  };
 
   return (
     <div className={styles.login_container}>
       <h1 className={styles.header}>Восстановление пароля</h1>
+      
+      {error && (
+        <div className={styles.error_message}>
+          {error}
+        </div>
+      )}
+      
       <div className={styles.mail_container}>
         <EmailInput
           name="email"
           placeholder="Укажите e-mail"
           onChange={(e) => setEmail(e.target.value)}
           value={email}
+          disabled={isLoading}
         />
         <div className={styles.size_button}>
-          <Button onClick={handleRegister} size="large" type="primary" htmlType="button">
-            {' '}
-            Восстановить
+          <Button 
+            onClick={handleForgotPassword} 
+            size="large" 
+            type="primary" 
+            htmlType="button"
+            disabled={isLoading || !email}
+          >
+            {isLoading ? 'Отправка...' : 'Восстановить'}
           </Button>
         </div>
       </div>
+      
       <div className={styles.registration_container}>
         <p className={`${styles.grid_item_1} text text_type_main-default`}>
-          {' '}
-          Вспомнили пароль?{' '}
+          Вспомнили пароль?
         </p>
         <p
-          className={`${styles.grid_item_2} text text_type_main-default text_color_inactive `}
+          className={`${styles.grid_item_2} text text_type_main-default text_color_inactive`}
+          onClick={handleLoginClick}
+          style={{ cursor: 'pointer' }}
         >
-          {' '}
           Войти
         </p>
       </div>

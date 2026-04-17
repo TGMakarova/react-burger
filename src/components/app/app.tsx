@@ -6,9 +6,9 @@ import { LoginPage } from '@/pages/login-page/login-page';
 import { RegisterPage } from '@/pages/register-page/register-page';
 import { FeedPage } from '@/pages/feed-page/feed-page';
 import { ProfilePage } from '@/pages/profile-page/profile-page';
-import { ResetPasswordPage } from '@/pages/reset-password-page/reset-password-page';
+import { ResetPassword} from '@/pages/reset-password/reset-password';
 import { AppHeader } from '../app-header/app-header';
-import { ForgotPasswordPage } from '@/pages/forgot-password-page/forgot-password-page';
+import { ForgotPassword } from '@/pages/forgot-password/forgot-password';
 import { ProfileOrderPage } from '@/pages/profile-order-page/profile-order-page';
 import { ProfileLayout } from '@/pages/profile-layout/profile-layout';
 import ProtectedRoute from '../protected-route/propected-route';
@@ -60,18 +60,18 @@ export function App() {
           }
         />
         <Route
-          path="forgot-password-page"
+          path="forgot-password"
           element={
             <PublicRoute>
-              <ForgotPasswordPage />
+              <ForgotPassword />
             </PublicRoute>
           }
         />
         <Route
-          path="reset-password-page"
+          path="reset-password"
           element={
             <PublicRoute>
-              <ResetPasswordPage />
+              <ResetPassword />
             </PublicRoute>
           }
         />

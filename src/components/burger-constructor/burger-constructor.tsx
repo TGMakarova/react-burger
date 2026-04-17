@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useDrop } from 'react-dnd';
+import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { MyComponentUI } from '../mycomponent-ui/mycomponent-ui';
 import { OtherDetails } from '../other-details/other-details';
@@ -13,6 +14,7 @@ import styles from './burger-constructor.module.css';
 
 export const BurgerConstructor = (): React.JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const dropRef = useRef<HTMLElement>(null);
 
   // Получаем данные из Redux store
@@ -23,6 +25,12 @@ export const BurgerConstructor = (): React.JSX.Element => {
   const { orderNumber, loading, error } = useSelector((state: RootState) => state.order);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Проверка авторизации
+  const isAuthenticated = () => {
+    const token = localStorage.getItem('accessToken');
+    return !!token;
+  };
 
   // Настройка drop-зоны для перетаскивания
   const [{ isHover }, drop] = useDrop({
@@ -56,11 +64,20 @@ export const BurgerConstructor = (): React.JSX.Element => {
     allIngredientsForDisplay.push(bun);
   }
 
-  // Функция для отправки заказа
+  // Функция для отправки заказа с проверкой авторизации
   const handleOrder = async () => {
     console.log('📞 handleOrder called');
     console.log('Current bun:', bun);
     console.log('Current ingredients:', ingredients);
+
+    // Проверяем авторизацию перед отправкой заказа
+    if (!isAuthenticated()) {
+      console.log('🔒 User not authenticated, redirecting to login');
+      // Сохраняем текущий путь для возврата после логина
+      localStorage.setItem('returnTo', window.location.pathname);
+      navigate('/login-page');
+      return;
+    }
 
     if (!bun) {
       console.log('❌ No bun selected');
@@ -91,7 +108,16 @@ export const BurgerConstructor = (): React.JSX.Element => {
         setIsModalOpen(true);
       } else if (submitOrder.rejected.match(resultAction)) {
         console.error('❌ Order failed:', resultAction.error);
-        alert(`Ошибка: ${resultAction.error.message || 'Не удалось оформить заказ'}`);
+        
+        // Проверяем, может быть ошибка из-за отсутствия авторизации
+        if (resultAction.error.message?.includes('401') || 
+            resultAction.error.message?.includes('unauthorized')) {
+          console.log('🔒 Unauthorized, redirecting to login');
+          localStorage.setItem('returnTo', window.location.pathname);
+          navigate('/login-page');
+        } else {
+          alert(`Ошибка: ${resultAction.error.message || 'Не удалось оформить заказ'}`);
+        }
       }
     } catch (err) {
       console.error('❌ Order error:', err);

@@ -3,54 +3,60 @@ import {
   PasswordInput,
   Input,
 } from '@krgaa/react-developer-burger-ui-components';
-import styles from './reset-password-page.module.css';
+import styles from './reset-password.module.css';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { burgerApi } from '@utils/burger-api';
 
-// Правильный интерфейс для ответа сброса пароля
 interface ResetPasswordResponse {
   success: boolean;
   message: string;
 }
 
-export const ResetPasswordPage = (): React.ReactNode => {
+export const ResetPassword = (): React.ReactNode => {
   const [password, setPassword] = useState('');
   const [token, setToken] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // Проверяем флаг в useEffect, а не при рендере
+  
+    useEffect(() => {
+  const hasRequestedReset = localStorage.getItem('passwordResetRequested') === 'true';
+  
+  if (!hasRequestedReset) {
+    navigate('/forgot-password');
+  }
+    }, [navigate]);
+  
   useEffect(() => {
-    const hasRequestedReset = localStorage.getItem('passwordResetRequested') === 'true';
-    
-    if (!hasRequestedReset) {
-      navigate('/forgot-password-page');
-    }
-  }, [navigate]);
-
+  return () => {
+    // Опционально: очищаем флаг при уходе со страницы
+    // localStorage.removeItem('passwordResetRequested');
+  };
+  }, []);
+  
   const handleResetPassword = async () => {
     if (!password || !token) {
       setError('Заполните все поля');
       return;
     }
-    
+
     setIsLoading(true);
     setError('');
-    
+
     try {
-      // Используем burgerApi вместо fetch
-      const data = await burgerApi.post<ResetPasswordResponse>('/auth/password-reset/reset', {
-        password: password,
-        token: token
-      });
-      
+      const data = await burgerApi.post<ResetPasswordResponse>(
+        '/password-reset/reset',
+        {
+          password: password,
+          token: token,
+        }
+      );
+
       if (data.success) {
         console.log('Пароль успешно изменен:', data.message);
-        // Очищаем флаг после успешного сброса
         localStorage.removeItem('passwordResetRequested');
-        // Перенаправляем на страницу входа
         navigate('/login-page');
       } else {
         setError(data.message || 'Ошибка при сбросе пароля');
@@ -63,16 +69,13 @@ export const ResetPasswordPage = (): React.ReactNode => {
     }
   };
 
+
   return (
     <div className={styles.login_container}>
       <h1 className={styles.header}>Восстановление пароля</h1>
-      
-      {error && (
-        <div className={styles.error_message}>
-          {error}
-        </div>
-      )}
-      
+
+      {error && <div className={styles.error_message}>{error}</div>}
+
       <div className={styles.mail_container}>
         <PasswordInput
           icon="ShowIcon"
@@ -91,10 +94,10 @@ export const ResetPasswordPage = (): React.ReactNode => {
         />
 
         <div className={styles.size_button}>
-          <Button 
-            onClick={handleResetPassword} 
-            size="large" 
-            type="primary" 
+          <Button
+            onClick={handleResetPassword}
+            size="large"
+            type="primary"
             htmlType="button"
             disabled={isLoading || !password || !token}
           >
@@ -102,7 +105,7 @@ export const ResetPasswordPage = (): React.ReactNode => {
           </Button>
         </div>
       </div>
-      
+
       <div className={styles.registration_container}>
         <p className={`${styles.grid_item_1} text text_type_main-default`}>
           Вспомнили пароль?

@@ -1,5 +1,5 @@
 import { Button, EmailInput } from '@krgaa/react-developer-burger-ui-components';
-import styles from './forgot-password-page.module.css';
+import styles from './forgot-password.module.css';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { burgerApi } from '@utils/burger-api';
@@ -10,10 +10,11 @@ interface ForgotPasswordResponse {
   message: string;
 }
 
-export const ForgotPasswordPage = (): React.JSX.Element => {
+export const ForgotPassword = (): React.JSX.Element => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  
   const navigate = useNavigate();
 
   const handleForgotPassword = async () => {
@@ -27,7 +28,7 @@ export const ForgotPasswordPage = (): React.JSX.Element => {
     
     try {
       // Правильный эндпоинт для запроса сброса пароля
-      const data = await burgerApi.post<ForgotPasswordResponse>('/auth/password-reset', {
+      const data = await burgerApi.post<ForgotPasswordResponse>('/password-reset', {
         email
       });
       
@@ -36,7 +37,7 @@ export const ForgotPasswordPage = (): React.JSX.Element => {
         // Сохраняем флаг, что запрос отправлен
         localStorage.setItem('passwordResetRequested', 'true');
         // Перенаправляем на страницу ввода нового пароля
-        navigate('/reset-password-page');
+        navigate('/reset-password');
       } else {
         setError(data.message || 'Ошибка при отправке запроса');
       }

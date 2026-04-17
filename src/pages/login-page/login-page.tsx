@@ -48,7 +48,7 @@ export const LoginPage = (): React.JSX.Element => {
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
         console.log('Токены успешно сохранены');
-
+          
         // Проверяем, есть ли сохраненный маршрут
         const returnTo = localStorage.getItem('returnTo');
         if (returnTo) {
@@ -73,7 +73,7 @@ export const LoginPage = (): React.JSX.Element => {
   };
 
   const handleForgotPassword = () => {
-    navigate('/forgot-password-page');
+    navigate('/forgot-password');
   };
 
   return (

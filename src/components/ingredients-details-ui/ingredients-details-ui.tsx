@@ -56,7 +56,7 @@ export const IngredientsDetailsUI = ({ setCategoryRef }: IngredientsDetailsUIPro
     
     // Переходим на маршрут с ингредиентом
     navigate(`/ingredients/${ingredient._id}`, {
-      state: { background: location }
+      state: { background: location, from: location.pathname }
     });
   };
 

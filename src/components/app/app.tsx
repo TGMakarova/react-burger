@@ -1,29 +1,40 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
 import { IngredientDetails } from '../ingredient-details/ingredient-details';
 import { Home } from '@/pages/home/home';
 import { IngredientPage } from '../ingredient-page/ingredient-page';
-import { LoginPage } from '@/pages/login-page/login-page';
-import { RegisterPage } from '@/pages/register-page/register-page';
+import { LoginPage } from '@/pages/login/login';
+import { RegisterPage } from '@/pages/register/register';
 import { FeedPage } from '@/pages/feed-page/feed-page';
-import { ProfilePage } from '@/pages/profile-page/profile-page';
+import { ProfilePage } from '@/pages/profile/profile';
 import { ResetPassword} from '@/pages/reset-password/reset-password';
 import { AppHeader } from '../app-header/app-header';
 import { ForgotPassword } from '@/pages/forgot-password/forgot-password';
-import { ProfileOrderPage } from '@/pages/profile-order-page/profile-order-page';
+import { ProfileOrderPage } from '@/pages/orders/orders';
 import { ProfileLayout } from '@/pages/profile-layout/profile-layout';
-import ProtectedRoute from '../protected-route/propected-route';
+import  ProtectedRoute  from '../protected-route/protected-route';
 import PublicRoute from '../public-route/public-route';
-import { NotFoundPage } from '@/pages/not-found-page copy/not-found-page';
-import { useEffect } from 'react';
+import { NotFoundPage } from '@/pages/not-found-page/not-found-page';
+import { checkAuth } from '../../services/authActions';
+import type { RootState, AppDispatch } from '../../services/store';
 
 export function App() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const background = location.state?.background;
+  
+  const { isAuthChecked,  isLoading } = useSelector((state: RootState) => state.auth);
+
+  // Проверка токена при загрузке приложения
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
 
   // Очищаем localStorage при закрытии попапа
   useEffect(() => {
     if (!background) {
-      // Не очищаем сразу, даем время на восстановление
       const timer = setTimeout(() => {
         if (!localStorage.getItem('popupRestored')) {
           localStorage.removeItem('popupIngredientId');
@@ -35,16 +46,61 @@ export function App() {
     }
   }, [background]);
 
+  const handleCloseModal = () => {
+    localStorage.removeItem('popupIngredientId');
+    localStorage.removeItem('popupBackgroundPath');
+    localStorage.removeItem('popupRestored');
+    
+    const returnPath = location.state?.from || '/';
+    navigate(returnPath);
+  };
+
+  // Пока проверяем токен - показываем загрузку
+  if (!isAuthChecked || isLoading) {
+    return (
+      <>
+        <AppHeader />
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          flexDirection: 'column',
+          gap: '20px'
+        }}>
+          <div style={{
+            width: '50px',
+            height: '50px',
+            border: '4px solid #E2E8F0',
+            borderTop: '4px solid #3B82F6',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite'
+          }} />
+          <div>Проверка авторизации...</div>
+          <style>{`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <AppHeader />
 
       <Routes location={background || location}>
+        {/* Публичные маршруты */}
         <Route path="/" element={<Home />} />
         <Route path="ingredients/:id" element={<IngredientPage />} />
         <Route path="feed" element={<FeedPage />} />
+        
+        {/* Маршруты для неавторизованных пользователей */}
         <Route
-          path="login-page"
+          path="login"
           element={
             <PublicRoute>
               <LoginPage />
@@ -52,7 +108,7 @@ export function App() {
           }
         />
         <Route
-          path="register-page"
+          path="register"
           element={
             <PublicRoute>
               <RegisterPage />
@@ -76,25 +132,20 @@ export function App() {
           }
         />
 
-        <Route path="profile" element={<ProfileLayout />}>
-          <Route
-            index
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="orders"
-            element={
-              <ProtectedRoute>
-                <ProfileOrderPage />
-              </ProtectedRoute>
-            }
-          />
+        {/* Защищённые маршруты */}
+        <Route
+          path="profile"
+          element={
+            <ProtectedRoute>
+              <ProfileLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<ProfilePage />} />
+          <Route path="orders" element={<ProfileOrderPage />} />
         </Route>
 
+        {/* 404 страница */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
@@ -106,13 +157,7 @@ export function App() {
             element={
               <IngredientDetails
                 isOpen={true}
-                onClose={() => {
-                  // Очищаем все данные при закрытии
-                  localStorage.removeItem('popupIngredientId');
-                  localStorage.removeItem('popupBackgroundPath');
-                  localStorage.removeItem('popupRestored');
-                  window.history.back();
-                }}
+                onClose={handleCloseModal}
                 header={'Детали ингредиента'}
               />
             }

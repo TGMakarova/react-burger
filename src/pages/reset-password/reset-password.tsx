@@ -57,7 +57,7 @@ export const ResetPassword = (): React.ReactNode => {
       if (data.success) {
         console.log('Пароль успешно изменен:', data.message);
         localStorage.removeItem('passwordResetRequested');
-        navigate('/login-page');
+        navigate('/login');
       } else {
         setError(data.message || 'Ошибка при сбросе пароля');
       }
@@ -112,7 +112,7 @@ export const ResetPassword = (): React.ReactNode => {
         </p>
         <p
           className={`${styles.grid_item_2} text text_type_main-default text_color_inactive`}
-          onClick={() => navigate('/login-page')}
+          onClick={() => navigate('/login')}
           style={{ cursor: 'pointer' }}
         >
           Войти

@@ -3,11 +3,11 @@ import { useSelector } from 'react-redux';
 import type { ReactNode } from 'react';
 import type { RootState } from '../../services/store';
 
-interface PublicRouteProps {
+interface ProtectedRouteProps {
   children: ReactNode;
 }
 
-export default function PublicRoute({ children }: PublicRouteProps) {
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const location = useLocation();
   const { isLoggedIn, isAuthChecked } = useSelector((state: RootState) => state.auth);
   
@@ -15,10 +15,9 @@ export default function PublicRoute({ children }: PublicRouteProps) {
     return null;
   }
   
-  if (isLoggedIn) {
-    const from = location.state?.from?.pathname || '/profile';
-    return <Navigate to={from} replace />;
+  if (!isLoggedIn) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
   
-  return <>{children}</>;
+  return children;
 }

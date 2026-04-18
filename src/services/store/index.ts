@@ -1,9 +1,9 @@
-// services/store.ts
 import { configureStore } from '@reduxjs/toolkit';
 import ingredientsReducer from '../slices/ingredientsSlice';
 import burgerConstructorReducer from '../slices/burgerConstructorSlice';
 import selectedIngredientReducer from '../slices/selectedIngredientSlice';
 import orderReducer from '../slices/orderSlice';
+import authReducer from '../slices/authSlice'; // 👈 ДОБАВИТЬ ЭТУ СТРОКУ
 import {
   apiMiddleware,
   localStorageMiddleware,
@@ -16,6 +16,7 @@ export const store = configureStore({
     burgerConstructor: burgerConstructorReducer,
     selectedIngredient: selectedIngredientReducer,
     order: orderReducer,
+    auth: authReducer, 
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

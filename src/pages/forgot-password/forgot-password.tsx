@@ -50,7 +50,7 @@ export const ForgotPassword = (): React.JSX.Element => {
   };
 
   const handleLoginClick = () => {
-    navigate('/login-page');
+    navigate('/login');
   };
 
   return (

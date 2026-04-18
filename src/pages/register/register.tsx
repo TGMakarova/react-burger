@@ -4,7 +4,7 @@ import {
   PasswordInput,
   Input,
 } from '@krgaa/react-developer-burger-ui-components';
-import styles from './register-page.module.css';
+import styles from './register.module.css';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { burgerApi } from '@utils/burger-api';
@@ -69,7 +69,7 @@ export const RegisterPage = (): React.JSX.Element => {
     }
   };
   const handleLoginClick = () => {
-    navigate('/login-page');
+    navigate('/login');
   };
 
   return (

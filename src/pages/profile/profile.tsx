@@ -1,8 +1,8 @@
 import { Input, EmailInput, PasswordInput, Button } from '@krgaa/react-developer-burger-ui-components';
-import styles from './profile-page.module.css';
+import styles from './profile.module.css';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { burgerApi } from '@utils/burger-api';
+import { authService } from '@utils/auth-service';
 
 interface UserData {
   name: string;
@@ -10,11 +10,6 @@ interface UserData {
 }
 
 interface UserResponse {
-  success: boolean;
-  user: UserData;
-}
-
-interface UpdateUserResponse {
   success: boolean;
   user: UserData;
 }
@@ -37,8 +32,10 @@ export const ProfilePage = (): React.JSX.Element => {
       setError('');
       
       try {
-        const data = await burgerApi.get<UserResponse>('/auth/user');
+        console.log('Fetching user data with authService...');
+        const data = await authService.getUser();
         
+        console.log('User data received:', data);
         if (data.success && data.user) {
           setName(data.user.name);
           setEmail(data.user.email);
@@ -55,7 +52,7 @@ export const ProfilePage = (): React.JSX.Element => {
           // Очищаем токены и перенаправляем на логин через 2 секунды
           setTimeout(() => {
             localStorage.clear();
-            navigate('/login-page');
+            navigate('/login');
           }, 2000);
         } else if (error.message?.includes('404')) {
           setError('Сервис недоступен. Попробуйте позже.');
@@ -67,7 +64,15 @@ export const ProfilePage = (): React.JSX.Element => {
       }
     };
 
-    fetchUserData();
+    // Проверяем авторизацию перед загрузкой
+    if (authService.isAuthenticated()) {
+      fetchUserData();
+    } else {
+      setError('Не авторизован. Пожалуйста, войдите в систему.');
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+    }
   }, [navigate]);
 
   // Отслеживание изменений
@@ -119,20 +124,11 @@ export const ProfilePage = (): React.JSX.Element => {
     setSuccessMessage('');
 
     try {
-      const updateData: Partial<UserData & { password: string }> = {};
+      // Используем authService для обновления
+      const data = await authService.updateUser(email.trim(), name.trim());
       
-      if (name !== originalUser?.name) updateData.name = name.trim();
-      if (email !== originalUser?.email) updateData.email = email.trim();
-      if (password) updateData.password = password;
-
-      if (Object.keys(updateData).length === 0) {
-        setIsEdited(false);
-        setIsLoading(false);
-        return;
-      }
-
-      const data = await burgerApi.patch<UpdateUserResponse>('/auth/user', updateData);
-
+      console.log('Update response:', data);
+      
       if (data.success && data.user) {
         setOriginalUser(data.user);
         setName(data.user.name);
@@ -160,11 +156,11 @@ export const ProfilePage = (): React.JSX.Element => {
       
       if (error.message?.includes('409')) {
         setError('Пользователь с таким email уже существует');
-      } else if (error.message?.includes('401')) {
+      } else if (error.message?.includes('401') || error.message?.includes('403')) {
         setError('Сессия истекла. Пожалуйста, войдите заново.');
         setTimeout(() => {
           localStorage.clear();
-          navigate('/login-page');
+          navigate('/login');
         }, 2000);
       } else {
         setError(error.message || 'Не удалось сохранить изменения');

@@ -25,26 +25,22 @@ export function App() {
   const dispatch = useDispatch<AppDispatch>();
   const background = location.state?.background;
   
-  const { isAuthChecked,  isLoading } = useSelector((state: RootState) => state.auth);
+  const { isAuthChecked, isLoading } = useSelector((state: RootState) => state.auth);
 
   // Проверка токена при загрузке приложения
   useEffect(() => {
-    dispatch(checkAuth());
-  }, [dispatch]);
-
-  // Очищаем localStorage при закрытии попапа
-  useEffect(() => {
-    if (!background) {
-      const timer = setTimeout(() => {
-        if (!localStorage.getItem('popupRestored')) {
-          localStorage.removeItem('popupIngredientId');
-          localStorage.removeItem('popupBackgroundPath');
-        }
-      }, 100);
-      
-      return () => clearTimeout(timer);
+    // ✅ Если мы восстанавливаем заказ - не делаем checkAuth
+    const isRestoringOrder = sessionStorage.getItem('restoringOrder') === 'true';
+    
+    if (!isRestoringOrder) {
+      console.log('🔍 Running checkAuth');
+      dispatch(checkAuth());
+    } else {
+      console.log('⏭️ Skipping checkAuth - restoring order');
+      // ✅ Сбрасываем флаг после того как он использован
+      sessionStorage.removeItem('restoringOrder');
     }
-  }, [background]);
+  }, [dispatch]);
 
   const handleCloseModal = () => {
     localStorage.removeItem('popupIngredientId');

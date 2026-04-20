@@ -1,17 +1,12 @@
 import { Input, EmailInput, PasswordInput, Button } from '@krgaa/react-developer-burger-ui-components';
 import styles from './profile.module.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '@utils/auth-service';
+import { burgerApi } from '@utils/burger-api';
 
 interface UserData {
   name: string;
   email: string;
-}
-
-interface UserResponse {
-  success: boolean;
-  user: UserData;
 }
 
 export const ProfilePage = (): React.JSX.Element => {
@@ -24,18 +19,26 @@ export const ProfilePage = (): React.JSX.Element => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [originalUser, setOriginalUser] = useState<UserData | null>(null);
+  const hasFetched = useRef(false); // Предотвращаем повторную загрузку
 
-  // Загрузка данных пользователя
+  // Загрузка данных пользователя (только один раз)
   useEffect(() => {
+    if (hasFetched.current) return;
+    
     const fetchUserData = async () => {
+      // Проверяем авторизацию перед загрузкой
+      if (!burgerApi.isAuthenticated()) {
+        navigate('/login', { replace: true });
+        return;
+      }
+
+      hasFetched.current = true;
       setIsLoading(true);
       setError('');
       
       try {
-        console.log('Fetching user data with authService...');
-        const data = await authService.getUser();
+        const data = await burgerApi.getUser();
         
-        console.log('User data received:', data);
         if (data.success && data.user) {
           setName(data.user.name);
           setEmail(data.user.email);
@@ -46,16 +49,12 @@ export const ProfilePage = (): React.JSX.Element => {
       } catch (error: any) {
         console.error('Ошибка загрузки:', error);
         
-        // Обработка разных кодов ошибок
         if (error.message?.includes('401') || error.message?.includes('403')) {
           setError('Сессия истекла. Пожалуйста, войдите заново.');
-          // Очищаем токены и перенаправляем на логин через 2 секунды
           setTimeout(() => {
             localStorage.clear();
-            navigate('/login');
+            navigate('/login', { replace: true });
           }, 2000);
-        } else if (error.message?.includes('404')) {
-          setError('Сервис недоступен. Попробуйте позже.');
         } else {
           setError(error.message || 'Не удалось загрузить данные пользователя');
         }
@@ -64,16 +63,8 @@ export const ProfilePage = (): React.JSX.Element => {
       }
     };
 
-    // Проверяем авторизацию перед загрузкой
-    if (authService.isAuthenticated()) {
-      fetchUserData();
-    } else {
-      setError('Не авторизован. Пожалуйста, войдите в систему.');
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
-    }
-  }, [navigate]);
+    fetchUserData();
+  }, [navigate]); // Убираем зависимость от burgerApi
 
   // Отслеживание изменений
   useEffect(() => {
@@ -83,7 +74,6 @@ export const ProfilePage = (): React.JSX.Element => {
                         password !== '';
       setIsEdited(hasChanges);
       
-      // Очищаем сообщения при новом изменении
       if (hasChanges) {
         setError('');
         setSuccessMessage('');
@@ -124,10 +114,7 @@ export const ProfilePage = (): React.JSX.Element => {
     setSuccessMessage('');
 
     try {
-      // Используем authService для обновления
-      const data = await authService.updateUser(email.trim(), name.trim());
-      
-      console.log('Update response:', data);
+      const data = await burgerApi.updateUser({ name: name.trim(), email: email.trim() });
       
       if (data.success && data.user) {
         setOriginalUser(data.user);
@@ -137,7 +124,6 @@ export const ProfilePage = (): React.JSX.Element => {
         setIsEdited(false);
         setSuccessMessage('Данные успешно обновлены!');
         
-        // Обновляем данные пользователя в localStorage если они там хранятся
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
           const user = JSON.parse(storedUser);
@@ -146,7 +132,6 @@ export const ProfilePage = (): React.JSX.Element => {
           localStorage.setItem('user', JSON.stringify(user));
         }
         
-        // Автоматически скрыть сообщение через 3 секунды
         setTimeout(() => setSuccessMessage(''), 3000);
       } else {
         setError('Не удалось обновить данные');
@@ -160,7 +145,7 @@ export const ProfilePage = (): React.JSX.Element => {
         setError('Сессия истекла. Пожалуйста, войдите заново.');
         setTimeout(() => {
           localStorage.clear();
-          navigate('/login');
+          navigate('/login', { replace: true });
         }, 2000);
       } else {
         setError(error.message || 'Не удалось сохранить изменения');

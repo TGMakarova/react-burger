@@ -16,8 +16,9 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
   
   if (!isLoggedIn) {
+    // Сохраняем путь, куда хотел попасть пользователь
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   
-  return children;
+  return <>{children}</>;
 }

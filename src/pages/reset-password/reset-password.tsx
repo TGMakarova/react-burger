@@ -4,7 +4,7 @@ import {
   Input,
 } from '@krgaa/react-developer-burger-ui-components';
 import styles from './reset-password.module.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { burgerApi } from '@utils/burger-api';
 
@@ -20,25 +20,41 @@ export const ResetPassword = (): React.ReactNode => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  
-    useEffect(() => {
-  const hasRequestedReset = localStorage.getItem('passwordResetRequested') === 'true';
-  
-  if (!hasRequestedReset) {
-    navigate('/forgot-password');
-  }
-    }, [navigate]);
+  useEffect(() => {
+    const hasRequestedReset = localStorage.getItem('passwordResetRequested') === 'true';
+    
+    if (!hasRequestedReset) {
+      navigate('/forgot-password');
+    }
+  }, [navigate]);
   
   useEffect(() => {
-  return () => {
-    // Опционально: очищаем флаг при уходе со страницы
-    // localStorage.removeItem('passwordResetRequested');
-  };
+    return () => {
+      // Опционально: очищаем флаг при уходе со страницы
+      // localStorage.removeItem('passwordResetRequested');
+    };
   }, []);
+
+  const validateForm = (): boolean => {
+    if (!password.trim()) {
+      setError('Введите новый пароль');
+      return false;
+    }
+    if (password.length < 6) {
+      setError('Пароль должен содержать минимум 6 символов');
+      return false;
+    }
+    if (!token.trim()) {
+      setError('Введите код из письма');
+      return false;
+    }
+    return true;
+  };
   
-  const handleResetPassword = async () => {
-    if (!password || !token) {
-      setError('Заполните все поля');
+  const handleSubmitResetPassword = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
       return;
     }
 
@@ -55,23 +71,20 @@ export const ResetPassword = (): React.ReactNode => {
       );
 
       if (data.success) {
-        console.log('Пароль успешно изменен:', data.message);
         localStorage.removeItem('passwordResetRequested');
         navigate('/login');
       } else {
         setError(data.message || 'Ошибка при сбросе пароля');
       }
     } catch (error: any) {
-      console.error('Ошибка изменения пароля:', error);
       setError(error.message || 'Не удалось изменить пароль. Попробуйте позже.');
     } finally {
       setIsLoading(false);
     }
   };
 
-
   return (
-    <div className={styles.login_container}>
+    <form className={styles.login_container} onSubmit={handleSubmitResetPassword}>
       <h1 className={styles.header}>Восстановление пароля</h1>
 
       {error && <div className={styles.error_message}>{error}</div>}
@@ -95,10 +108,9 @@ export const ResetPassword = (): React.ReactNode => {
 
         <div className={styles.size_button}>
           <Button
-            onClick={handleResetPassword}
             size="large"
             type="primary"
-            htmlType="button"
+            htmlType="submit"
             disabled={isLoading || !password || !token}
           >
             {isLoading ? 'Сохранение...' : 'Сохранить'}
@@ -118,6 +130,6 @@ export const ResetPassword = (): React.ReactNode => {
           Войти
         </p>
       </div>
-    </div>
+    </form>
   );
 };

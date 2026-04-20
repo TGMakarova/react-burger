@@ -15,9 +15,13 @@ export default function PublicRoute({ children }: PublicRouteProps) {
     return null;
   }
   
-  if (isLoggedIn) {
-    const from = location.state?.from?.pathname || '/profile';
-    return <Navigate to={from} replace />;
+  // Список публичных маршрутов
+  const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
+  
+  // Если пользователь авторизован и пытается зайти на публичный маршрут
+  if (isLoggedIn && publicPaths.includes(location.pathname)) {
+    // Редиректим на главную, а не на /profile
+    return <Navigate to="/" replace />;
   }
   
   return <>{children}</>;

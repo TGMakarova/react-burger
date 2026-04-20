@@ -5,21 +5,14 @@ import {
   Input,
 } from '@krgaa/react-developer-burger-ui-components';
 import styles from './register.module.css';
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { burgerApi } from '@utils/burger-api';
-
-interface RegisterResponse {
-  success: boolean;
-  accessToken: string;
-  refreshToken: string;
-  user: {
-    email: string;
-    name: string;
-  };
-}
+import { useDispatch } from 'react-redux';
+import { setUser, setAuthChecked } from '../../services/slices/authSlice';
 
 export const RegisterPage = (): React.JSX.Element => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -27,53 +20,78 @@ export const RegisterPage = (): React.JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleRegister = async () => {
+  const validateForm = (): boolean => {
+    if (!name.trim()) {
+      setError('Введите имя');
+      return false;
+    }
+    if (!email.trim()) {
+      setError('Введите email');
+      return false;
+    }
+    if (!password.trim()) {
+      setError('Введите пароль');
+      return false;
+    }
+    if (password.length < 6) {
+      setError('Пароль должен содержать минимум 6 символов');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmitRegister = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setIsLoading(true);
     setError('');
 
     try {
-      const data = await burgerApi.post<RegisterResponse>('/auth/register', {
-        name,
-        email,
-        password,
-      });
+      const data = await burgerApi.register(name, email, password);
 
-      const { accessToken, refreshToken } = data;
-
-      if (accessToken && refreshToken) {
-        // ОЧИЩАЕМ старые токены перед сохранением новых
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-
-        // Сохраняем новые токены
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
-
-        console.log('Токены успешно сохранены для нового пользователя');
-
-        // Очищаем форму
-        setName('');
-        setEmail('');
-        setPassword('');
-
-        // Перенаправляем на страницу профиля
-        navigate('/profile');
+      if (data.accessToken && data.refreshToken) {
+        // Сохраняем токены
+        localStorage.setItem('accessToken', data.accessToken);
+        localStorage.setItem('refreshToken', data.refreshToken);
+        
+        // Сохраняем пользователя в Redux
+        dispatch(setUser(data.user));
+        dispatch(setAuthChecked(true)); // ЭТО ВАЖНО!
+        
+        // Проверяем, нужно ли восстановить конструктор
+        const savedConstructor = localStorage.getItem('savedConstructor');
+        const returnTo = localStorage.getItem('returnTo');
+        
+        if (savedConstructor && returnTo) {
+          sessionStorage.setItem('restoringOrder', 'true');
+          localStorage.removeItem('returnTo');
+          navigate(returnTo);
+          return;
+        }
+        
+        // Перенаправляем на главную
+        navigate('/');
       } else {
         setError('Токены не найдены в ответе сервера');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Ошибка регистрации:', error);
-      setError('Ошибка регистрации. Попробуйте еще раз.');
+      setError(error.message || 'Ошибка регистрации. Попробуйте еще раз.');
     } finally {
       setIsLoading(false);
     }
   };
+
   const handleLoginClick = () => {
     navigate('/login');
   };
 
   return (
-    <div className={styles.register_container}>
+    <form className={styles.register_container} onSubmit={handleSubmitRegister}>
       <h1 className={styles.header}>Регистрация</h1>
 
       {error && <div className={styles.error_message}>{error}</div>}
@@ -103,11 +121,10 @@ export const RegisterPage = (): React.JSX.Element => {
 
       <div className={styles.size_button}>
         <Button
-          onClick={handleRegister}
           size="large"
           type="primary"
           disabled={isLoading}
-          htmlType="button"
+          htmlType="submit"
         >
           {isLoading ? 'Регистрация...' : 'Зарегистрироваться'}
         </Button>
@@ -125,6 +142,6 @@ export const RegisterPage = (): React.JSX.Element => {
           Войти
         </p>
       </div>
-    </div>
+    </form>
   );
 };

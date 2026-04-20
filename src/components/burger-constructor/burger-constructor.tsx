@@ -34,68 +34,76 @@ export const BurgerConstructor = (): React.JSX.Element => {
     return !!token;
   };
 
+  // Сохраняем конструктор в localStorage
+  const saveConstructorToLocalStorage = () => {
+    if (bun || ingredients.length > 0) {
+      const constructorData = {
+        bun: bun,
+        ingredients: ingredients
+      };
+      localStorage.setItem('savedConstructor', JSON.stringify(constructorData));
+    }
+  };
+
   // Восстанавливаем конструктор после авторизации
   useEffect(() => {
     const savedConstructor = localStorage.getItem('savedConstructor');
     const returnTo = localStorage.getItem('returnTo');
     
-    console.log('🔍 Restoration check:', {
-      savedConstructor: !!savedConstructor,
-      returnTo,
-      currentPath: location.pathname,
-      isAuthenticated: isAuthenticated(),
-      isRestored
-    });
-    
     // Если есть сохраненный конструктор и мы на странице, куда должны вернуться
-    if (savedConstructor && returnTo === location.pathname && !isRestored) {
+    if (savedConstructor && !isRestored && location.pathname !== '/login' && location.pathname !== '/register') {
+      // Если returnTo указан, проверяем соответствие
+      if (returnTo && returnTo !== location.pathname) {
+        return;
+      }
+      
       try {
         const { bun: savedBun, ingredients: savedIngredients } = JSON.parse(savedConstructor);
         
-        console.log('🔄 Restoring constructor:', { savedBun, savedIngredients });
+        // Проверяем, нужно ли восстанавливать (если конструктор пустой)
+        const hasNoIngredients = !bun && ingredients.length === 0;
         
-        // Очищаем текущий конструктор
-        dispatch(clearConstructor());
-        
-        // Восстанавливаем булку
-        if (savedBun) {
-          dispatch(addIngredient({ ...savedBun, constructorId: uuidv4() }));
+        if (hasNoIngredients && savedBun) {
+          // Очищаем текущий конструктор (на всякий случай)
+          dispatch(clearConstructor());
+          
+          // Восстанавливаем булку
+          if (savedBun) {
+            dispatch(addIngredient({ ...savedBun, constructorId: uuidv4() }));
+          }
+          
+          // Восстанавливаем все ингредиенты
+          if (savedIngredients && savedIngredients.length > 0) {
+            savedIngredients.forEach((ingredient: ConstructorIngredient) => {
+              dispatch(addIngredient({ ...ingredient, constructorId: uuidv4() }));
+            });
+          }
+          
+          setIsRestored(true);
+          sessionStorage.removeItem('restoringOrder');
         }
-        
-        // Восстанавливаем все ингредиенты
-        if (savedIngredients && savedIngredients.length > 0) {
-          savedIngredients.forEach((ingredient: ConstructorIngredient) => {
-            dispatch(addIngredient({ ...ingredient, constructorId: uuidv4() }));
-          });
-        }
-        
-        setIsRestored(true);
-        console.log('✅ Constructor restored successfully');
       } catch (err) {
         console.error('Error restoring constructor:', err);
       }
     }
-  }, [location.pathname, dispatch, isRestored]);
+  }, [location.pathname, dispatch, isRestored, bun, ingredients]);
 
   // Очищаем флаг восстановления при изменении конструктора
   useEffect(() => {
-    if (bun || ingredients.length > 0) {
+    if ((bun || ingredients.length > 0) && isRestored) {
       setIsRestored(false);
     }
-  }, [bun, ingredients]);
+  }, [bun, ingredients, isRestored]);
 
   // Настройка drop-зоны для перетаскивания
   const [{ isHover }, drop] = useDrop({
     accept: 'ingredient',
     drop: (item: TIngredient) => {
-      console.log('🎯 ITEM DROPPED:', item);
-
       const ingredientWithId: ConstructorIngredient = {
         ...item,
         constructorId: uuidv4(),
       };
 
-      console.log('➕ Adding ingredient:', ingredientWithId);
       dispatch(addIngredient(ingredientWithId));
     },
     collect: (monitor) => ({
@@ -105,7 +113,7 @@ export const BurgerConstructor = (): React.JSX.Element => {
 
   drop(dropRef);
 
-  // Формируем массив для отображения (пропсы для MyComponentUI)
+  // Формируем массив для отображения
   const allIngredientsForDisplay = [];
 
   if (bun) {
@@ -116,91 +124,89 @@ export const BurgerConstructor = (): React.JSX.Element => {
     allIngredientsForDisplay.push(bun);
   }
 
-  // Сохраняем конструктор в localStorage
-  const saveConstructorToLocalStorage = () => {
-    if (bun || ingredients.length > 0) {
-      const constructorData = {
-        bun: bun,
-        ingredients: ingredients
-      };
-      localStorage.setItem('savedConstructor', JSON.stringify(constructorData));
-      console.log('💾 Constructor saved to localStorage:', constructorData);
-    }
-  };
-
-  // Функция для отправки заказа
-  const handleOrder = async () => {
-    console.log('📞 handleOrder called');
-    console.log('Current bun:', bun);
-    console.log('Current ingredients:', ingredients);
-
+  // Функция для валидации формы
+  const validateOrder = () => {
     if (!bun) {
-      console.log('❌ No bun selected');
       alert('Добавьте булку');
-      return;
+      return false;
     }
 
     if (ingredients.length === 0) {
-      console.log('❌ No ingredients selected');
       alert('Добавьте хотя бы один ингредиент');
-      return;
+      return false;
     }
 
-    // Проверяем авторизацию перед отправкой заказа
-    if (!isAuthenticated()) {
-      console.log('🔒 User not authenticated, saving constructor and redirecting to login');
-      
-      // Сохраняем конструктор перед редиректом
-      saveConstructorToLocalStorage();
-      
-      // Сохраняем текущий путь для возврата
-      localStorage.setItem('returnTo', location.pathname);
-      
-      // Перенаправляем на логин
-      navigate('/login');
-      return;
-    }
-
-    // Если авторизован, отправляем заказ
-    const ingredientsIds = [bun._id, ...ingredients.map((item) => item._id), bun._id];
-
-    try {
-      console.log('🚀 Sending order with IDs:', ingredientsIds);
-
-      const resultAction = await dispatch(submitOrder(ingredientsIds));
-
-      if (submitOrder.fulfilled.match(resultAction)) {
-        console.log('✅ Order successful!');
-        
-        // Очищаем конструктор после успешного заказа
-        dispatch(clearConstructor());
-        
-        // Очищаем сохраненные данные
-        localStorage.removeItem('savedConstructor');
-        localStorage.removeItem('returnTo');
-        
-        // Открываем модальное окно с номером заказа
-        setIsModalOpen(true);
-      } else if (submitOrder.rejected.match(resultAction)) {
-        console.error('❌ Order failed:', resultAction.error);
-        
-        // Проверяем, может быть ошибка из-за отсутствия авторизации
-        if (resultAction.error.message?.includes('401') || 
-            resultAction.error.message?.includes('unauthorized')) {
-          console.log('🔒 Unauthorized, saving constructor and redirecting to login');
-          saveConstructorToLocalStorage();
-          localStorage.setItem('returnTo', location.pathname);
-          navigate('/login');
-        } else {
-          alert(`Ошибка: ${resultAction.error.message || 'Не удалось оформить заказ'}`);
-        }
-      }
-    } catch (err) {
-      console.error('❌ Order error:', err);
-      alert('Произошла ошибка при оформлении заказа');
-    }
+    return true;
   };
 
+  // Основная функция отправки заказа
+const handleSubmitOrder = async () => {
+  console.log('1. Начало handleSubmitOrder');
+  console.log('2. bun:', bun);
+  console.log('3. ingredients:', ingredients);
+  console.log('4. Токен:', localStorage.getItem('accessToken'));
+  console.log('5. isAuthenticated:', isAuthenticated());
+  
+  if (!bun) {
+    alert('Добавьте булку');
+    return;
+  }
+
+  if (ingredients.length === 0) {
+    alert('Добавьте хотя бы один ингредиент');
+    return;
+  }
+
+  if (!isAuthenticated()) {
+    console.log('6. Не авторизован, сохраняем и редирект');
+    saveConstructorToLocalStorage();
+    localStorage.setItem('returnTo', location.pathname);
+    navigate('/login');
+    return;
+  }
+
+  console.log('7. Авторизован, отправляем заказ');
+
+  // Если авторизован, отправляем заказ
+  // Добавляем проверку, что bun не null (хотя validateOrder уже проверяет)
+  if (!bun) {
+    alert('Добавьте булку');
+    return;
+  }
+
+  const ingredientsIds = [bun._id, ...ingredients.map((item) => item._id), bun._id];
+
+  try {
+    const resultAction = await dispatch(submitOrder(ingredientsIds));
+
+    if (submitOrder.fulfilled.match(resultAction)) {
+      // Очищаем конструктор после успешного заказа
+      dispatch(clearConstructor());
+      
+      // Очищаем сохраненные данные
+      localStorage.removeItem('savedConstructor');
+      localStorage.removeItem('returnTo');
+      
+      // Сбрасываем флаг восстановления
+      setIsRestored(false);
+      
+      // Открываем модальное окно с номером заказа
+      setIsModalOpen(true);
+    } else if (submitOrder.rejected.match(resultAction)) {
+      // Проверяем, может быть ошибка из-за отсутствия авторизации
+      if (resultAction.error.message?.includes('401') || 
+          resultAction.error.message?.includes('unauthorized')) {
+        saveConstructorToLocalStorage();
+        localStorage.setItem('returnTo', location.pathname);
+        navigate('/login');
+      } else {
+        alert(`Ошибка: ${resultAction.error.message || 'Не удалось оформить заказ'}`);
+      }
+    }
+  } catch (err) {
+    alert('Произошла ошибка при оформлении заказа');
+  }
+};
   const handleCloseModal = () => {
     setIsModalOpen(false);
     dispatch(clearOrder());
@@ -213,7 +219,7 @@ export const BurgerConstructor = (): React.JSX.Element => {
     >
       <MyComponentUI
         ingredients={allIngredientsForDisplay}
-        onOrderClick={handleOrder}
+        onOrderClick={handleSubmitOrder}
         isLoading={loading}
       />
 

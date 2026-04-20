@@ -1,7 +1,7 @@
 import { useNavigate, Outlet, NavLink } from 'react-router-dom';
 import styles from './profile-layout.module.css';
 import { useState } from 'react';
-import { authService } from '@utils/auth-service';
+import { burgerApi } from '@utils/burger-api';
 
 export function ProfileLayout() {
   const navigate = useNavigate();
@@ -13,14 +13,23 @@ export function ProfileLayout() {
     setIsLoggingOut(true);
     
     try {
-      await authService.logout();
+      await burgerApi.logout();
+      
+      // Очищаем все данные
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Перенаправляем на логин
+      navigate('/login', { replace: true });
     } catch (error) {
       console.error('Ошибка при выходе:', error);
+      // Даже при ошибке очищаем и перенаправляем
+      localStorage.clear();
+      sessionStorage.clear();
+      navigate('/login', { replace: true });
+    } finally {
+      setIsLoggingOut(false);
     }
-    
-    // В любом случае перезагружаем страницу
-    // Это гарантированно сбросит всё состояние
-    window.location.href = '/login';
   };
 
   return (

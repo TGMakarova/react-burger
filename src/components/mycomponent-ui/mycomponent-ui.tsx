@@ -23,24 +23,16 @@ type MyComponentUIProps = {
 };
 
 export const MyComponentUI = ({
-  ingredients,
+
   onOrderClick,
   isLoading,
 }: MyComponentUIProps): React.JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
 
   // Получаем данные напрямую из Redux store
-  const { bun, ingredients: storeIngredients } = useSelector((state: RootState) => {
-    console.log('📦 MyComponentUI Redux state:', {
-      bun: state.burgerConstructor.bun?.name,
-      ingredientsCount: state.burgerConstructor.ingredients.length,
-    });
-    return state.burgerConstructor;
-  });
-
-  console.log('🍔 Bun from Redux:', bun);
-  console.log('📋 Store ingredients:', storeIngredients);
-  console.log('🎨 Props ingredients (display):', ingredients);
+  const { bun, ingredients: storeIngredients } = useSelector(
+    (state: RootState) => state.burgerConstructor
+  );
 
   // Для отображения используем данные из Redux
   const displayBun = bun;
@@ -52,7 +44,6 @@ export const MyComponentUI = ({
     displayIngredients.reduce((sum, item) => sum + item.price, 0);
 
   const handleRemove = (constructorId: string) => {
-    console.log('🗑️ Removing ingredient with constructorId:', constructorId);
     dispatch(removeIngredient(constructorId));
   };
 
@@ -194,9 +185,7 @@ const DraggableIngredient = ({
 
   drag(drop(ref));
 
-  const handleRemoveClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log('❌ Remove button clicked for:', ingredient.name, constructorId);
+  const handleRemoveClick = () => {
     onRemove(constructorId);
   };
 

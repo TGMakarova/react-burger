@@ -6,7 +6,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { MyComponentUI } from '../mycomponent-ui/mycomponent-ui';
 import { OtherDetails } from '../other-details/other-details';
 import { submitOrder, clearOrder } from '../../services/slices/orderSlice';
-import { addIngredient, clearConstructor } from '../../services/slices/burgerConstructorSlice';
+import {
+  addIngredient,
+  clearConstructor,
+} from '../../services/slices/burgerConstructorSlice';
 import type { TIngredient } from '@utils/types';
 import type { ConstructorIngredient } from '../../services/slices/burgerConstructorSlice';
 import type { AppDispatch, RootState } from '../../services/store';
@@ -39,7 +42,7 @@ export const BurgerConstructor = (): React.JSX.Element => {
     if (bun || ingredients.length > 0) {
       const constructorData = {
         bun: bun,
-        ingredients: ingredients
+        ingredients: ingredients,
       };
       localStorage.setItem('savedConstructor', JSON.stringify(constructorData));
     }
@@ -49,36 +52,42 @@ export const BurgerConstructor = (): React.JSX.Element => {
   useEffect(() => {
     const savedConstructor = localStorage.getItem('savedConstructor');
     const returnTo = localStorage.getItem('returnTo');
-    
+
     // Если есть сохраненный конструктор и мы на странице, куда должны вернуться
-    if (savedConstructor && !isRestored && location.pathname !== '/login' && location.pathname !== '/register') {
+    if (
+      savedConstructor &&
+      !isRestored &&
+      location.pathname !== '/login' &&
+      location.pathname !== '/register'
+    ) {
       // Если returnTo указан, проверяем соответствие
       if (returnTo && returnTo !== location.pathname) {
         return;
       }
-      
+
       try {
-        const { bun: savedBun, ingredients: savedIngredients } = JSON.parse(savedConstructor);
-        
+        const { bun: savedBun, ingredients: savedIngredients } =
+          JSON.parse(savedConstructor);
+
         // Проверяем, нужно ли восстанавливать (если конструктор пустой)
         const hasNoIngredients = !bun && ingredients.length === 0;
-        
+
         if (hasNoIngredients && savedBun) {
           // Очищаем текущий конструктор (на всякий случай)
           dispatch(clearConstructor());
-          
+
           // Восстанавливаем булку
           if (savedBun) {
             dispatch(addIngredient({ ...savedBun, constructorId: uuidv4() }));
           }
-          
+
           // Восстанавливаем все ингредиенты
           if (savedIngredients && savedIngredients.length > 0) {
             savedIngredients.forEach((ingredient: ConstructorIngredient) => {
               dispatch(addIngredient({ ...ingredient, constructorId: uuidv4() }));
             });
           }
-          
+
           setIsRestored(true);
           sessionStorage.removeItem('restoringOrder');
         }
@@ -140,73 +149,75 @@ export const BurgerConstructor = (): React.JSX.Element => {
   };
 
   // Основная функция отправки заказа
-const handleSubmitOrder = async () => {
-  console.log('1. Начало handleSubmitOrder');
-  console.log('2. bun:', bun);
-  console.log('3. ingredients:', ingredients);
-  console.log('4. Токен:', localStorage.getItem('accessToken'));
-  console.log('5. isAuthenticated:', isAuthenticated());
-  
-  if (!bun) {
-    alert('Добавьте булку');
-    return;
-  }
+  const handleSubmitOrder = async () => {
+    console.log('1. Начало handleSubmitOrder');
+    console.log('2. bun:', bun);
+    console.log('3. ingredients:', ingredients);
+    console.log('4. Токен:', localStorage.getItem('accessToken'));
+    console.log('5. isAuthenticated:', isAuthenticated());
 
-  if (ingredients.length === 0) {
-    alert('Добавьте хотя бы один ингредиент');
-    return;
-  }
-
-  if (!isAuthenticated()) {
-    console.log('6. Не авторизован, сохраняем и редирект');
-    saveConstructorToLocalStorage();
-    localStorage.setItem('returnTo', location.pathname);
-    navigate('/login');
-    return;
-  }
-
-  console.log('7. Авторизован, отправляем заказ');
-
-  // Если авторизован, отправляем заказ
-  // Добавляем проверку, что bun не null (хотя validateOrder уже проверяет)
-  if (!bun) {
-    alert('Добавьте булку');
-    return;
-  }
-
-  const ingredientsIds = [bun._id, ...ingredients.map((item) => item._id), bun._id];
-
-  try {
-    const resultAction = await dispatch(submitOrder(ingredientsIds));
-
-    if (submitOrder.fulfilled.match(resultAction)) {
-      // Очищаем конструктор после успешного заказа
-      dispatch(clearConstructor());
-      
-      // Очищаем сохраненные данные
-      localStorage.removeItem('savedConstructor');
-      localStorage.removeItem('returnTo');
-      
-      // Сбрасываем флаг восстановления
-      setIsRestored(false);
-      
-      // Открываем модальное окно с номером заказа
-      setIsModalOpen(true);
-    } else if (submitOrder.rejected.match(resultAction)) {
-      // Проверяем, может быть ошибка из-за отсутствия авторизации
-      if (resultAction.error.message?.includes('401') || 
-          resultAction.error.message?.includes('unauthorized')) {
-        saveConstructorToLocalStorage();
-        localStorage.setItem('returnTo', location.pathname);
-        navigate('/login');
-      } else {
-        alert(`Ошибка: ${resultAction.error.message || 'Не удалось оформить заказ'}`);
-      }
+    if (!bun) {
+      alert('Добавьте булку');
+      return;
     }
-  } catch (err) {
-    alert('Произошла ошибка при оформлении заказа');
-  }
-};
+
+    if (ingredients.length === 0) {
+      alert('Добавьте хотя бы один ингредиент');
+      return;
+    }
+
+    if (!isAuthenticated()) {
+      console.log('6. Не авторизован, сохраняем и редирект');
+      saveConstructorToLocalStorage();
+      localStorage.setItem('returnTo', location.pathname);
+      navigate('/login');
+      return;
+    }
+
+    console.log('7. Авторизован, отправляем заказ');
+
+    // Если авторизован, отправляем заказ
+    // Добавляем проверку, что bun не null (хотя validateOrder уже проверяет)
+    if (!bun) {
+      alert('Добавьте булку');
+      return;
+    }
+
+    const ingredientsIds = [bun._id, ...ingredients.map((item) => item._id), bun._id];
+
+    try {
+      const resultAction = await dispatch(submitOrder(ingredientsIds));
+
+      if (submitOrder.fulfilled.match(resultAction)) {
+        // Очищаем конструктор после успешного заказа
+        dispatch(clearConstructor());
+
+        // Очищаем сохраненные данные
+        localStorage.removeItem('savedConstructor');
+        localStorage.removeItem('returnTo');
+
+        // Сбрасываем флаг восстановления
+        setIsRestored(false);
+
+        // Открываем модальное окно с номером заказа
+        setIsModalOpen(true);
+      } else if (submitOrder.rejected.match(resultAction)) {
+        // Проверяем, может быть ошибка из-за отсутствия авторизации
+        if (
+          resultAction.error.message?.includes('401') ||
+          resultAction.error.message?.includes('unauthorized')
+        ) {
+          saveConstructorToLocalStorage();
+          localStorage.setItem('returnTo', location.pathname);
+          navigate('/login');
+        } else {
+          alert(`Ошибка: ${resultAction.error.message || 'Не удалось оформить заказ'}`);
+        }
+      }
+    } catch (err) {
+      alert('Произошла ошибка при оформлении заказа');
+    }
+  };
   const handleCloseModal = () => {
     setIsModalOpen(false);
     dispatch(clearOrder());

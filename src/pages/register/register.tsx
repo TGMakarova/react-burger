@@ -42,7 +42,7 @@ export const RegisterPage = (): React.JSX.Element => {
 
   const handleSubmitRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -57,22 +57,22 @@ export const RegisterPage = (): React.JSX.Element => {
         // Сохраняем токены
         localStorage.setItem('accessToken', data.accessToken);
         localStorage.setItem('refreshToken', data.refreshToken);
-        
+
         // Сохраняем пользователя в Redux
         dispatch(setUser(data.user));
         dispatch(setAuthChecked(true)); // ЭТО ВАЖНО!
-        
+
         // Проверяем, нужно ли восстановить конструктор
         const savedConstructor = localStorage.getItem('savedConstructor');
         const returnTo = localStorage.getItem('returnTo');
-        
+
         if (savedConstructor && returnTo) {
           sessionStorage.setItem('restoringOrder', 'true');
           localStorage.removeItem('returnTo');
           navigate(returnTo);
           return;
         }
-        
+
         // Перенаправляем на главную
         navigate('/');
       } else {
@@ -120,12 +120,7 @@ export const RegisterPage = (): React.JSX.Element => {
       </div>
 
       <div className={styles.size_button}>
-        <Button
-          size="large"
-          type="primary"
-          disabled={isLoading}
-          htmlType="submit"
-        >
+        <Button size="large" type="primary" disabled={isLoading} htmlType="submit">
           {isLoading ? 'Регистрация...' : 'Зарегистрироваться'}
         </Button>
       </div>
@@ -137,7 +132,6 @@ export const RegisterPage = (): React.JSX.Element => {
         <p
           className={`${styles.grid_item_2} text text_type_main-default text_color_inactive`}
           onClick={handleLoginClick}
-          style={{ cursor: 'pointer' }}
         >
           Войти
         </p>

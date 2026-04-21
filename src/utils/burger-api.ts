@@ -59,12 +59,9 @@ class BurgerApi {
     }
   }
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     try {
       const response = await fetch(url, {
         ...options,
@@ -73,7 +70,7 @@ class BurgerApi {
           ...options.headers,
         },
       });
-      
+
       return checkResponse<T>(response);
     } catch (error) {
       console.error(`API Error [${endpoint}]:`, error);
@@ -86,7 +83,7 @@ class BurgerApi {
     options: RequestInit = {}
   ): Promise<T> {
     let token = this.getAccessToken();
-    
+
     if (!token) {
       throw new Error('Не авторизован');
     }
@@ -94,22 +91,22 @@ class BurgerApi {
     const makeRequest = async (requestToken: string) => {
       const cleanToken = requestToken.replace(/^Bearer\s+/i, '');
       const authHeader = `Bearer ${cleanToken}`;
-      
+
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         ...options,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': authHeader,
+          Authorization: authHeader,
           ...options.headers,
         },
       });
-      
+
       if (response.status === 401 || response.status === 403) {
         const error: any = new Error(`HTTP ${response.status}`);
         error.status = response.status;
         throw error;
       }
-      
+
       return checkResponse<T>(response);
     };
 
@@ -142,7 +139,7 @@ class BurgerApi {
   get<T>(endpoint: string, options?: RequestInit): Promise<T> {
     return this.request<T>(endpoint, { ...options, method: 'GET' });
   }
-  
+
   // POST запрос
   post<T>(endpoint: string, data?: any, options?: RequestInit): Promise<T> {
     return this.request<T>(endpoint, {
@@ -151,7 +148,7 @@ class BurgerApi {
       body: data ? JSON.stringify(data) : undefined,
     });
   }
-  
+
   // PUT запрос
   put<T>(endpoint: string, data?: any, options?: RequestInit): Promise<T> {
     return this.request<T>(endpoint, {
@@ -160,7 +157,7 @@ class BurgerApi {
       body: data ? JSON.stringify(data) : undefined,
     });
   }
-  
+
   // PATCH запрос
   patch<T>(endpoint: string, data?: any, options?: RequestInit): Promise<T> {
     return this.request<T>(endpoint, {
@@ -169,38 +166,44 @@ class BurgerApi {
       body: data ? JSON.stringify(data) : undefined,
     });
   }
-  
+
   // ========== МЕТОДЫ АВТОРИЗАЦИИ ==========
-  
+
   // Логин
   async login(email: string, password: string): Promise<AuthResponse> {
     const response = await this.post<AuthResponse>('/auth/login', { email, password });
-    
+
     if (response.accessToken && response.refreshToken) {
       this.setAccessToken(response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
     }
-    
+
     return response;
   }
-  
+
   // Регистрация
   async register(name: string, email: string, password: string): Promise<AuthResponse> {
-    const response = await this.post<AuthResponse>('/auth/register', { name, email, password });
-    
+    const response = await this.post<AuthResponse>('/auth/register', {
+      name,
+      email,
+      password,
+    });
+
     if (response.accessToken && response.refreshToken) {
       this.setAccessToken(response.accessToken);
       localStorage.setItem('refreshToken', response.refreshToken);
     }
-    
+
     return response;
   }
-  
+
   // Выход
   async logout(): Promise<LogoutResponse> {
     try {
       const refreshToken = localStorage.getItem('refreshToken');
-      const response = await this.post<LogoutResponse>('/auth/logout', { token: refreshToken });
+      const response = await this.post<LogoutResponse>('/auth/logout', {
+        token: refreshToken,
+      });
       this.clearAuth();
       return response;
     } catch (error) {
@@ -208,17 +211,17 @@ class BurgerApi {
       throw error;
     }
   }
-  
+
   // Обновление токена
   async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
     return this.post<RefreshTokenResponse>('/auth/token', { token: refreshToken });
   }
-  
+
   // Получение данных пользователя
   async getUser(): Promise<UserResponse> {
     return this.requestWithAuth<UserResponse>('/auth/user', { method: 'GET' });
   }
-  
+
   // Обновление данных пользователя
   async updateUser(user: { name: string; email: string }): Promise<UserResponse> {
     return this.requestWithAuth<UserResponse>('/auth/user', {
@@ -226,19 +229,22 @@ class BurgerApi {
       body: JSON.stringify(user),
     });
   }
-  
+
   // Запрос на сброс пароля
   forgotPassword(email: string): Promise<ResetPasswordResponse> {
     return this.post<ResetPasswordResponse>('/password-reset', { email });
   }
-  
+
   // Сброс пароля с токеном
   resetPassword(password: string, token: string): Promise<ResetPasswordResponse> {
-    return this.post<ResetPasswordResponse>('/password-reset/reset', { password, token });
+    return this.post<ResetPasswordResponse>('/password-reset/reset', {
+      password,
+      token,
+    });
   }
-  
+
   // ========== ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ==========
-  
+
   isAuthenticated(): boolean {
     return !!this.getAccessToken();
   }
@@ -252,7 +258,7 @@ class BurgerApi {
   getIngredients() {
     return this.get<{ data: TIngredient[] }>('/ingredients');
   }
-  
+
   // Создание заказа
   createOrder(ingredients: string[]) {
     return this.post<{ order: TOrder }>('/orders', { ingredients });

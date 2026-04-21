@@ -1,4 +1,9 @@
-import { Input, EmailInput, PasswordInput, Button } from '@krgaa/react-developer-burger-ui-components';
+import {
+  Input,
+  EmailInput,
+  PasswordInput,
+  Button,
+} from '@krgaa/react-developer-burger-ui-components';
 import styles from './profile.module.css';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -24,7 +29,7 @@ export const ProfilePage = (): React.JSX.Element => {
   // Загрузка данных пользователя (только один раз)
   useEffect(() => {
     if (hasFetched.current) return;
-    
+
     const fetchUserData = async () => {
       // Проверяем авторизацию перед загрузкой
       if (!burgerApi.isAuthenticated()) {
@@ -35,10 +40,10 @@ export const ProfilePage = (): React.JSX.Element => {
       hasFetched.current = true;
       setIsLoading(true);
       setError('');
-      
+
       try {
         const data = await burgerApi.getUser();
-        
+
         if (data.success && data.user) {
           setName(data.user.name);
           setEmail(data.user.email);
@@ -48,7 +53,7 @@ export const ProfilePage = (): React.JSX.Element => {
         }
       } catch (error: any) {
         console.error('Ошибка загрузки:', error);
-        
+
         if (error.message?.includes('401') || error.message?.includes('403')) {
           setError('Сессия истекла. Пожалуйста, войдите заново.');
           setTimeout(() => {
@@ -69,11 +74,10 @@ export const ProfilePage = (): React.JSX.Element => {
   // Отслеживание изменений
   useEffect(() => {
     if (originalUser) {
-      const hasChanges = name !== originalUser.name || 
-                        email !== originalUser.email || 
-                        password !== '';
+      const hasChanges =
+        name !== originalUser.name || email !== originalUser.email || password !== '';
       setIsEdited(hasChanges);
-      
+
       if (hasChanges) {
         setError('');
         setSuccessMessage('');
@@ -98,24 +102,27 @@ export const ProfilePage = (): React.JSX.Element => {
       setError('Имя должно содержать минимум 2 символа');
       return;
     }
-    
+
     if (!email.includes('@') || !email.includes('.')) {
       setError('Введите корректный email');
       return;
     }
-    
+
     if (password && password.length < 6) {
       setError('Пароль должен содержать минимум 6 символов');
       return;
     }
-    
+
     setIsLoading(true);
     setError('');
     setSuccessMessage('');
 
     try {
-      const data = await burgerApi.updateUser({ name: name.trim(), email: email.trim() });
-      
+      const data = await burgerApi.updateUser({
+        name: name.trim(),
+        email: email.trim(),
+      });
+
       if (data.success && data.user) {
         setOriginalUser(data.user);
         setName(data.user.name);
@@ -123,7 +130,7 @@ export const ProfilePage = (): React.JSX.Element => {
         setPassword('');
         setIsEdited(false);
         setSuccessMessage('Данные успешно обновлены!');
-        
+
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
           const user = JSON.parse(storedUser);
@@ -131,14 +138,14 @@ export const ProfilePage = (): React.JSX.Element => {
           user.email = data.user.email;
           localStorage.setItem('user', JSON.stringify(user));
         }
-        
+
         setTimeout(() => setSuccessMessage(''), 3000);
       } else {
         setError('Не удалось обновить данные');
       }
     } catch (error: any) {
       console.error('Ошибка сохранения:', error);
-      
+
       if (error.message?.includes('409')) {
         setError('Пользователь с таким email уже существует');
       } else if (error.message?.includes('401') || error.message?.includes('403')) {
@@ -158,23 +165,13 @@ export const ProfilePage = (): React.JSX.Element => {
   return (
     <div className={styles.mail_container}>
       {isLoading && !originalUser && (
-        <div className={styles.loading_message}>
-          Загрузка данных...
-        </div>
+        <div className={styles.loading_message}>Загрузка данных...</div>
       )}
-      
-      {error && (
-        <div className={styles.error_message}>
-          {error}
-        </div>
-      )}
-      
-      {successMessage && (
-        <div className={styles.success_message}>
-          {successMessage}
-        </div>
-      )}
-      
+
+      {error && <div className={styles.error_message}>{error}</div>}
+
+      {successMessage && <div className={styles.success_message}>{successMessage}</div>}
+
       <Input
         name="name"
         placeholder="Имя"
@@ -182,7 +179,7 @@ export const ProfilePage = (): React.JSX.Element => {
         value={name}
         disabled={isLoading}
       />
-      
+
       <EmailInput
         name="email"
         placeholder="Логин"
@@ -190,7 +187,7 @@ export const ProfilePage = (): React.JSX.Element => {
         value={email}
         disabled={isLoading}
       />
-      
+
       <PasswordInput
         name="password"
         placeholder="Новый пароль"

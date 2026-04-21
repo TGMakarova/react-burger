@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk} from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { burgerApi } from '../../utils/burger-api';
 import type { RootState } from '../store';

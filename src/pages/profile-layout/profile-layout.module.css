@@ -46,5 +46,34 @@
 }
 
 .error_message {
-  
+}
+
+.nav_link {
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.nav_link:hover {
+  opacity: 0.8;
+}
+
+.active_link {
+  color: white !important;
+  text-decoration: none;
+}
+
+.logout_button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.logout_button:hover {
+  opacity: 0.8;
+}
+
+.logout_button:disabled {
+  cursor: not-allowed;
 }

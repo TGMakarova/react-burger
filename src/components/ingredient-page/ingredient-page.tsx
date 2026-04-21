@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import type { RootState, AppDispatch } from '@/services/store';
 import { IngredientDetailsContent } from '../ingredient-details-content/ingredient-details-content';
 import styles from './ingredient-page.module.css';
-import { fetchIngredients } from '@/services/slices/ingredientsSlice';
+
 
 export const IngredientPage = () => {
   const { id } = useParams();

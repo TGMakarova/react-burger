@@ -28,36 +28,28 @@
 }
 
 .registration_container {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+}
+
+.grid_row {
   display: grid;
-  grid-template-columns: 1fx 1fx;
-  grid-template-rows: 2;
-  flex-direction: row;
+  grid-template-columns: 2;
   width: 100%;
   column-gap: 10px;
+  justify-content: center;
+  align-items: center;
 }
 
 .grid_item_1 {
-  grid-row: 1;
   grid-column: 1;
-  text-align: end;
 }
 
 .grid_item_2 {
-  grid-row: 1;
   grid-column: 2;
-}
-
-.grid_item_3 {
-  grid-row: 2;
-  grid-column: 1;
-  text-align: end;
-}
-
-.grid_item_4 {
-  grid-row: 2;
-  grid-column: 2;
+  cursor: pointer;
 }
 
 .error_message {
-  
 }

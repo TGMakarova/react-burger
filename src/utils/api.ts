@@ -7,7 +7,7 @@ export const checkResponse = async <T>(response: Response): Promise<T> => {
     const error = {
       status: response.status,
       statusText: response.statusText,
-      message: `Ошибка ${response.status}: ${response.statusText}`, 
+      message: `Ошибка ${response.status}: ${response.statusText}`,
       data: data,
     };
     return Promise.reject(error);
@@ -36,7 +36,7 @@ export const sendAuthRequest = async <T>(
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  return checkResponse(response); 
+  return checkResponse(response);
 };
 
 export const sendWithTokenRefresh = async <T>(

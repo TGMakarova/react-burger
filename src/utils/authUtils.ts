@@ -12,7 +12,7 @@ export const refreshTokens = async (): Promise<boolean> => {
 
   console.log('refreshTokens called');
   console.log('Refresh token exists:', !!refreshToken);
-  
+
   if (!refreshToken) {
     console.error('Refresh token не найден в localStorage');
     return false;
@@ -21,7 +21,7 @@ export const refreshTokens = async (): Promise<boolean> => {
   try {
     // Очищаем refreshToken от возможного префикса Bearer
     const cleanRefreshToken = refreshToken.replace(/^Bearer\s+/i, '');
-    
+
     const response = await fetch(`${BURGER_API_URL}/auth/token`, {
       method: 'POST',
       headers: {
@@ -31,18 +31,21 @@ export const refreshTokens = async (): Promise<boolean> => {
     });
 
     console.log('Refresh token response status:', response.status);
-    
+
     const data: RefreshResponse = await checkResponse(response);
-    console.log('Refresh response:', { ...data, accessToken: data.accessToken?.substring(0, 50) + '...' });
+    console.log('Refresh response:', {
+      ...data,
+      accessToken: data.accessToken?.substring(0, 50) + '...',
+    });
 
     if (data.success && data.accessToken && data.refreshToken) {
       // Очищаем токены от префикса Bearer
       const cleanAccessToken = data.accessToken.replace(/^Bearer\s+/i, '');
       const cleanNewRefreshToken = data.refreshToken.replace(/^Bearer\s+/i, '');
-      
+
       localStorage.setItem('accessToken', cleanAccessToken);
       localStorage.setItem('refreshToken', cleanNewRefreshToken);
-      
+
       console.log('Токены успешно обновлены');
       console.log('New accessToken saved:', cleanAccessToken.substring(0, 50) + '...');
       return true;

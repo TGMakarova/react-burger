@@ -10,15 +10,15 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const location = useLocation();
   const { isLoggedIn, isAuthChecked } = useSelector((state: RootState) => state.auth);
-  
+
   if (!isAuthChecked) {
     return null;
   }
-  
+
   if (!isLoggedIn) {
     // Сохраняем путь, куда хотел попасть пользователь
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
-  
+
   return <>{children}</>;
 }

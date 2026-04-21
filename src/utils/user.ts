@@ -1,4 +1,4 @@
-const API_URL = 'https://norma.nomoreparties.space/api'; // Ваш URL API
+const API_URL = 'https://norma.nomoreparties.space/api'; 
 
 // Получение данных пользователя с проверкой токена
 export const getUserApi = async () => {

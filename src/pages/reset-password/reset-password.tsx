@@ -22,12 +22,12 @@ export const ResetPassword = (): React.ReactNode => {
 
   useEffect(() => {
     const hasRequestedReset = localStorage.getItem('passwordResetRequested') === 'true';
-    
+
     if (!hasRequestedReset) {
       navigate('/forgot-password');
     }
   }, [navigate]);
-  
+
   useEffect(() => {
     return () => {
       // Опционально: очищаем флаг при уходе со страницы
@@ -50,10 +50,10 @@ export const ResetPassword = (): React.ReactNode => {
     }
     return true;
   };
-  
+
   const handleSubmitResetPassword = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -62,13 +62,10 @@ export const ResetPassword = (): React.ReactNode => {
     setError('');
 
     try {
-      const data = await burgerApi.post<ResetPasswordResponse>(
-        '/password-reset/reset',
-        {
-          password: password,
-          token: token,
-        }
-      );
+      const data = await burgerApi.post<ResetPasswordResponse>('/password-reset/reset', {
+        password: password,
+        token: token,
+      });
 
       if (data.success) {
         localStorage.removeItem('passwordResetRequested');
@@ -125,7 +122,6 @@ export const ResetPassword = (): React.ReactNode => {
         <p
           className={`${styles.grid_item_2} text text_type_main-default text_color_inactive`}
           onClick={() => navigate('/login')}
-          style={{ cursor: 'pointer' }}
         >
           Войти
         </p>

@@ -1,53 +1,52 @@
 .register_container {
-    display: flex;
-    width: 480px;
-    flex-direction: column;
-    margin: auto;
-    color:white; 
+  display: flex;
+  width: 480px;
+  flex-direction: column;
+  margin: auto;
+  color: white;
 }
 
 .header {
-    align-self: center;
+  align-self: center;
 }
 
 .mail_container {
-    display: flex;
-    padding-top:24px;
-    padding-bottom: 24px;
-    gap:24px;
-    flex-direction: column;
+  display: flex;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  gap: 24px;
+  flex-direction: column;
 }
 
 .size_button {
-    display: flex;
-    width: 50%;
-    align-items: center;
-    justify-content: center;
-    margin-left: auto;
-    margin-right: auto;
-    padding-bottom: 80px;
+  display: flex;
+  width: 50%;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 80px;
 }
 
 .registration_container {
-    display: grid;
-    grid-template-columns: 1fx 1fx;
-    flex-direction: row;
-    width:100%;
-    column-gap: 10px;
-   
+  display: grid;
+  grid-template-columns: 1fx 1fx;
+  flex-direction: row;
+  width: 100%;
+  column-gap: 10px;
 }
 
 .grid_item_1 {
-grid-row: 1;
-grid-column: 1;
-text-align: end;
+  grid-row: 1;
+  grid-column: 1;
+  text-align: end;
 }
 
 .grid_item_2 {
-grid-row: 1;
-grid-column: 2;
+  grid-row: 1;
+  grid-column: 2;
+  cursor: pointer;
 }
 
 .error_message {
-
 }

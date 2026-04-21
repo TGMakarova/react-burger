@@ -8,12 +8,12 @@ import { LoginPage } from '@/pages/login/login';
 import { RegisterPage } from '@/pages/register/register';
 import { FeedPage } from '@/pages/feed-page/feed-page';
 import { ProfilePage } from '@/pages/profile/profile';
-import { ResetPassword} from '@/pages/reset-password/reset-password';
+import { ResetPassword } from '@/pages/reset-password/reset-password';
 import { AppHeader } from '../app-header/app-header';
 import { ForgotPassword } from '@/pages/forgot-password/forgot-password';
 import { ProfileOrderPage } from '@/pages/orders/orders';
 import { ProfileLayout } from '@/pages/profile-layout/profile-layout';
-import  ProtectedRoute  from '../protected-route/protected-route';
+import ProtectedRoute from '../protected-route/protected-route';
 import PublicRoute from '../public-route/public-route';
 import { NotFoundPage } from '@/pages/not-found-page/not-found-page';
 import { checkAuth } from '../../services/authActions';
@@ -24,14 +24,14 @@ export function App() {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const background = location.state?.background;
-  
+
   const { isAuthChecked, isLoading } = useSelector((state: RootState) => state.auth);
 
   // Проверка токена при загрузке приложения
   useEffect(() => {
     // ✅ Если мы восстанавливаем заказ - не делаем checkAuth
     const isRestoringOrder = sessionStorage.getItem('restoringOrder') === 'true';
-    
+
     if (!isRestoringOrder) {
       console.log('🔍 Running checkAuth');
       dispatch(checkAuth());
@@ -46,7 +46,7 @@ export function App() {
     localStorage.removeItem('popupIngredientId');
     localStorage.removeItem('popupBackgroundPath');
     localStorage.removeItem('popupRestored');
-    
+
     const returnPath = location.state?.from || '/';
     navigate(returnPath);
   };
@@ -56,22 +56,26 @@ export function App() {
     return (
       <>
         <AppHeader />
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-          flexDirection: 'column',
-          gap: '20px'
-        }}>
-          <div style={{
-            width: '50px',
-            height: '50px',
-            border: '4px solid #E2E8F0',
-            borderTop: '4px solid #3B82F6',
-            borderRadius: '50%',
-            animation: 'spin 0.8s linear infinite'
-          }} />
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+            flexDirection: 'column',
+            gap: '20px',
+          }}
+        >
+          <div
+            style={{
+              width: '50px',
+              height: '50px',
+              border: '4px solid #E2E8F0',
+              borderTop: '4px solid #3B82F6',
+              borderRadius: '50%',
+              animation: 'spin 0.8s linear infinite',
+            }}
+          />
           <div>Проверка авторизации...</div>
           <style>{`
             @keyframes spin {
@@ -93,7 +97,7 @@ export function App() {
         <Route path="/" element={<Home />} />
         <Route path="ingredients/:id" element={<IngredientPage />} />
         <Route path="feed" element={<FeedPage />} />
-        
+
         {/* Маршруты для неавторизованных пользователей */}
         <Route
           path="login"

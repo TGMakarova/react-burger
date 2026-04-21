@@ -26,23 +26,23 @@ export const Home = (): React.JSX.Element => {
   }, [dispatch]);
 
   // Восстанавливаем попап после перезагрузки
-useEffect(() => {
-  const savedIngredientId = localStorage.getItem('popupIngredientId');
-  const savedBackgroundPath = localStorage.getItem('popupBackgroundPath');
-  
-  if (savedIngredientId && savedBackgroundPath && ingredients.length > 0) {
-    const ingredient = ingredients.find(item => item._id === savedIngredientId);
-    
-    if (ingredient && !location.pathname.includes('/ingredients/')) {
-      dispatch(setSelectedIngredient(ingredient));
-      
-      navigate(`/ingredients/${savedIngredientId}`, {
-        state: { background: { pathname: savedBackgroundPath } },
-        replace: true
-      });
+  useEffect(() => {
+    const savedIngredientId = localStorage.getItem('popupIngredientId');
+    const savedBackgroundPath = localStorage.getItem('popupBackgroundPath');
+
+    if (savedIngredientId && savedBackgroundPath && ingredients.length > 0) {
+      const ingredient = ingredients.find((item) => item._id === savedIngredientId);
+
+      if (ingredient && !location.pathname.includes('/ingredients/')) {
+        dispatch(setSelectedIngredient(ingredient));
+
+        navigate(`/ingredients/${savedIngredientId}`, {
+          state: { background: { pathname: savedBackgroundPath } },
+          replace: true,
+        });
+      }
     }
-  }
-}, [ingredients]); ;
+  }, [ingredients]);
 
   if (loading) {
     return (

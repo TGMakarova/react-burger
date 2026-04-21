@@ -1,7 +1,4 @@
-import {
-  Button,
-  EmailInput,
-} from '@krgaa/react-developer-burger-ui-components';
+import { Button, EmailInput } from '@krgaa/react-developer-burger-ui-components';
 import styles from './forgot-password.module.css';
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -33,7 +30,7 @@ export const ForgotPassword = (): React.ReactNode => {
 
   const handleSubmitForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -42,10 +39,9 @@ export const ForgotPassword = (): React.ReactNode => {
     setError('');
 
     try {
-      const data = await burgerApi.post<ForgotPasswordResponse>(
-        '/password-reset',
-        { email }
-      );
+      const data = await burgerApi.post<ForgotPasswordResponse>('/password-reset', {
+        email,
+      });
 
       if (data.success) {
         localStorage.setItem('passwordResetRequested', 'true');
@@ -98,7 +94,6 @@ export const ForgotPassword = (): React.ReactNode => {
         <p
           className={`${styles.grid_item_2} text text_type_main-default text_color_inactive`}
           onClick={handleLoginClick}
-          style={{ cursor: 'pointer' }}
         >
           Войти
         </p>

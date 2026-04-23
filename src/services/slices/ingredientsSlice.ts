@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { burgerApi } from '../../utils/burger-api';
 import type { TIngredient } from '../../utils/types';
 import type { RootState } from '../store';
+import { getIngredientsApi } from '../../utils/burger-api';
 
 interface IngredientsState {
   items: TIngredient[];
@@ -20,15 +20,13 @@ export const fetchIngredients = createAsyncThunk(
   'ingredients/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await burgerApi.getIngredients();
-      // response = { data: TIngredient[] }
-      return response.data;
+      const response = await getIngredientsApi(); // { data: TIngredient[] }
+      return response.data; // ✅ возвращаем TIngredient[]
     } catch (error: any) {
       return rejectWithValue(error.message || 'Ошибка загрузки ингредиентов');
     }
   }
 );
-
 const ingredientsSlice = createSlice({
   name: 'ingredients',
   initialState,

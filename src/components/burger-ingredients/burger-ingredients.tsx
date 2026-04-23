@@ -1,21 +1,22 @@
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { IngredientsDetailsUI } from '../ingredients-details-ui/ingredients-details-ui';
 
-import type { AppDispatch, RootState } from '../../services/store';
+import type { RootState } from '../../services/store';
 import styles from './burger-ingredients.module.css';
 
 type CategoryType = 'bun' | 'sauce' | 'main';
 
 export const BurgerIngredients = (): React.JSX.Element => {
-
   const [currentTab, setCurrentTab] = useState<CategoryType>('bun');
-  
+
   // Получаем ингредиенты из Redux
-  const { items: ingredients, loading, error } = useSelector(
-    (state: RootState) => state.ingredients
-  );
+  const {
+    items: ingredients,
+    loading,
+    error,
+  } = useSelector((state: RootState) => state.ingredients);
 
   const categoryRefs = useRef<{
     bun: HTMLDivElement | null;
@@ -85,13 +86,10 @@ export const BurgerIngredients = (): React.JSX.Element => {
   }
 
   // Отображение ошибки
-   if (error) {
+  if (error) {
     return (
       <section className={styles.burger_ingredients}>
-        <div className={styles.error}>
-          Ошибка: {error}
-          
-        </div>
+        <div className={styles.error}>Ошибка: {error}</div>
       </section>
     );
   }

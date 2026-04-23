@@ -5,64 +5,49 @@ import {
 } from '@krgaa/react-developer-burger-ui-components';
 import styles from './login.module.css';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { burgerApi } from '@utils/burger-api';
-import { useDispatch } from 'react-redux';
-import { setUser, setAuthChecked } from '../../services/slices/authSlice';
+import { useState} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../../services/slices/authSlice'; // ✅ импортируем экшен
+import type { AppDispatch, RootState } from '../../services/store';
 
 export function LoginPage() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const location = useLocation(); // ✅ добавляем useLocation
+  const location = useLocation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  console.log('📱 [LoginPage] Рендер');
 
-  useEffect(() => {
-    console.log('📱 [LoginPage] returnTo из localStorage:', localStorage.getItem('returnTo'));
-  }, []);
+  // ✅ Берём состояние загрузки из Redux
+  const isLoading = useSelector((state: RootState) => state.auth.isLoading);
 
-
-
-  // ✅ Получаем путь для возврата (приоритет: state > localStorage > '/')
+  // ✅ Получаем путь для возврата
   const getReturnPath = () => {
-    // 1. Сначала проверяем state из Navigate
     const fromState = location.state?.from?.pathname;
     if (fromState) return fromState;
     
-    // 2. Затем проверяем localStorage (от ProtectedRoute)
     const savedPath = localStorage.getItem('returnTo');
     if (savedPath) return savedPath;
     
-    // 3. По умолчанию - на главную
     return '/';
   };
 
   const handleSubmitLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-console.log('📱 [LoginPage] Попытка входа');
 
     if (isLoading) return;
 
-    setIsLoading(true);
     setError('');
 
     try {
-      const response = await burgerApi.login(email, password);
-
-      dispatch(setUser(response.user));
-      dispatch(setAuthChecked(true));
-
+      // ✅ Используем Redux экшен вместо прямого вызова burgerApi
+      const result = await dispatch(login({ email, password })).unwrap();
+      
       // ✅ Восстанавливаем сохраненный путь
       const returnPath = getReturnPath();
-      
-      // Проверяем, восстанавливаем ли заказ
       const savedConstructor = localStorage.getItem('savedConstructor');
       
-      // Очищаем сохраненный путь
       localStorage.removeItem('returnTo');
       
       if (savedConstructor && returnPath.includes('/orders')) {
@@ -72,12 +57,9 @@ console.log('📱 [LoginPage] Попытка входа');
         return;
       }
 
-      // Редирект на сохраненный путь или на главную
       navigate(returnPath, { replace: true });
     } catch (error: any) {
       setError(error.message || 'Ошибка авторизации. Проверьте email и пароль');
-    } finally {
-      setIsLoading(false);
     }
   };
 

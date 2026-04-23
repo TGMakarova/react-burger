@@ -1,8 +1,25 @@
-import { checkResponse } from './api';
 import type { TIngredient, TOrder } from './types';
 
 export const BURGER_API_URL = 'https://new-stellarburgers.education-services.ru/api';
 
+// ========== БАЗОВАЯ ФУНКЦИЯ ПРОВЕРКИ ОТВЕТА ==========
+const checkResponse = async <T>(response: Response): Promise<T> => {
+  const data = (await response.json()) as T;
+
+  if (!response.ok) {
+    const error = {
+      status: response.status,
+      statusText: response.statusText,
+      message: `Ошибка ${response.status}: ${response.statusText}`,
+      data: data,
+    };
+    return Promise.reject(error);
+  }
+
+  return data;
+};
+
+// ========== ИНТЕРФЕЙСЫ ==========
 interface AuthResponse {
   success: boolean;
   accessToken: string;
@@ -37,6 +54,7 @@ interface UserResponse {
   };
 }
 
+// ========== КЛАСС API ==========
 class BurgerApi {
   private baseUrl: string;
   private accessToken: string | null = null;
@@ -53,7 +71,6 @@ class BurgerApi {
   private setAccessToken(token: string | null) {
     this.accessToken = token;
     if (token) {
-      // ✅ Сохраняем токен без "Bearer "
       localStorage.setItem('accessToken', token);
     } else {
       localStorage.removeItem('accessToken');
@@ -80,70 +97,67 @@ class BurgerApi {
   }
 
   private async requestWithAuth<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
-  let token = this.getAccessToken();
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    let token = this.getAccessToken();
 
-  if (!token) {
-    throw new Error('Не авторизован');
-  }
+    if (!token) {
+      throw new Error('Не авторизован');
+    }
 
-  const makeRequest = async (requestToken: string) => {
-    // ✅ Если токен уже без "Bearer", просто добавляем "Bearer "
-    const authHeader = `Bearer ${requestToken}`;
+    const makeRequest = async (requestToken: string) => {
+      const authHeader = `Bearer ${requestToken}`;
 
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': authHeader,
-        ...options.headers,
-      },
-    });
+      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: authHeader,
+          ...options.headers,
+        },
+      });
 
-    if (response.status === 401 || response.status === 403) {
-      const error: any = new Error(`HTTP ${response.status}`);
-      error.status = response.status;
+      if (response.status === 401 || response.status === 403) {
+        const error: any = new Error(`HTTP ${response.status}`);
+        error.status = response.status;
+        throw error;
+      }
+
+      return checkResponse<T>(response);
+    };
+
+    try {
+      return await makeRequest(token);
+    } catch (error: any) {
+      if (error.status === 401 || error.status === 403) {
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (refreshToken) {
+          try {
+            const refreshData = await this.refreshToken(refreshToken);
+            if (refreshData.accessToken) {
+              const cleanToken = refreshData.accessToken.replace(/^Bearer\s+/i, '');
+              this.setAccessToken(cleanToken);
+              localStorage.setItem('refreshToken', refreshData.refreshToken);
+              return await makeRequest(this.getAccessToken()!);
+            }
+          } catch (refreshError) {
+            this.clearAuth();
+            throw new Error('Сессия истекла. Пожалуйста, войдите снова.');
+          }
+        }
+        this.clearAuth();
+        throw new Error('Сессия истекла. Пожалуйста, войдите снова.');
+      }
       throw error;
     }
-
-    return checkResponse<T>(response);
-  };
-
-  try {
-    return await makeRequest(token);
-  } catch (error: any) {
-    if (error.status === 401 || error.status === 403) {
-      const refreshToken = localStorage.getItem('refreshToken');
-      if (refreshToken) {
-        try {
-          const refreshData = await this.refreshToken(refreshToken);
-          if (refreshData.accessToken) {
-            // ✅ Тоже убираем "Bearer" при обновлении
-            const cleanToken = refreshData.accessToken.replace(/^Bearer\s+/i, '');
-            this.setAccessToken(cleanToken);
-            localStorage.setItem('refreshToken', refreshData.refreshToken);
-            return await makeRequest(this.getAccessToken()!);
-          }
-        } catch (refreshError) {
-          this.clearAuth();
-          throw new Error('Сессия истекла. Пожалуйста, войдите снова.');
-        }
-      }
-      this.clearAuth();
-      throw new Error('Сессия истекла. Пожалуйста, войдите снова.');
-    }
-    throw error;
   }
-}
 
-  // GET запрос
+  // HTTP методы
   get<T>(endpoint: string, options?: RequestInit): Promise<T> {
     return this.request<T>(endpoint, { ...options, method: 'GET' });
   }
 
-  // POST запрос
   post<T>(endpoint: string, data?: any, options?: RequestInit): Promise<T> {
     return this.request<T>(endpoint, {
       ...options,
@@ -152,7 +166,6 @@ class BurgerApi {
     });
   }
 
-  // PUT запрос
   put<T>(endpoint: string, data?: any, options?: RequestInit): Promise<T> {
     return this.request<T>(endpoint, {
       ...options,
@@ -161,7 +174,6 @@ class BurgerApi {
     });
   }
 
-  // PATCH запрос
   patch<T>(endpoint: string, data?: any, options?: RequestInit): Promise<T> {
     return this.request<T>(endpoint, {
       ...options,
@@ -172,12 +184,10 @@ class BurgerApi {
 
   // ========== МЕТОДЫ АВТОРИЗАЦИИ ==========
 
-  // Логин
   async login(email: string, password: string): Promise<AuthResponse> {
     const response = await this.post<AuthResponse>('/auth/login', { email, password });
 
     if (response.accessToken && response.refreshToken) {
-      // ✅ Убираем "Bearer " из токена перед сохранением
       const cleanToken = response.accessToken.replace(/^Bearer\s+/i, '');
       this.setAccessToken(cleanToken);
       localStorage.setItem('refreshToken', response.refreshToken);
@@ -186,7 +196,6 @@ class BurgerApi {
     return response;
   }
 
-  // Регистрация
   async register(name: string, email: string, password: string): Promise<AuthResponse> {
     const response = await this.post<AuthResponse>('/auth/register', {
       name,
@@ -195,7 +204,6 @@ class BurgerApi {
     });
 
     if (response.accessToken && response.refreshToken) {
-      // ✅ Убираем "Bearer " из токена перед сохранением
       const cleanToken = response.accessToken.replace(/^Bearer\s+/i, '');
       this.setAccessToken(cleanToken);
       localStorage.setItem('refreshToken', response.refreshToken);
@@ -203,7 +211,7 @@ class BurgerApi {
 
     return response;
   }
-  // Выход
+
   async logout(): Promise<LogoutResponse> {
     try {
       const refreshToken = localStorage.getItem('refreshToken');
@@ -218,17 +226,14 @@ class BurgerApi {
     }
   }
 
-  // Обновление токена
   async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
     return this.post<RefreshTokenResponse>('/auth/token', { token: refreshToken });
   }
 
-  // Получение данных пользователя
   async getUser(): Promise<UserResponse> {
     return this.requestWithAuth<UserResponse>('/auth/user', { method: 'GET' });
   }
 
-  // Обновление данных пользователя
   async updateUser(user: { name: string; email: string }): Promise<UserResponse> {
     return this.requestWithAuth<UserResponse>('/auth/user', {
       method: 'PATCH',
@@ -236,12 +241,10 @@ class BurgerApi {
     });
   }
 
-  // Запрос на сброс пароля
   forgotPassword(email: string): Promise<ResetPasswordResponse> {
     return this.post<ResetPasswordResponse>('/password-reset', { email });
   }
 
-  // Сброс пароля с токеном
   resetPassword(password: string, token: string): Promise<ResetPasswordResponse> {
     return this.post<ResetPasswordResponse>('/password-reset/reset', {
       password,
@@ -260,16 +263,17 @@ class BurgerApi {
     localStorage.removeItem('refreshToken');
   }
 
-  // Получение ингредиентов
   getIngredients() {
     return this.get<{ data: TIngredient[] }>('/ingredients');
   }
 
-  // Создание заказа
   createOrder(ingredients: string[]) {
     return this.post<{ order: TOrder }>('/orders', { ingredients });
   }
 }
 
-// Создаем экземпляр API клиента
+export const getIngredientsApi = () => burgerApi.getIngredients();
+
+
+// ========== ЭКЗЕМПЛЯР API ДЛЯ ИСПОЛЬЗОВАНИЯ ==========
 export const burgerApi = new BurgerApi(BURGER_API_URL);

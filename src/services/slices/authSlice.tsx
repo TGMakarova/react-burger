@@ -22,29 +22,104 @@ const initialState: AuthState = {
   error: null,
 };
 
-// ✅ Исправленный checkAuth - правильно обрабатываем ответ от API
+// ✅ checkAuth - использует burgerApi.getUser()
 export const checkAuth = createAsyncThunk(
   'auth/checkAuth',
   async (_, { rejectWithValue }) => {
     const token = localStorage.getItem('accessToken');
-    
-    console.log('🔍 [checkAuth] Начало проверки');
-    console.log('🔍 [checkAuth] Токен из localStorage:', token ? `${token.substring(0, 20)}...` : 'нет');
-    
+
     if (!token) {
-      console.log('🔍 [checkAuth] Нет токена');
       return rejectWithValue('No token');
     }
-    
+
     try {
       const response = await burgerApi.getUser();
-      console.log('🔍 [checkAuth] Ответ от getUser:', response);
-      console.log('🔍 [checkAuth] Возвращаем user:', response.user);
       return response.user;
     } catch (error) {
-      console.log('🔍 [checkAuth] Ошибка:', error);
       localStorage.removeItem('accessToken');
       return rejectWithValue('Invalid token');
+    }
+  }
+);
+
+// ✅ updateUser - использует burgerApi.updateUser()
+export const updateUser = createAsyncThunk(
+  'auth/updateUser',
+  async ({ name, email }: { name: string; email: string }, { rejectWithValue }) => {
+    try {
+      const response = await burgerApi.updateUser({ name, email });
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Ошибка обновления данных');
+    }
+  }
+);
+
+export const login = createAsyncThunk(
+  'auth/login',
+  async (
+    { email, password }: { email: string; password: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await burgerApi.login(email, password);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Ошибка входа');
+    }
+  }
+);
+
+export const forgotPassword = createAsyncThunk(
+  'auth/forgotPassword',
+  async ({ email }: { email: string }, { rejectWithValue }) => {
+    try {
+      const response = await burgerApi.forgotPassword(email);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Ошибка восстановления пароля');
+    }
+  }
+);
+
+export const register = createAsyncThunk(
+  'auth/register',
+  async (
+    { name, email, password }: { name: string; email: string; password: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await burgerApi.register(name, email, password);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Ошибка регистрации');
+    }
+  }
+);
+
+export const resetPassword = createAsyncThunk(
+  'auth/resetPassword',
+  async (
+    { password, token }: { password: string; token: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await burgerApi.resetPassword(password, token);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Ошибка сброса пароля');
+    }
+  }
+);
+
+export const logoutUser = createAsyncThunk(
+  'auth/logoutUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await burgerApi.logout();
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Ошибка выхода');
     }
   }
 );
@@ -77,14 +152,11 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(checkAuth.pending, (state) => {
-        console.log('[authSlice] checkAuth.pending');
         state.isLoading = true;
         state.isAuthChecked = false;
         state.error = null;
       })
       .addCase(checkAuth.fulfilled, (state, action) => {
-        console.log('[authSlice] checkAuth.fulfilled:', action.payload);
-        // ✅ action.payload теперь содержит { email, name }
         state.isLoggedIn = true;
         state.user = action.payload;
         state.isAuthChecked = true;
@@ -92,11 +164,101 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(checkAuth.rejected, (state, action) => {
-        console.log('[authSlice] checkAuth.rejected:', action.payload);
         state.isLoggedIn = false;
         state.user = null;
         state.isAuthChecked = true;
         state.isLoading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(updateUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload.user;
+        state.error = null;
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(login.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(login.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isLoggedIn = true;
+        state.user = action.payload.user;
+        state.isAuthChecked = true;
+        state.error = null;
+      })
+      .addCase(login.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isLoggedIn = false;
+        state.user = null;
+        state.isAuthChecked = true;
+        state.error = action.payload as string;
+      })
+      .addCase(register.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(register.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isLoggedIn = true;
+        state.user = action.payload.user;
+        state.isAuthChecked = true;
+        state.error = null;
+      })
+      .addCase(register.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isLoggedIn = false;
+        state.user = null;
+        state.isAuthChecked = true;
+        state.error = action.payload as string;
+      })
+      .addCase(forgotPassword.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(forgotPassword.fulfilled, (state) => {
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(resetPassword.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(logoutUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.isLoading = false;
+        state.isLoggedIn = false;
+        state.user = null;
+        state.isAuthChecked = true;
+        state.error = null;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isLoggedIn = false;
+        state.user = null;
+        state.isAuthChecked = true;
         state.error = action.payload as string;
       });
   },

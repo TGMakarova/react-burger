@@ -7,18 +7,20 @@ import {
 import styles from './register.module.css';
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { burgerApi } from '@utils/burger-api';
-import { useDispatch } from 'react-redux';
-import { setUser, setAuthChecked } from '../../services/slices/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { register } from '../../services/slices/authSlice'; // ✅ импортируем экшен
+import type { AppDispatch, RootState } from '../../services/store';
 
 export const RegisterPage = (): React.JSX.Element => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // ✅ Берём состояние загрузки из Redux
+  const isLoading = useSelector((state: RootState) => state.auth.isLoading);
 
   const validateForm = (): boolean => {
     if (!name.trim()) {
@@ -47,42 +49,27 @@ export const RegisterPage = (): React.JSX.Element => {
       return;
     }
 
-    setIsLoading(true);
     setError('');
 
     try {
-      const data = await burgerApi.register(name, email, password);
+      // ✅ Используем Redux экшен вместо прямого вызова burgerApi
+      await dispatch(register({ name, email, password })).unwrap();
 
-      if (data.accessToken && data.refreshToken) {
-        // Сохраняем токены
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
+      // Проверяем, нужно ли восстановить конструктор
+      const savedConstructor = localStorage.getItem('savedConstructor');
+      const returnTo = localStorage.getItem('returnTo');
 
-        // Сохраняем пользователя в Redux
-        dispatch(setUser(data.user));
-        dispatch(setAuthChecked(true)); // ЭТО ВАЖНО!
-
-        // Проверяем, нужно ли восстановить конструктор
-        const savedConstructor = localStorage.getItem('savedConstructor');
-        const returnTo = localStorage.getItem('returnTo');
-
-        if (savedConstructor && returnTo) {
-          sessionStorage.setItem('restoringOrder', 'true');
-          localStorage.removeItem('returnTo');
-          navigate(returnTo);
-          return;
-        }
-
-        // Перенаправляем на главную
-        navigate('/');
-      } else {
-        setError('Токены не найдены в ответе сервера');
+      if (savedConstructor && returnTo) {
+        sessionStorage.setItem('restoringOrder', 'true');
+        localStorage.removeItem('returnTo');
+        navigate(returnTo);
+        return;
       }
+
+      // Перенаправляем на главную
+      navigate('/');
     } catch (error: any) {
-      console.error('Ошибка регистрации:', error);
       setError(error.message || 'Ошибка регистрации. Попробуйте еще раз.');
-    } finally {
-      setIsLoading(false);
     }
   };
 

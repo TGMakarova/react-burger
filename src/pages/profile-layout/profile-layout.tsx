@@ -1,28 +1,27 @@
 import { useNavigate, Outlet, NavLink } from 'react-router-dom';
 import styles from './profile-layout.module.css';
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { burgerApi } from '@utils/burger-api';
+import { useDispatch, useSelector } from 'react-redux';
+import { logoutUser } from '../../services/slices/authSlice'; // ✅ импортируем экшен
 import { clearConstructor } from '../../services/slices/burgerConstructorSlice';
-import { logout } from '../../services/slices/authSlice';
+import type { AppDispatch, RootState } from '../../services/store';
 
 export function ProfileLayout() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  
+  // ✅ Берём состояние загрузки из Redux
+  const isLoading = useSelector((state: RootState) => state.auth.isLoading);
 
   const handleLogout = async () => {
-    if (isLoggingOut) return;
-
-    setIsLoggingOut(true);
+    if (isLoading) return;
 
     try {
-      await burgerApi.logout();
-
-      // Очищаем Redux состояние
+      // ✅ Используем Redux экшен вместо прямого вызова API
+      await dispatch(logoutUser()).unwrap();
+      
+      // Очищаем конструктор
       dispatch(clearConstructor());
-      dispatch(logout());
-
+      
       // Очищаем все данные
       localStorage.clear();
       sessionStorage.clear();
@@ -30,15 +29,11 @@ export function ProfileLayout() {
       // Перенаправляем на логин
       navigate('/login', { replace: true });
     } catch (error) {
-      console.error('Ошибка при выходе:', error);
       // Даже при ошибке очищаем и перенаправляем
       dispatch(clearConstructor());
-      dispatch(logout());
       localStorage.clear();
       sessionStorage.clear();
       navigate('/login', { replace: true });
-    } finally {
-      setIsLoggingOut(false);
     }
   };
 
@@ -66,9 +61,9 @@ export function ProfileLayout() {
           <button
             className={`${styles.logout_button} text text_type_main-medium text_color_inactive`}
             onClick={handleLogout}
-            disabled={isLoggingOut}
+            disabled={isLoading}
           >
-            {isLoggingOut ? 'Выход...' : 'Выход'}
+            {isLoading ? 'Выход...' : 'Выход'}
           </button>
         </div>
 

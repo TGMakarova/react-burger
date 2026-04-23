@@ -6,19 +6,19 @@ import {
 import styles from './reset-password.module.css';
 import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { burgerApi } from '@utils/burger-api';
-
-interface ResetPasswordResponse {
-  success: boolean;
-  message: string;
-}
+import { useDispatch, useSelector } from 'react-redux';
+import { resetPassword } from '../../services/slices/authSlice';
+import type { AppDispatch, RootState } from '../../services/store';
 
 export const ResetPassword = (): React.ReactNode => {
+  const dispatch = useDispatch<AppDispatch>();
   const [password, setPassword] = useState('');
   const [token, setToken] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  // Берём состояние загрузки из Redux
+  const isLoading = useSelector((state: RootState) => state.auth.isLoading);
 
   useEffect(() => {
     const hasRequestedReset = localStorage.getItem('passwordResetRequested') === 'true';
@@ -27,13 +27,6 @@ export const ResetPassword = (): React.ReactNode => {
       navigate('/forgot-password');
     }
   }, [navigate]);
-
-  useEffect(() => {
-    return () => {
-      // Опционально: очищаем флаг при уходе со страницы
-      // localStorage.removeItem('passwordResetRequested');
-    };
-  }, []);
 
   const validateForm = (): boolean => {
     if (!password.trim()) {
@@ -58,25 +51,15 @@ export const ResetPassword = (): React.ReactNode => {
       return;
     }
 
-    setIsLoading(true);
     setError('');
 
     try {
-      const data = await burgerApi.post<ResetPasswordResponse>('/password-reset/reset', {
-        password: password,
-        token: token,
-      });
-
-      if (data.success) {
-        localStorage.removeItem('passwordResetRequested');
-        navigate('/login');
-      } else {
-        setError(data.message || 'Ошибка при сбросе пароля');
-      }
+      // Используем Redux экшен вместо прямого вызова API
+      await dispatch(resetPassword({ password, token })).unwrap();
+      localStorage.removeItem('passwordResetRequested');
+      navigate('/login');
     } catch (error: any) {
       setError(error.message || 'Не удалось изменить пароль. Попробуйте позже.');
-    } finally {
-      setIsLoading(false);
     }
   };
 

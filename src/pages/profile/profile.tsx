@@ -5,77 +5,49 @@ import {
   Button,
 } from '@krgaa/react-developer-burger-ui-components';
 import styles from './profile.module.css';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { burgerApi } from '@utils/burger-api';
-
-interface UserData {
-  name: string;
-  email: string;
-}
+import { updateUser } from '../../services/slices/authSlice'; 
+import type { AppDispatch, RootState } from '../../services/store';
 
 export const ProfilePage = (): React.JSX.Element => {
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  
+  // Берём пользователя из Redux store
+  const { user, isLoggedIn, isLoading: isAuthLoading } = useSelector(
+    (state: RootState) => state.auth
+  );
+  
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isEdited, setIsEdited] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const [originalUser, setOriginalUser] = useState<UserData | null>(null);
-  const hasFetched = useRef(false); // Предотвращаем повторную загрузку
 
-  // Загрузка данных пользователя (только один раз)
+  // Заполняем форму данными из store
   useEffect(() => {
-    if (hasFetched.current) return;
+    if (user) {
+      setName(user.name);
+      setEmail(user.email);
+    }
+  }, [user]);
 
-    const fetchUserData = async () => {
-      // Проверяем авторизацию перед загрузкой
-      if (!burgerApi.isAuthenticated()) {
-        navigate('/login', { replace: true });
-        return;
-      }
-
-      hasFetched.current = true;
-      setIsLoading(true);
-      setError('');
-
-      try {
-        const data = await burgerApi.getUser();
-
-        if (data.success && data.user) {
-          setName(data.user.name);
-          setEmail(data.user.email);
-          setOriginalUser(data.user);
-        } else {
-          setError('Не удалось загрузить данные пользователя');
-        }
-      } catch (error: any) {
-        console.error('Ошибка загрузки:', error);
-
-        if (error.message?.includes('401') || error.message?.includes('403')) {
-          setError('Сессия истекла. Пожалуйста, войдите заново.');
-          setTimeout(() => {
-            localStorage.clear();
-            navigate('/login', { replace: true });
-          }, 2000);
-        } else {
-          setError(error.message || 'Не удалось загрузить данные пользователя');
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserData();
-  }, [navigate]); // Убираем зависимость от burgerApi
+  // Проверка авторизации
+  useEffect(() => {
+    if (!isAuthLoading && !isLoggedIn) {
+      navigate('/login', { replace: true });
+    }
+  }, [isLoggedIn, isAuthLoading, navigate]);
 
   // Отслеживание изменений
   useEffect(() => {
-    if (originalUser) {
+    if (user) {
       const hasChanges =
-        name !== originalUser.name || email !== originalUser.email || password !== '';
+        name !== user.name || email !== user.email || password !== '';
       setIsEdited(hasChanges);
 
       if (hasChanges) {
@@ -83,12 +55,12 @@ export const ProfilePage = (): React.JSX.Element => {
         setSuccessMessage('');
       }
     }
-  }, [name, email, password, originalUser]);
+  }, [name, email, password, user]);
 
   const handleCancel = () => {
-    if (originalUser) {
-      setName(originalUser.name);
-      setEmail(originalUser.email);
+    if (user) {
+      setName(user.name);
+      setEmail(user.email);
       setPassword('');
       setIsEdited(false);
       setError('');
@@ -113,63 +85,47 @@ export const ProfilePage = (): React.JSX.Element => {
       return;
     }
 
-    setIsLoading(true);
+    setIsSaving(true);
     setError('');
     setSuccessMessage('');
 
     try {
-      const data = await burgerApi.updateUser({
+      // Используем Redux экшен для обновления
+      const result = await dispatch(updateUser({
         name: name.trim(),
         email: email.trim(),
-      });
+      })).unwrap();
 
-      if (data.success && data.user) {
-        setOriginalUser(data.user);
-        setName(data.user.name);
-        setEmail(data.user.email);
+      if (result.success && result.user) {
         setPassword('');
         setIsEdited(false);
         setSuccessMessage('Данные успешно обновлены!');
-
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          const user = JSON.parse(storedUser);
-          user.name = data.user.name;
-          user.email = data.user.email;
-          localStorage.setItem('user', JSON.stringify(user));
-        }
-
         setTimeout(() => setSuccessMessage(''), 3000);
-      } else {
-        setError('Не удалось обновить данные');
       }
     } catch (error: any) {
-      console.error('Ошибка сохранения:', error);
-
+      // ✅ Удалён console.error
       if (error.message?.includes('409')) {
         setError('Пользователь с таким email уже существует');
-      } else if (error.message?.includes('401') || error.message?.includes('403')) {
-        setError('Сессия истекла. Пожалуйста, войдите заново.');
-        setTimeout(() => {
-          localStorage.clear();
-          navigate('/login', { replace: true });
-        }, 2000);
       } else {
         setError(error.message || 'Не удалось сохранить изменения');
       }
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
+  // Показываем загрузку, если пользователь ещё не загружен
+  if (isAuthLoading || !user) {
+    return (
+      <div className={styles.mail_container}>
+        <div className={styles.loading_message}>Загрузка данных...</div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.mail_container}>
-      {isLoading && !originalUser && (
-        <div className={styles.loading_message}>Загрузка данных...</div>
-      )}
-
       {error && <div className={styles.error_message}>{error}</div>}
-
       {successMessage && <div className={styles.success_message}>{successMessage}</div>}
 
       <Input
@@ -177,7 +133,7 @@ export const ProfilePage = (): React.JSX.Element => {
         placeholder="Имя"
         onChange={(e) => setName(e.target.value)}
         value={name}
-        disabled={isLoading}
+        disabled={isSaving}
       />
 
       <EmailInput
@@ -185,7 +141,7 @@ export const ProfilePage = (): React.JSX.Element => {
         placeholder="Логин"
         onChange={(e) => setEmail(e.target.value)}
         value={email}
-        disabled={isLoading}
+        disabled={isSaving}
       />
 
       <PasswordInput
@@ -193,7 +149,7 @@ export const ProfilePage = (): React.JSX.Element => {
         placeholder="Новый пароль"
         onChange={(e) => setPassword(e.target.value)}
         value={password}
-        disabled={isLoading}
+        disabled={isSaving}
       />
 
       {isEdited && (
@@ -201,7 +157,7 @@ export const ProfilePage = (): React.JSX.Element => {
           <Button
             type="secondary"
             onClick={handleCancel}
-            disabled={isLoading}
+            disabled={isSaving}
             htmlType="button"
           >
             Отмена
@@ -209,10 +165,10 @@ export const ProfilePage = (): React.JSX.Element => {
           <Button
             type="primary"
             onClick={handleSave}
-            disabled={isLoading}
+            disabled={isSaving}
             htmlType="button"
           >
-            {isLoading ? 'Сохранение...' : 'Сохранить'}
+            {isSaving ? 'Сохранение...' : 'Сохранить'}
           </Button>
         </div>
       )}

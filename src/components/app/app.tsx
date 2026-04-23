@@ -17,12 +17,10 @@ import ProtectedRoute from '../protected-route/protected-route';
 import PublicRoute from '../public-route/public-route';
 import { NotFoundPage } from '@/pages/not-found-page/not-found-page';
 import { checkAuth } from '../../services/slices/authSlice';
-import { fetchIngredients } from '../../services/slices/ingredientsSlice'; 
+import { fetchIngredients } from '../../services/slices/ingredientsSlice';
 import type { RootState, AppDispatch } from '../../services/store';
 
 import styles from './app.module.css';
-
-
 
 export function App() {
   const location = useLocation();
@@ -31,42 +29,35 @@ export function App() {
 
   const background = location.state?.background;
 
-  // ✅ Добавьте эту строку - получение isLoggedIn, isAuthChecked, isLoading из store
-  const { isAuthChecked, isLoading, isLoggedIn } = useSelector((state: RootState) => state.auth);
-  // ✅  Загрузка ингредиентов при запуске приложения
+  const { isAuthChecked, isLoading, isLoggedIn } = useSelector(
+    (state: RootState) => state.auth
+  );
+
+  // Загрузка ингредиентов при запуске приложения
   useEffect(() => {
-    console.log('🍔 Загружаем ингредиенты...');
     dispatch(fetchIngredients());
   }, [dispatch]);
-  // МАКСИМАЛЬНЫЙ ЛОГГИНГ
-  useEffect(() => {
-    console.log('🔍 [App] Текущий путь:', location.pathname);
-    console.log('🔍 [App] Состояние авторизации:', { isAuthChecked, isLoading, isLoggedIn });
-    console.log('🔍 [App] localStorage.accessToken:', localStorage.getItem('accessToken'));
-    console.log('🔍 [App] localStorage.returnTo:', localStorage.getItem('returnTo'));
-  }, [isAuthChecked, isLoading, isLoggedIn, location.pathname]);
-
-  
 
   // Проверка токена при загрузке приложения
   useEffect(() => {
     const isRestoringOrder = sessionStorage.getItem('restoringOrder') === 'true';
 
     if (!isRestoringOrder) {
-      console.log('🔍 Running checkAuth');
       dispatch(checkAuth());
     } else {
-      console.log('⏭️ Skipping checkAuth - restoring order');
       sessionStorage.removeItem('restoringOrder');
     }
   }, [dispatch]);
 
-  // ✅ Добавьте этот useEffect для восстановления URL после авторизации
+  // Восстановление URL после авторизации
   useEffect(() => {
     if (isAuthChecked && isLoggedIn) {
       const returnTo = localStorage.getItem('returnTo');
-      if (returnTo && window.location.pathname !== returnTo && !window.location.pathname.includes('/login')) {
-        console.log('[App] Восстанавливаем URL:', returnTo);
+      if (
+        returnTo &&
+        window.location.pathname !== returnTo &&
+        !window.location.pathname.includes('/login')
+      ) {
         localStorage.removeItem('returnTo');
         navigate(returnTo, { replace: true });
       }
@@ -84,16 +75,16 @@ export function App() {
 
   // Пока проверяем токен - показываем загрузку
   if (!isAuthChecked || isLoading) {
-  return (
-    <>
-      <AppHeader />
-      <div className={styles.container}>
-        <div className={styles.spinner} />
-        <div className={styles.text}>Проверка авторизации...</div>
-      </div>
-    </>
-  );
-}
+    return (
+      <>
+        <AppHeader />
+        <div className={styles.container}>
+          <div className={styles.spinner} />
+          <div className={styles.text}>Проверка авторизации...</div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

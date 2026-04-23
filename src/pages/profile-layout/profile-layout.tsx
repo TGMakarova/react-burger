@@ -67,7 +67,6 @@ export function ProfileLayout() {
             className={`${styles.logout_button} text text_type_main-medium text_color_inactive`}
             onClick={handleLogout}
             disabled={isLoggingOut}
-            style={{ cursor: isLoggingOut ? 'not-allowed' : 'pointer' }}
           >
             {isLoggingOut ? 'Выход...' : 'Выход'}
           </button>

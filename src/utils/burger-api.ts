@@ -53,6 +53,7 @@ class BurgerApi {
   private setAccessToken(token: string | null) {
     this.accessToken = token;
     if (token) {
+      // ✅ Сохраняем токен без "Bearer "
       localStorage.setItem('accessToken', token);
     } else {
       localStorage.removeItem('accessToken');
@@ -79,61 +80,63 @@ class BurgerApi {
   }
 
   private async requestWithAuth<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    let token = this.getAccessToken();
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  let token = this.getAccessToken();
 
-    if (!token) {
-      throw new Error('Не авторизован');
-    }
+  if (!token) {
+    throw new Error('Не авторизован');
+  }
 
-    const makeRequest = async (requestToken: string) => {
-      const cleanToken = requestToken.replace(/^Bearer\s+/i, '');
-      const authHeader = `Bearer ${cleanToken}`;
+  const makeRequest = async (requestToken: string) => {
+    // ✅ Если токен уже без "Bearer", просто добавляем "Bearer "
+    const authHeader = `Bearer ${requestToken}`;
 
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
-        ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: authHeader,
-          ...options.headers,
-        },
-      });
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': authHeader,
+        ...options.headers,
+      },
+    });
 
-      if (response.status === 401 || response.status === 403) {
-        const error: any = new Error(`HTTP ${response.status}`);
-        error.status = response.status;
-        throw error;
-      }
-
-      return checkResponse<T>(response);
-    };
-
-    try {
-      return await makeRequest(token);
-    } catch (error: any) {
-      if (error.status === 401 || error.status === 403) {
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (refreshToken) {
-          try {
-            const refreshData = await this.refreshToken(refreshToken);
-            if (refreshData.accessToken) {
-              this.setAccessToken(refreshData.accessToken);
-              localStorage.setItem('refreshToken', refreshData.refreshToken);
-              return await makeRequest(this.getAccessToken()!);
-            }
-          } catch (refreshError) {
-            this.clearAuth();
-            throw new Error('Сессия истекла. Пожалуйста, войдите снова.');
-          }
-        }
-        this.clearAuth();
-        throw new Error('Сессия истекла. Пожалуйста, войдите снова.');
-      }
+    if (response.status === 401 || response.status === 403) {
+      const error: any = new Error(`HTTP ${response.status}`);
+      error.status = response.status;
       throw error;
     }
+
+    return checkResponse<T>(response);
+  };
+
+  try {
+    return await makeRequest(token);
+  } catch (error: any) {
+    if (error.status === 401 || error.status === 403) {
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (refreshToken) {
+        try {
+          const refreshData = await this.refreshToken(refreshToken);
+          if (refreshData.accessToken) {
+            // ✅ Тоже убираем "Bearer" при обновлении
+            const cleanToken = refreshData.accessToken.replace(/^Bearer\s+/i, '');
+            this.setAccessToken(cleanToken);
+            localStorage.setItem('refreshToken', refreshData.refreshToken);
+            return await makeRequest(this.getAccessToken()!);
+          }
+        } catch (refreshError) {
+          this.clearAuth();
+          throw new Error('Сессия истекла. Пожалуйста, войдите снова.');
+        }
+      }
+      this.clearAuth();
+      throw new Error('Сессия истекла. Пожалуйста, войдите снова.');
+    }
+    throw error;
   }
+}
 
   // GET запрос
   get<T>(endpoint: string, options?: RequestInit): Promise<T> {
@@ -174,7 +177,9 @@ class BurgerApi {
     const response = await this.post<AuthResponse>('/auth/login', { email, password });
 
     if (response.accessToken && response.refreshToken) {
-      this.setAccessToken(response.accessToken);
+      // ✅ Убираем "Bearer " из токена перед сохранением
+      const cleanToken = response.accessToken.replace(/^Bearer\s+/i, '');
+      this.setAccessToken(cleanToken);
       localStorage.setItem('refreshToken', response.refreshToken);
     }
 
@@ -190,13 +195,14 @@ class BurgerApi {
     });
 
     if (response.accessToken && response.refreshToken) {
-      this.setAccessToken(response.accessToken);
+      // ✅ Убираем "Bearer " из токена перед сохранением
+      const cleanToken = response.accessToken.replace(/^Bearer\s+/i, '');
+      this.setAccessToken(cleanToken);
       localStorage.setItem('refreshToken', response.refreshToken);
     }
 
     return response;
   }
-
   // Выход
   async logout(): Promise<LogoutResponse> {
     try {

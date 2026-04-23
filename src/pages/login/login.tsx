@@ -4,8 +4,8 @@ import {
   PasswordInput,
 } from '@krgaa/react-developer-burger-ui-components';
 import styles from './login.module.css';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { burgerApi } from '@utils/burger-api';
 import { useDispatch } from 'react-redux';
 import { setUser, setAuthChecked } from '../../services/slices/authSlice';
@@ -13,14 +13,37 @@ import { setUser, setAuthChecked } from '../../services/slices/authSlice';
 export function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation(); // ✅ добавляем useLocation
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  console.log('📱 [LoginPage] Рендер');
+
+  useEffect(() => {
+    console.log('📱 [LoginPage] returnTo из localStorage:', localStorage.getItem('returnTo'));
+  }, []);
+
+
+
+  // ✅ Получаем путь для возврата (приоритет: state > localStorage > '/')
+  const getReturnPath = () => {
+    // 1. Сначала проверяем state из Navigate
+    const fromState = location.state?.from?.pathname;
+    if (fromState) return fromState;
+    
+    // 2. Затем проверяем localStorage (от ProtectedRoute)
+    const savedPath = localStorage.getItem('returnTo');
+    if (savedPath) return savedPath;
+    
+    // 3. По умолчанию - на главную
+    return '/';
+  };
 
   const handleSubmitLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+console.log('📱 [LoginPage] Попытка входа');
 
     if (isLoading) return;
 
@@ -33,17 +56,24 @@ export function LoginPage() {
       dispatch(setUser(response.user));
       dispatch(setAuthChecked(true));
 
+      // ✅ Восстанавливаем сохраненный путь
+      const returnPath = getReturnPath();
+      
+      // Проверяем, восстанавливаем ли заказ
       const savedConstructor = localStorage.getItem('savedConstructor');
-      const returnTo = localStorage.getItem('returnTo');
-
-      if (savedConstructor && returnTo) {
+      
+      // Очищаем сохраненный путь
+      localStorage.removeItem('returnTo');
+      
+      if (savedConstructor && returnPath.includes('/orders')) {
         sessionStorage.setItem('restoringOrder', 'true');
-        localStorage.removeItem('returnTo');
-        navigate(returnTo, { replace: true });
+        localStorage.removeItem('savedConstructor');
+        navigate(returnPath, { replace: true });
         return;
       }
 
-      navigate('/', { replace: true });
+      // Редирект на сохраненный путь или на главную
+      navigate(returnPath, { replace: true });
     } catch (error: any) {
       setError(error.message || 'Ошибка авторизации. Проверьте email и пароль');
     } finally {

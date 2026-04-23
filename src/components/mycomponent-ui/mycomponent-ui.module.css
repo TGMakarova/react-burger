@@ -418,3 +418,7 @@
   flex: 1;
   text-align: center;
 }
+
+.ingredient_item_dragging {
+  opacity: 0.5;
+}

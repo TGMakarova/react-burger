@@ -5,7 +5,7 @@ import { BurgerConstructor } from '@components/burger-constructor/burger-constru
 import type { AppDispatch, RootState } from '@/services/store/index';
 import styles from './home.module.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchIngredients } from '@/services/slices/ingredientsSlice';
+
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { setSelectedIngredient } from '@/services/slices/selectedIngredientSlice';
@@ -21,10 +21,7 @@ export const Home = (): React.JSX.Element => {
     items: ingredients,
   } = useSelector((state: RootState) => state.ingredients);
 
-  useEffect(() => {
-    dispatch(fetchIngredients());
-  }, [dispatch]);
-
+  
   // Восстанавливаем попап после перезагрузки
   useEffect(() => {
     const savedIngredientId = localStorage.getItem('popupIngredientId');

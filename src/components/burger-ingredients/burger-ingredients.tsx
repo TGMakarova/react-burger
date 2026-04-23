@@ -2,14 +2,14 @@ import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IngredientsDetailsUI } from '../ingredients-details-ui/ingredients-details-ui';
-import { fetchIngredients } from '../../services/slices/ingredientsSlice';
+
 import type { AppDispatch, RootState } from '../../services/store';
 import styles from './burger-ingredients.module.css';
 
 type CategoryType = 'bun' | 'sauce' | 'main';
 
 export const BurgerIngredients = (): React.JSX.Element => {
-  const dispatch = useDispatch<AppDispatch>();
+
   const [currentTab, setCurrentTab] = useState<CategoryType>('bun');
   
   // Получаем ингредиенты из Redux
@@ -85,14 +85,12 @@ export const BurgerIngredients = (): React.JSX.Element => {
   }
 
   // Отображение ошибки
-  if (error) {
+   if (error) {
     return (
       <section className={styles.burger_ingredients}>
         <div className={styles.error}>
           Ошибка: {error}
-          <button onClick={() => dispatch(fetchIngredients())}>
-            Попробовать снова
-          </button>
+          
         </div>
       </section>
     );

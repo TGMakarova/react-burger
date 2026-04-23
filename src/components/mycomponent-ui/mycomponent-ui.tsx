@@ -192,8 +192,7 @@ const DraggableIngredient = ({
   return (
     <div
       ref={ref}
-      className={styles.ingredient_item}
-      style={{ opacity: isDragging ? 0.5 : 1 }}
+      className={`${styles.ingredient_item} ${isDragging ? styles.ingredient_item_dragging : ''}`}
     >
       <DragIcon type="secondary" />
       <ConstructorElement

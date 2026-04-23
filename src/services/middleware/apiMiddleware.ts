@@ -29,17 +29,7 @@ function isAnyAction(
 
 // Функция для получения токена из localStorage
 const getAccessToken = (): string | null => {
-  // Проверьте, как именно вы храните токен
-  // Вариант 1: Прямое хранение
   return localStorage.getItem('accessToken');
-
-  // Вариант 2: В объекте (раскомментируйте если нужно)
-  // const tokens = localStorage.getItem('tokens');
-  // if (tokens) {
-  //   const { accessToken } = JSON.parse(tokens);
-  //   return accessToken;
-  // }
-  // return null;
 };
 
 // Middleware для синхронизации с localStorage
@@ -70,7 +60,6 @@ export const localStorageMiddleware: Middleware = (store) => (next) => (action) 
 
 // Middleware для отслеживания API запросов и проверки авторизации
 export const apiMiddleware: Middleware = (store) => (next) => (action) => {
-  // Проверяем, это экшен отправки заказа?
   if (isAnyAction(action) && action.type === 'order/sendOrder/pending') {
     const state = store.getState() as RootState;
     const isLoggedIn = state.auth.isLoggedIn;

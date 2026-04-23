@@ -1,5 +1,5 @@
-import { useParams } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useParams, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import type { RootState, AppDispatch } from '@/services/store';
 import { IngredientDetailsContent } from '../ingredient-details-content/ingredient-details-content';
@@ -8,16 +8,25 @@ import styles from './ingredient-page.module.css';
 
 export const IngredientPage = () => {
   const { id } = useParams();
-  //const dispatch = useDispatch<AppDispatch>();
+  const location = useLocation();
+ 
 
   const ingredients = useSelector((state: RootState) => state.ingredients.items);
   const loading = useSelector((state: RootState) => state.ingredients.loading);
   const error = useSelector((state: RootState) => state.ingredients.error);
 
-  const ingredient = ingredients.find((item) => item._id === id);
 
-  if (loading) {
-    return <div className={styles.not_found}>Загрузка...</div>;
+
+  // Проверяем, не передан ли ингредиент через state (при клике из модала)
+  const ingredientFromState = location.state?.ingredient;
+  
+  let ingredient = ingredientFromState;
+  if (!ingredient && ingredients.length > 0) {
+    ingredient = ingredients.find((item) => item._id === id);
+  }
+
+  if (loading && ingredients.length === 0) {
+    return <div className={styles.not_found}>Загрузка ингредиентов...</div>;
   }
 
   if (error) {
@@ -34,12 +43,11 @@ export const IngredientPage = () => {
       <div className={styles.not_found}>
         <h2>Ингредиент не найден</h2>
         <p>ID: {id}</p>
-        <p>Доступно ингредиентов: {ingredients.length}</p>
+        <p>Загружено ингредиентов: {ingredients.length}</p>
       </div>
     );
   }
 
-  // Теперь ingredient точно существует
   return (
     <div className={styles.ingredient_page}>
       <div className={styles.container}>

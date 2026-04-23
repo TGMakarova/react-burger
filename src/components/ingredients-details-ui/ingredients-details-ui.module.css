@@ -9,6 +9,9 @@
   font-family: 'Jet Brains Mono', serif;
   box-sizing: border-box;
   cursor: pointer;
+  position: relative;
+  cursor: grab;
+  transition: opacity 0.2s ease;
 }
 
 .ingredients_picture {
@@ -127,4 +130,12 @@
 .not_found h2 {
   margin-bottom: 20px;
   color: #ff5252;
+}
+
+.ingredients_element_dragging {
+  opacity: 0.5;
+}
+
+.ingredients_element:active {
+  cursor: grabbing;
 }

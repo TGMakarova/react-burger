@@ -1,4 +1,5 @@
-const API_URL = 'https://norma.nomoreparties.space/api'; 
+import { BURGER_API_URL } from './burger-api';
+
 
 // Получение данных пользователя с проверкой токена
 export const getUserApi = async () => {
@@ -8,7 +9,7 @@ export const getUserApi = async () => {
     throw new Error('No token');
   }
   
-  const response = await fetch(`${API_URL}/auth/user`, {
+  const response = await fetch(`${BURGER_API_URL}/auth/user`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

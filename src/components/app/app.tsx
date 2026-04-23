@@ -16,20 +16,40 @@ import { ProfileLayout } from '@/pages/profile-layout/profile-layout';
 import ProtectedRoute from '../protected-route/protected-route';
 import PublicRoute from '../public-route/public-route';
 import { NotFoundPage } from '@/pages/not-found-page/not-found-page';
-import { checkAuth } from '../../services/authActions';
+import { checkAuth } from '../../services/slices/authSlice';
+import { fetchIngredients } from '../../services/slices/ingredientsSlice'; 
 import type { RootState, AppDispatch } from '../../services/store';
+
+import styles from './app.module.css';
+
+
 
 export function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+
   const background = location.state?.background;
 
-  const { isAuthChecked, isLoading } = useSelector((state: RootState) => state.auth);
+  // ✅ Добавьте эту строку - получение isLoggedIn, isAuthChecked, isLoading из store
+  const { isAuthChecked, isLoading, isLoggedIn } = useSelector((state: RootState) => state.auth);
+  // ✅  Загрузка ингредиентов при запуске приложения
+  useEffect(() => {
+    console.log('🍔 Загружаем ингредиенты...');
+    dispatch(fetchIngredients());
+  }, [dispatch]);
+  // МАКСИМАЛЬНЫЙ ЛОГГИНГ
+  useEffect(() => {
+    console.log('🔍 [App] Текущий путь:', location.pathname);
+    console.log('🔍 [App] Состояние авторизации:', { isAuthChecked, isLoading, isLoggedIn });
+    console.log('🔍 [App] localStorage.accessToken:', localStorage.getItem('accessToken'));
+    console.log('🔍 [App] localStorage.returnTo:', localStorage.getItem('returnTo'));
+  }, [isAuthChecked, isLoading, isLoggedIn, location.pathname]);
+
+  
 
   // Проверка токена при загрузке приложения
   useEffect(() => {
-    // ✅ Если мы восстанавливаем заказ - не делаем checkAuth
     const isRestoringOrder = sessionStorage.getItem('restoringOrder') === 'true';
 
     if (!isRestoringOrder) {
@@ -37,10 +57,21 @@ export function App() {
       dispatch(checkAuth());
     } else {
       console.log('⏭️ Skipping checkAuth - restoring order');
-      // ✅ Сбрасываем флаг после того как он использован
       sessionStorage.removeItem('restoringOrder');
     }
   }, [dispatch]);
+
+  // ✅ Добавьте этот useEffect для восстановления URL после авторизации
+  useEffect(() => {
+    if (isAuthChecked && isLoggedIn) {
+      const returnTo = localStorage.getItem('returnTo');
+      if (returnTo && window.location.pathname !== returnTo && !window.location.pathname.includes('/login')) {
+        console.log('[App] Восстанавливаем URL:', returnTo);
+        localStorage.removeItem('returnTo');
+        navigate(returnTo, { replace: true });
+      }
+    }
+  }, [isAuthChecked, isLoggedIn, navigate]);
 
   const handleCloseModal = () => {
     localStorage.removeItem('popupIngredientId');
@@ -48,45 +79,21 @@ export function App() {
     localStorage.removeItem('popupRestored');
 
     const returnPath = location.state?.from || '/';
-    navigate(returnPath);
+    navigate(returnPath, { replace: true });
   };
 
   // Пока проверяем токен - показываем загрузку
   if (!isAuthChecked || isLoading) {
-    return (
-      <>
-        <AppHeader />
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
-            flexDirection: 'column',
-            gap: '20px',
-          }}
-        >
-          <div
-            style={{
-              width: '50px',
-              height: '50px',
-              border: '4px solid #E2E8F0',
-              borderTop: '4px solid #3B82F6',
-              borderRadius: '50%',
-              animation: 'spin 0.8s linear infinite',
-            }}
-          />
-          <div>Проверка авторизации...</div>
-          <style>{`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          `}</style>
-        </div>
-      </>
-    );
-  }
+  return (
+    <>
+      <AppHeader />
+      <div className={styles.container}>
+        <div className={styles.spinner} />
+        <div className={styles.text}>Проверка авторизации...</div>
+      </div>
+    </>
+  );
+}
 
   return (
     <>

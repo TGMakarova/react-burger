@@ -87,12 +87,7 @@ export const IngredientsDetailsUI = ({ setCategoryRef }: IngredientsDetailsUIPro
     return (
       <div
         ref={elementRef}
-        className={styles.ingredients_element}
-        style={{
-          opacity: isDragging ? 0.5 : 1,
-          cursor: 'grab',
-          position: 'relative',
-        }}
+        className={`${styles.ingredients_element} ${isDragging ? styles.ingredients_element_dragging : ''}`}
         onClick={() => handleIngredientClick(ingredient)}
       >
         <img

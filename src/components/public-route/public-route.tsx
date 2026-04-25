@@ -1,11 +1,12 @@
-import { Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import type { ReactNode } from 'react';
-import type { RootState } from '../../services/store';
+import { Navigate, useLocation } from 'react-router-dom';
 
-interface PublicRouteProps {
+import type { RootState } from '../../services/store';
+import type { ReactNode } from 'react';
+
+type PublicRouteProps = {
   children: ReactNode;
-}
+};
 
 export default function PublicRoute({ children }: PublicRouteProps) {
   const location = useLocation();

@@ -2,11 +2,14 @@ import { CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
 import { useRef, useEffect } from 'react';
 import { useDrag } from 'react-dnd';
 import { useDispatch, useSelector } from 'react-redux';
-import type { AppDispatch, RootState } from '@/services/store';
-import { setSelectedIngredient } from '@/services/slices/selectedIngredientSlice';
-import { selectIngredientsWithCounts } from '@/services/slices/burgerConstructorSlice';
-import type { TIngredient } from '@utils/types';
 import { useNavigate, useLocation } from 'react-router-dom';
+
+import { selectIngredientsWithCounts } from '@/services/slices/burgerConstructorSlice';
+import { setSelectedIngredient } from '@/services/slices/selectedIngredientSlice';
+
+import type { AppDispatch, RootState } from '@/services/store';
+import type { TIngredient } from '@utils/types';
+
 import styles from './ingredients-details-ui.module.css';
 
 type IngredientsDetailsUIProps = {
@@ -23,7 +26,7 @@ export const IngredientsDetailsUI = ({ setCategoryRef }: IngredientsDetailsUIPro
 
   // Получаем ингредиенты из Redux store
   const ingredients = useSelector((state: RootState) => state.ingredients.items);
-  
+
   // Используем мемоизированный селектор для получения ингредиентов с счётчиками
   const ingredientsWithCounts = useSelector(selectIngredientsWithCounts);
 
@@ -50,13 +53,13 @@ export const IngredientsDetailsUI = ({ setCategoryRef }: IngredientsDetailsUIPro
     localStorage.setItem('popupIngredientId', ingredient._id);
     localStorage.setItem('popupBackgroundPath', location.pathname);
     localStorage.removeItem('popupRestored'); // Убираем флаг восстановления при новом клике
-    
+
     // Сохраняем в Redux
     dispatch(setSelectedIngredient(ingredient));
-    
+
     // Переходим на маршрут с ингредиентом
     navigate(`/ingredients/${ingredient._id}`, {
-      state: { background: location, from: location.pathname }
+      state: { background: location, from: location.pathname },
     });
   };
 
@@ -142,11 +145,7 @@ export const IngredientsDetailsUI = ({ setCategoryRef }: IngredientsDetailsUIPro
                 ref={titleRef}
                 className={`${styles.ingredients_name_container} text text_type_main-medium`}
               >
-                {type === 'bun'
-                  ? 'Булки'
-                  : type === 'sauce'
-                    ? 'Соусы'
-                    : 'Начинки'}
+                {type === 'bun' ? 'Булки' : type === 'sauce' ? 'Соусы' : 'Начинки'}
               </div>
               <div className={styles.ingredients_grid}>
                 {ingredientsOfType.map((ingredient) => (

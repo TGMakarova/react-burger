@@ -1,18 +1,19 @@
 import { createSlice, type PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+
 import { burgerApi } from '@utils/burger-api';
 
-interface User {
+type User = {
   email: string;
   name: string;
-}
+};
 
-interface AuthState {
+type AuthState = {
   isLoggedIn: boolean;
   user: User | null;
   isAuthChecked: boolean;
   isLoading: boolean;
   error: string | null;
-}
+};
 
 const initialState: AuthState = {
   isLoggedIn: false,

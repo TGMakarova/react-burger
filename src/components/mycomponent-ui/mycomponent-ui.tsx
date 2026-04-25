@@ -1,20 +1,23 @@
-import { useRef } from 'react';
-import { useDrag, useDrop } from 'react-dnd';
 import {
   Button,
   ConstructorElement,
   DragIcon,
   CurrencyIcon,
 } from '@krgaa/react-developer-burger-ui-components';
+import { useRef } from 'react';
+import { useDrag, useDrop } from 'react-dnd';
 import { useDispatch, useSelector } from 'react-redux';
+
 import {
   removeIngredient,
   moveIngredient,
 } from '../../services/slices/burgerConstructorSlice';
-import type { AppDispatch, RootState } from '../../services/store';
+
 import type { ConstructorIngredient } from '../../services/slices/burgerConstructorSlice';
-import styles from './mycomponent-ui.module.css';
+import type { AppDispatch, RootState } from '../../services/store';
 import type { TIngredient } from '@utils/types.ts';
+
+import styles from './mycomponent-ui.module.css';
 
 type MyComponentUIProps = {
   ingredients: TIngredient[];
@@ -23,7 +26,6 @@ type MyComponentUIProps = {
 };
 
 export const MyComponentUI = ({
-
   onOrderClick,
   isLoading,
 }: MyComponentUIProps): React.JSX.Element => {

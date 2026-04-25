@@ -1,10 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
-import type { TIngredient } from '@utils/types';
-import type { PayloadAction } from '@reduxjs/toolkit';
 
-interface SelectedIngredientState {
+import type { PayloadAction } from '@reduxjs/toolkit';
+import type { TIngredient } from '@utils/types';
+
+type SelectedIngredientState = {
   ingredient: TIngredient | null;
-}
+};
 
 const initialState: SelectedIngredientState = {
   ingredient: null,

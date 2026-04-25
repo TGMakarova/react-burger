@@ -1,14 +1,17 @@
-import { useNavigate, Outlet, NavLink } from 'react-router-dom';
-import styles from './profile-layout.module.css';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, Outlet, NavLink } from 'react-router-dom';
+
 import { logoutUser } from '../../services/slices/authSlice'; // ✅ импортируем экшен
 import { clearConstructor } from '../../services/slices/burgerConstructorSlice';
+
 import type { AppDispatch, RootState } from '../../services/store';
+
+import styles from './profile-layout.module.css';
 
 export function ProfileLayout() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  
+
   // ✅ Берём состояние загрузки из Redux
   const isLoading = useSelector((state: RootState) => state.auth.isLoading);
 
@@ -18,10 +21,10 @@ export function ProfileLayout() {
     try {
       // ✅ Используем Redux экшен вместо прямого вызова API
       await dispatch(logoutUser()).unwrap();
-      
+
       // Очищаем конструктор
       dispatch(clearConstructor());
-      
+
       // Очищаем все данные
       localStorage.clear();
       sessionStorage.clear();

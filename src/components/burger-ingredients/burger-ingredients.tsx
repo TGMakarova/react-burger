@@ -1,9 +1,11 @@
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
+
 import { IngredientsDetailsUI } from '../ingredients-details-ui/ingredients-details-ui';
 
 import type { RootState } from '../../services/store';
+
 import styles from './burger-ingredients.module.css';
 
 type CategoryType = 'bun' | 'sauce' | 'main';

@@ -1,18 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useDrop } from 'react-dnd';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import { MyComponentUI } from '../mycomponent-ui/mycomponent-ui';
-import { OtherDetails } from '../other-details/other-details';
-import { submitOrder, clearOrder } from '../../services/slices/orderSlice';
+
 import {
   addIngredient,
   clearConstructor,
 } from '../../services/slices/burgerConstructorSlice';
-import type { TIngredient } from '@utils/types';
+import { submitOrder, clearOrder } from '../../services/slices/orderSlice';
+import { MyComponentUI } from '../mycomponent-ui/mycomponent-ui';
+import { OtherDetails } from '../other-details/other-details';
+
 import type { ConstructorIngredient } from '../../services/slices/burgerConstructorSlice';
 import type { AppDispatch, RootState } from '../../services/store';
+import type { TIngredient } from '@utils/types';
+
 import styles from './burger-constructor.module.css';
 
 export const BurgerConstructor = (): React.JSX.Element => {

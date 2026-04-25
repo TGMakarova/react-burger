@@ -1,23 +1,26 @@
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import { IngredientDetails } from '../ingredient-details/ingredient-details';
-import { Home } from '@/pages/home/home';
-import { IngredientPage } from '../ingredient-page/ingredient-page';
-import { LoginPage } from '@/pages/login/login';
-import { RegisterPage } from '@/pages/register/register';
+import { useDispatch, useSelector } from 'react-redux';
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+
 import { FeedPage } from '@/pages/feed-page/feed-page';
-import { ProfilePage } from '@/pages/profile/profile';
-import { ResetPassword } from '@/pages/reset-password/reset-password';
-import { AppHeader } from '../app-header/app-header';
 import { ForgotPassword } from '@/pages/forgot-password/forgot-password';
+import { Home } from '@/pages/home/home';
+import { LoginPage } from '@/pages/login/login';
+import { NotFoundPage } from '@/pages/not-found-page/not-found-page';
 import { ProfileOrderPage } from '@/pages/orders/orders';
 import { ProfileLayout } from '@/pages/profile-layout/profile-layout';
-import ProtectedRoute from '../protected-route/protected-route';
-import PublicRoute from '../public-route/public-route';
-import { NotFoundPage } from '@/pages/not-found-page/not-found-page';
+import { ProfilePage } from '@/pages/profile/profile';
+import { RegisterPage } from '@/pages/register/register';
+import { ResetPassword } from '@/pages/reset-password/reset-password';
+
 import { checkAuth } from '../../services/slices/authSlice';
 import { fetchIngredients } from '../../services/slices/ingredientsSlice';
+import { AppHeader } from '../app-header/app-header';
+import { IngredientDetails } from '../ingredient-details/ingredient-details';
+import { IngredientPage } from '../ingredient-page/ingredient-page';
+import ProtectedRoute from '../protected-route/protected-route';
+import PublicRoute from '../public-route/public-route';
+
 import type { RootState, AppDispatch } from '../../services/store';
 
 import styles from './app.module.css';

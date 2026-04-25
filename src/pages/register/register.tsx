@@ -4,12 +4,15 @@ import {
   PasswordInput,
   Input,
 } from '@krgaa/react-developer-burger-ui-components';
-import styles from './register.module.css';
 import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
 import { register } from '../../services/slices/authSlice'; // ✅ импортируем экшен
+
 import type { AppDispatch, RootState } from '../../services/store';
+
+import styles from './register.module.css';
 
 export const RegisterPage = (): React.JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();

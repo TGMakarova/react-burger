@@ -1,14 +1,16 @@
+import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { BurgerIngredients } from '@/components/burger-ingredients/burger-ingredients';
-import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
-import type { AppDispatch, RootState } from '@/services/store/index';
-import styles from './home.module.css';
 import { useDispatch, useSelector } from 'react-redux';
-
-import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+
+import { BurgerIngredients } from '@/components/burger-ingredients/burger-ingredients';
 import { setSelectedIngredient } from '@/services/slices/selectedIngredientSlice';
+import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
+
+import type { AppDispatch, RootState } from '@/services/store/index';
+
+import styles from './home.module.css';
 
 export const Home = (): React.JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
@@ -21,7 +23,6 @@ export const Home = (): React.JSX.Element => {
     items: ingredients,
   } = useSelector((state: RootState) => state.ingredients);
 
-  
   // Восстанавливаем попап после перезагрузки
   useEffect(() => {
     const savedIngredientId = localStorage.getItem('popupIngredientId');

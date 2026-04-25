@@ -1,7 +1,10 @@
-import { useParams, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import type { RootState } from '@/services/store';
+import { useParams, useLocation } from 'react-router-dom';
+
 import { IngredientDetailsContent } from '../ingredient-details-content/ingredient-details-content';
+
+import type { RootState } from '@/services/store';
+
 import styles from './ingredient-page.module.css';
 
 export const IngredientPage = () => {

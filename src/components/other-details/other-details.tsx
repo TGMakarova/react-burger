@@ -1,6 +1,6 @@
-
 import { Modal } from '../modal/modal';
 import { OtherDetailsContent } from '../other-details-content/other-details-content';
+
 import styles from './other-details.module.css';
 
 type OtherDetailsProps = {

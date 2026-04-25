@@ -4,8 +4,7 @@ import {
   Logo,
   ProfileIcon,
 } from '@krgaa/react-developer-burger-ui-components';
-
-import { NavLink } from 'react-router-dom'; 
+import { NavLink } from 'react-router-dom';
 
 import styles from './app-header.module.css';
 

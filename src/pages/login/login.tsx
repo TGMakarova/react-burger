@@ -3,12 +3,15 @@ import {
   EmailInput,
   PasswordInput,
 } from '@krgaa/react-developer-burger-ui-components';
-import styles from './login.module.css';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useState} from 'react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 import { login } from '../../services/slices/authSlice'; // ✅ импортируем экшен
+
 import type { AppDispatch, RootState } from '../../services/store';
+
+import styles from './login.module.css';
 
 export function LoginPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -26,10 +29,10 @@ export function LoginPage() {
   const getReturnPath = () => {
     const fromState = location.state?.from?.pathname;
     if (fromState) return fromState;
-    
+
     const savedPath = localStorage.getItem('returnTo');
     if (savedPath) return savedPath;
-    
+
     return '/';
   };
 
@@ -43,13 +46,13 @@ export function LoginPage() {
     try {
       // ✅ Используем Redux экшен вместо прямого вызова burgerApi
       const result = await dispatch(login({ email, password })).unwrap();
-      
+
       // ✅ Восстанавливаем сохраненный путь
       const returnPath = getReturnPath();
       const savedConstructor = localStorage.getItem('savedConstructor');
-      
+
       localStorage.removeItem('returnTo');
-      
+
       if (savedConstructor && returnPath.includes('/orders')) {
         sessionStorage.setItem('restoringOrder', 'true');
         localStorage.removeItem('savedConstructor');

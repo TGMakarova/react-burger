@@ -1,7 +1,7 @@
 import type { Middleware } from '@reduxjs/toolkit';
 
 // Тип RootState с вашим authSlice
-interface RootState {
+type RootState = {
   auth: {
     isLoggedIn: boolean;
     user: { email: string; name: string } | null;
@@ -13,7 +13,7 @@ interface RootState {
     bun: any;
     ingredients: any[];
   };
-}
+};
 
 // Type guard для проверки action
 function isAnyAction(

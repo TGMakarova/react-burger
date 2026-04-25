@@ -4,22 +4,27 @@ import {
   PasswordInput,
   Button,
 } from '@krgaa/react-developer-burger-ui-components';
-import styles from './profile.module.css';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { updateUser } from '../../services/slices/authSlice'; 
+
+import { updateUser } from '../../services/slices/authSlice';
+
 import type { AppDispatch, RootState } from '../../services/store';
+
+import styles from './profile.module.css';
 
 export const ProfilePage = (): React.JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  
+
   // Берём пользователя из Redux store
-  const { user, isLoggedIn, isLoading: isAuthLoading } = useSelector(
-    (state: RootState) => state.auth
-  );
-  
+  const {
+    user,
+    isLoggedIn,
+    isLoading: isAuthLoading,
+  } = useSelector((state: RootState) => state.auth);
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -46,8 +51,7 @@ export const ProfilePage = (): React.JSX.Element => {
   // Отслеживание изменений
   useEffect(() => {
     if (user) {
-      const hasChanges =
-        name !== user.name || email !== user.email || password !== '';
+      const hasChanges = name !== user.name || email !== user.email || password !== '';
       setIsEdited(hasChanges);
 
       if (hasChanges) {
@@ -91,10 +95,12 @@ export const ProfilePage = (): React.JSX.Element => {
 
     try {
       // Используем Redux экшен для обновления
-      const result = await dispatch(updateUser({
-        name: name.trim(),
-        email: email.trim(),
-      })).unwrap();
+      const result = await dispatch(
+        updateUser({
+          name: name.trim(),
+          email: email.trim(),
+        })
+      ).unwrap();
 
       if (result.success && result.user) {
         setPassword('');

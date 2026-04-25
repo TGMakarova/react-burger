@@ -20,7 +20,7 @@ const checkResponse = async <T>(response: Response): Promise<T> => {
 };
 
 // ========== ИНТЕРФЕЙСЫ ==========
-interface AuthResponse {
+type AuthResponse = {
   success: boolean;
   accessToken: string;
   refreshToken: string;
@@ -28,31 +28,31 @@ interface AuthResponse {
     email: string;
     name: string;
   };
-}
+};
 
-interface ResetPasswordResponse {
+type ResetPasswordResponse = {
   success: boolean;
   message: string;
-}
+};
 
-interface LogoutResponse {
+type LogoutResponse = {
   success: boolean;
   message: string;
-}
+};
 
-interface RefreshTokenResponse {
+type RefreshTokenResponse = {
   success: boolean;
   accessToken: string;
   refreshToken: string;
-}
+};
 
-interface UserResponse {
+type UserResponse = {
   success: boolean;
   user: {
     email: string;
     name: string;
   };
-}
+};
 
 // ========== КЛАСС API ==========
 class BurgerApi {
@@ -100,7 +100,7 @@ class BurgerApi {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    let token = this.getAccessToken();
+    const token = this.getAccessToken();
 
     if (!token) {
       throw new Error('Не авторизован');
@@ -273,7 +273,6 @@ class BurgerApi {
 }
 
 export const getIngredientsApi = () => burgerApi.getIngredients();
-
 
 // ========== ЭКЗЕМПЛЯР API ДЛЯ ИСПОЛЬЗОВАНИЯ ==========
 export const burgerApi = new BurgerApi(BURGER_API_URL);

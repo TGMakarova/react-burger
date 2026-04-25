@@ -1,11 +1,12 @@
-import { Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import type { ReactNode } from 'react';
-import type { RootState } from '../../services/store';
+import { Navigate, useLocation } from 'react-router-dom';
 
-interface ProtectedRouteProps {
+import type { RootState } from '../../services/store';
+import type { ReactNode } from 'react';
+
+type ProtectedRouteProps = {
   children: ReactNode;
-}
+};
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const location = useLocation();

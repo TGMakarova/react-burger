@@ -20,27 +20,27 @@ export const INGREDIENTS_ACTIONS = {
 } as const;
 
 // Типизированные интерфейсы экшенов
-export interface AddIngredientAction {
+export type AddIngredientAction = {
   type: typeof CONSTRUCTOR_ACTIONS.ADD_INGREDIENT;
   payload: TIngredient;
-}
+};
 
-export interface RemoveIngredientAction {
+export type RemoveIngredientAction = {
   type: typeof CONSTRUCTOR_ACTIONS.REMOVE_INGREDIENT;
   payload: string;
-}
+};
 
-export interface MoveIngredientAction {
+export type MoveIngredientAction = {
   type: typeof CONSTRUCTOR_ACTIONS.MOVE_INGREDIENT;
   payload: { from: number; to: number };
-}
+};
 
-export interface ClearConstructorAction {
+export type ClearConstructorAction = {
   type: typeof CONSTRUCTOR_ACTIONS.CLEAR_CONSTRUCTOR;
-}
+};
 
 // Общий тип для всех экшенов конструктора
-export type ConstructorAction = 
+export type ConstructorAction =
   | AddIngredientAction
   | RemoveIngredientAction
   | MoveIngredientAction

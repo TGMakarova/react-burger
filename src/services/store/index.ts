@@ -1,14 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit';
-import ingredientsReducer from '../slices/ingredientsSlice';
-import burgerConstructorReducer from '../slices/burgerConstructorSlice';
-import selectedIngredientReducer from '../slices/selectedIngredientSlice';
-import orderReducer from '../slices/orderSlice';
-import authReducer from '../slices/authSlice'; // 👈 ДОБАВИТЬ ЭТУ СТРОКУ
+
 import {
   apiMiddleware,
   localStorageMiddleware,
   performanceMiddleware,
 } from '../middleware/apiMiddleware';
+import authReducer from '../slices/authSlice'; // 👈 ДОБАВИТЬ ЭТУ СТРОКУ
+import burgerConstructorReducer from '../slices/burgerConstructorSlice';
+import ingredientsReducer from '../slices/ingredientsSlice';
+import orderReducer from '../slices/orderSlice';
+import selectedIngredientReducer from '../slices/selectedIngredientSlice';
 
 export const store = configureStore({
   reducer: {
@@ -16,7 +17,7 @@ export const store = configureStore({
     burgerConstructor: burgerConstructorReducer,
     selectedIngredient: selectedIngredientReducer,
     order: orderReducer,
-    auth: authReducer, 
+    auth: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

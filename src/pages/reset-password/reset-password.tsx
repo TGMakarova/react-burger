@@ -3,12 +3,15 @@ import {
   PasswordInput,
   Input,
 } from '@krgaa/react-developer-burger-ui-components';
-import styles from './reset-password.module.css';
 import { useState, useEffect, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
 import { resetPassword } from '../../services/slices/authSlice';
+
 import type { AppDispatch, RootState } from '../../services/store';
+
+import styles from './reset-password.module.css';
 
 export const ResetPassword = (): React.ReactNode => {
   const dispatch = useDispatch<AppDispatch>();

@@ -2,9 +2,9 @@ import { CheckMarkIcon } from '@krgaa/react-developer-burger-ui-components';
 
 import styles from './other-details-content.module.css';
 
-interface OtherDetailsContentProps {
+type OtherDetailsContentProps = {
   orderNumber?: number | null;
-}
+};
 
 export const OtherDetailsContent = ({ orderNumber }: OtherDetailsContentProps) => {
   return (
@@ -21,7 +21,9 @@ export const OtherDetailsContent = ({ orderNumber }: OtherDetailsContentProps) =
       <h3 className={`${styles.other_details_order_text} text text_type_main-default`}>
         Ваш заказ начали готовить
       </h3>
-      <p className={`${styles.other_details_finish_text} text text_type_main-default text_color_inactive`}>
+      <p
+        className={`${styles.other_details_finish_text} text text_type_main-default text_color_inactive`}
+      >
         Дождитесь готовности на орбитальной станции
       </p>
     </div>

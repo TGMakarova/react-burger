@@ -8,7 +8,9 @@ type ProtectedRouteProps = {
   children: ReactNode;
 };
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+export default function ProtectedRoute({
+  children,
+}: ProtectedRouteProps): React.JSX.Element | null {
   const location = useLocation();
   const { isLoggedIn, isAuthChecked } = useSelector((state: RootState) => state.auth);
 

@@ -7,12 +7,12 @@ const checkResponse = async <T>(response: Response): Promise<T> => {
   const data = (await response.json()) as T;
 
   if (!response.ok) {
-    const error = {
-      status: response.status,
-      statusText: response.statusText,
-      message: `Ошибка ${response.status}: ${response.statusText}`,
-      data: data,
-    };
+    const error: Error & { status?: number; statusText?: string; data?: T } = new Error(
+      `Ошибка ${response.status}: ${response.statusText}`
+    );
+    error.status = response.status;
+    error.statusText = response.statusText;
+    error.data = data;
     return Promise.reject(error);
   }
 
@@ -65,10 +65,10 @@ class BurgerApi {
   }
 
   private getAccessToken(): string | null {
-    return this.accessToken || localStorage.getItem('accessToken');
+    return this.accessToken ?? localStorage.getItem('accessToken');
   }
 
-  private setAccessToken(token: string | null) {
+  private setAccessToken(token: string | null): void {
     this.accessToken = token;
     if (token) {
       localStorage.setItem('accessToken', token);
@@ -106,7 +106,7 @@ class BurgerApi {
       throw new Error('Не авторизован');
     }
 
-    const makeRequest = async (requestToken: string) => {
+    const makeRequest = async (requestToken: string): Promise<T> => {
       const authHeader = `Bearer ${requestToken}`;
 
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
@@ -119,7 +119,7 @@ class BurgerApi {
       });
 
       if (response.status === 401 || response.status === 403) {
-        const error: any = new Error(`HTTP ${response.status}`);
+        const error: Error & { status?: number } = new Error(`HTTP ${response.status}`);
         error.status = response.status;
         throw error;
       }
@@ -129,7 +129,8 @@ class BurgerApi {
 
     try {
       return await makeRequest(token);
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error & { status?: number };
       if (error.status === 401 || error.status === 403) {
         const refreshToken = localStorage.getItem('refreshToken');
         if (refreshToken) {
@@ -141,7 +142,7 @@ class BurgerApi {
               localStorage.setItem('refreshToken', refreshData.refreshToken);
               return await makeRequest(this.getAccessToken()!);
             }
-          } catch (refreshError) {
+          } catch (_refreshError) {
             this.clearAuth();
             throw new Error('Сессия истекла. Пожалуйста, войдите снова.');
           }
@@ -158,7 +159,7 @@ class BurgerApi {
     return this.request<T>(endpoint, { ...options, method: 'GET' });
   }
 
-  post<T>(endpoint: string, data?: any, options?: RequestInit): Promise<T> {
+  post<T>(endpoint: string, data?: unknown, options?: RequestInit): Promise<T> {
     return this.request<T>(endpoint, {
       ...options,
       method: 'POST',
@@ -166,7 +167,7 @@ class BurgerApi {
     });
   }
 
-  put<T>(endpoint: string, data?: any, options?: RequestInit): Promise<T> {
+  put<T>(endpoint: string, data?: unknown, options?: RequestInit): Promise<T> {
     return this.request<T>(endpoint, {
       ...options,
       method: 'PUT',
@@ -174,7 +175,7 @@ class BurgerApi {
     });
   }
 
-  patch<T>(endpoint: string, data?: any, options?: RequestInit): Promise<T> {
+  patch<T>(endpoint: string, data?: unknown, options?: RequestInit): Promise<T> {
     return this.request<T>(endpoint, {
       ...options,
       method: 'PATCH',
@@ -258,21 +259,22 @@ class BurgerApi {
     return !!this.getAccessToken();
   }
 
-  clearAuth() {
+  clearAuth(): void {
     this.setAccessToken(null);
     localStorage.removeItem('refreshToken');
   }
 
-  getIngredients() {
+  getIngredients(): Promise<{ data: TIngredient[] }> {
     return this.get<{ data: TIngredient[] }>('/ingredients');
   }
 
-  createOrder(ingredients: string[]) {
+  createOrder(ingredients: string[]): Promise<{ order: TOrder }> {
     return this.post<{ order: TOrder }>('/orders', { ingredients });
   }
 }
 
-export const getIngredientsApi = () => burgerApi.getIngredients();
+export const getIngredientsApi = (): Promise<{ data: TIngredient[] }> =>
+  burgerApi.getIngredients();
 
 // ========== ЭКЗЕМПЛЯР API ДЛЯ ИСПОЛЬЗОВАНИЯ ==========
 export const burgerApi = new BurgerApi(BURGER_API_URL);

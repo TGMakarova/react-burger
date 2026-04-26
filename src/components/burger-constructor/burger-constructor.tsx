@@ -35,13 +35,13 @@ export const BurgerConstructor = (): React.JSX.Element => {
   const [isRestored, setIsRestored] = useState(false);
 
   // Проверка авторизации
-  const isAuthenticated = () => {
+  const isAuthenticated = (): boolean => {
     const token = localStorage.getItem('accessToken');
     return !!token;
   };
 
   // Сохраняем конструктор в localStorage
-  const saveConstructorToLocalStorage = () => {
+  const saveConstructorToLocalStorage = (): void => {
     if (bun || ingredients.length > 0) {
       const constructorData = {
         bun: bun,
@@ -67,29 +67,30 @@ export const BurgerConstructor = (): React.JSX.Element => {
       }
 
       try {
-        const { bun: savedBun, ingredients: savedIngredients } =
-          JSON.parse(savedConstructor);
+        const { bun: savedBun, ingredients: savedIngredients } = JSON.parse(
+          savedConstructor
+        ) as { bun: ConstructorIngredient | null; ingredients: ConstructorIngredient[] };
 
         const hasNoIngredients = !bun && ingredients.length === 0;
 
         if (hasNoIngredients && savedBun) {
-          dispatch(clearConstructor());
+          void dispatch(clearConstructor());
 
           if (savedBun) {
-            dispatch(addIngredient({ ...savedBun, constructorId: uuidv4() }));
+            void dispatch(addIngredient({ ...savedBun, constructorId: uuidv4() }));
           }
 
           if (savedIngredients && savedIngredients.length > 0) {
             savedIngredients.forEach((ingredient: ConstructorIngredient) => {
-              dispatch(addIngredient({ ...ingredient, constructorId: uuidv4() }));
+              void dispatch(addIngredient({ ...ingredient, constructorId: uuidv4() }));
             });
           }
 
           setIsRestored(true);
           sessionStorage.removeItem('restoringOrder');
         }
-      } catch (err) {
-        console.error('Error restoring constructor:', err);
+      } catch (_err) {
+        console.error('Error restoring constructor:', _err);
       }
     }
   }, [location.pathname, dispatch, isRestored, bun, ingredients]);
@@ -119,7 +120,7 @@ export const BurgerConstructor = (): React.JSX.Element => {
   drop(dropRef);
 
   // Формируем массив для отображения
-  const allIngredientsForDisplay = [];
+  const allIngredientsForDisplay: ConstructorIngredient[] = [];
 
   if (bun) {
     allIngredientsForDisplay.push(bun);
@@ -143,8 +144,7 @@ export const BurgerConstructor = (): React.JSX.Element => {
   };
 
   // Основная функция отправки заказа
-  const handleSubmitOrder = async () => {
-    // ✅ Используем validateOrder
+  const handleSubmitOrder = async (): Promise<void> => {
     const validation = validateOrder();
     if (!validation.isValid) {
       alert(validation.errorMessage);
@@ -154,18 +154,17 @@ export const BurgerConstructor = (): React.JSX.Element => {
     if (!isAuthenticated()) {
       saveConstructorToLocalStorage();
       localStorage.setItem('returnTo', location.pathname);
-      navigate('/login');
+      void navigate('/login');
       return;
     }
 
-    // ✅ Гарантированно bun не null после валидации
     const ingredientsIds = [bun!._id, ...ingredients.map((item) => item._id), bun!._id];
 
     try {
       const resultAction = await dispatch(submitOrder(ingredientsIds));
 
       if (submitOrder.fulfilled.match(resultAction)) {
-        dispatch(clearConstructor());
+        void dispatch(clearConstructor());
         localStorage.removeItem('savedConstructor');
         localStorage.removeItem('returnTo');
         setIsRestored(false);
@@ -177,19 +176,18 @@ export const BurgerConstructor = (): React.JSX.Element => {
         ) {
           saveConstructorToLocalStorage();
           localStorage.setItem('returnTo', location.pathname);
-          navigate('/login');
+          void navigate('/login');
         } else {
-          alert(`Ошибка: ${resultAction.error.message || 'Не удалось оформить заказ'}`);
+          alert(`Ошибка: ${resultAction.error.message ?? 'Не удалось оформить заказ'}`);
         }
       }
-    } catch (err) {
+    } catch (_err) {
       alert('Произошла ошибка при оформлении заказа');
     }
   };
-
-  const handleCloseModal = () => {
+  const handleCloseModal = (): void => {
     setIsModalOpen(false);
-    dispatch(clearOrder());
+    void dispatch(clearOrder());
   };
 
   return (
@@ -199,7 +197,9 @@ export const BurgerConstructor = (): React.JSX.Element => {
     >
       <MyComponentUI
         ingredients={allIngredientsForDisplay}
-        onOrderClick={handleSubmitOrder}
+        onOrderClick={() => {
+          void handleSubmitOrder();
+        }}
         isLoading={loading}
       />
 

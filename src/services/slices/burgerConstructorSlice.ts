@@ -81,19 +81,19 @@ export const selectIngredientsWithCounts = createSelector(
     // Подсчитываем булку (2 штуки)
     if (burgerConstructor.bun) {
       const bunId = burgerConstructor.bun._id;
-      countMap.set(bunId, (countMap.get(bunId) || 0) + 2);
+      countMap.set(bunId, (countMap.get(bunId) ?? 0) + 2);
     }
 
     // Подсчитываем обычные ингредиенты
     burgerConstructor.ingredients.forEach((ingredient: ConstructorIngredient) => {
       const ingredientId = ingredient._id;
-      countMap.set(ingredientId, (countMap.get(ingredientId) || 0) + 1);
+      countMap.set(ingredientId, (countMap.get(ingredientId) ?? 0) + 1);
     });
 
     // Возвращаем ингредиенты с актуальными счётчиками
     return allIngredients.map((ingredient: TIngredient) => ({
       ...ingredient,
-      count: countMap.get(ingredient._id) || 0,
+      count: countMap.get(ingredient._id) ?? 0,
     }));
   }
 );

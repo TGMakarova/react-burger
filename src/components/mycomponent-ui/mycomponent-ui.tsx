@@ -31,25 +31,27 @@ export const MyComponentUI = ({
 }: MyComponentUIProps): React.JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
 
-  // Получаем данные напрямую из Redux store
+  // Пустая функция-заглушка для ConstructorElement
+  const noop = (): void => {
+    // заглушка для обязательного пропса handleClose
+  };
+
   const { bun, ingredients: storeIngredients } = useSelector(
     (state: RootState) => state.burgerConstructor
   );
 
-  // Для отображения используем данные из Redux
   const displayBun = bun;
   const displayIngredients = storeIngredients;
 
-  // Подсчет общей стоимости
   const totalPrice =
-    (displayBun?.price || 0) * 2 +
+    (displayBun?.price ?? 0) * 2 +
     displayIngredients.reduce((sum, item) => sum + item.price, 0);
 
-  const handleRemove = (constructorId: string) => {
+  const handleRemove = (constructorId: string): void => {
     dispatch(removeIngredient(constructorId));
   };
 
-  const handleMove = (dragIndex: number, hoverIndex: number) => {
+  const handleMove = (dragIndex: number, hoverIndex: number): void => {
     dispatch(moveIngredient({ dragIndex, hoverIndex }));
   };
 
@@ -65,7 +67,7 @@ export const MyComponentUI = ({
       ) : (
         <div className={styles.bun_top}>
           <ConstructorElement
-            handleClose={() => {}}
+            handleClose={noop}
             isLocked={true}
             price={displayBun.price}
             text={`${displayBun.name} (верх)`}
@@ -107,7 +109,7 @@ export const MyComponentUI = ({
       ) : (
         <div className={styles.bun_bottom}>
           <ConstructorElement
-            handleClose={() => {}}
+            handleClose={noop}
             isLocked={true}
             price={displayBun.price}
             text={`${displayBun.name} (низ)`}
@@ -151,12 +153,15 @@ const DraggableIngredient = ({
   index: number;
   onRemove: (id: string) => void;
   onMove: (dragIndex: number, hoverIndex: number) => void;
-}) => {
+}): React.JSX.Element => {
   const ref = useRef<HTMLDivElement>(null);
 
   const [{ isDragging }, drag] = useDrag({
     type: 'constructor-ingredient',
-    item: { index, type: 'constructor-ingredient' },
+    item: (): { index: number; type: string } => ({
+      index,
+      type: 'constructor-ingredient',
+    }),
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -164,7 +169,7 @@ const DraggableIngredient = ({
 
   const [, drop] = useDrop({
     accept: 'constructor-ingredient',
-    hover: (item: { index: number }, monitor) => {
+    hover: (item: { index: number }, monitor): void => {
       if (!ref.current) return;
 
       const dragIndex = item.index;
@@ -175,7 +180,7 @@ const DraggableIngredient = ({
       const hoverBoundingRect = ref.current.getBoundingClientRect();
       const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
       const clientOffset = monitor.getClientOffset();
-      const hoverClientY = (clientOffset?.y || 0) - hoverBoundingRect.top;
+      const hoverClientY = (clientOffset?.y ?? 0) - hoverBoundingRect.top;
 
       if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return;
       if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return;
@@ -187,7 +192,7 @@ const DraggableIngredient = ({
 
   drag(drop(ref));
 
-  const handleRemoveClick = () => {
+  const handleRemoveClick = (): void => {
     onRemove(constructorId);
   };
 

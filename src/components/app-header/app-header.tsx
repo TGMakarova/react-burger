@@ -4,13 +4,12 @@ import {
   Logo,
   ProfileIcon,
 } from '@krgaa/react-developer-burger-ui-components';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 
 import styles from './app-header.module.css';
 
 export const AppHeader = (): React.JSX.Element => {
-  // Функция для определения стиля активной ссылки
-  const getLinkClass = ({ isActive }: { isActive: boolean }) => {
+  const getLinkClass = ({ isActive }: { isActive: boolean }): string => {
     return `${styles.link} ${isActive ? styles.link_active : ''}`;
   };
 
@@ -18,17 +17,11 @@ export const AppHeader = (): React.JSX.Element => {
     <header className={styles.header}>
       <nav className={`${styles.menu} p-4`}>
         <div className={styles.menu_part_left}>
-          {/* Конструктор - точное совпадение с "/" */}
-          <NavLink
-            to="/"
-            end // 👈 активен только на главной
-            className={getLinkClass}
-          >
+          <NavLink to="/" end className={getLinkClass}>
             <BurgerIcon type="primary" />
             <p className="text text_type_main-default ml-2">Конструктор</p>
           </NavLink>
 
-          {/* Лента заказов */}
           <NavLink
             to="/feed"
             className={({ isActive }) =>
@@ -40,11 +33,11 @@ export const AppHeader = (): React.JSX.Element => {
           </NavLink>
         </div>
 
-        <div className={styles.logo}>
+        {/* 👇 ОБЕРНИТЕ ЛОГОТИП В ССЫЛКУ */}
+        <Link to="/" className={styles.logo}>
           <Logo />
-        </div>
+        </Link>
 
-        {/* Личный кабинет - активен на /profile и всех вложенных */}
         <NavLink
           to="/profile"
           className={({ isActive }) =>

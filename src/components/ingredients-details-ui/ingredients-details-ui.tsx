@@ -19,23 +19,20 @@ type IngredientsDetailsUIProps = {
   ) => void;
 };
 
-export const IngredientsDetailsUI = ({ setCategoryRef }: IngredientsDetailsUIProps) => {
+export const IngredientsDetailsUI = ({
+  setCategoryRef,
+}: IngredientsDetailsUIProps): React.JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Получаем ингредиенты из Redux store
   const ingredients = useSelector((state: RootState) => state.ingredients.items);
-
-  // Используем мемоизированный селектор для получения ингредиентов с счётчиками
   const ingredientsWithCounts = useSelector(selectIngredientsWithCounts);
 
-  // Создаем локальные рефы
   const bunTitleRef = useRef<HTMLDivElement>(null);
   const sauceTitleRef = useRef<HTMLDivElement>(null);
   const mainTitleRef = useRef<HTMLDivElement>(null);
 
-  // Передаем рефы в родительский компонент
   useEffect(() => {
     setCategoryRef('bun', bunTitleRef.current);
     setCategoryRef('sauce', sauceTitleRef.current);
@@ -48,30 +45,30 @@ export const IngredientsDetailsUI = ({ setCategoryRef }: IngredientsDetailsUIPro
     };
   }, [setCategoryRef]);
 
-  const handleIngredientClick = (ingredient: TIngredient) => {
-    // Сохраняем данные для восстановления после перезагрузки
+  const handleIngredientClick = (ingredient: TIngredient): void => {
     localStorage.setItem('popupIngredientId', ingredient._id);
     localStorage.setItem('popupBackgroundPath', location.pathname);
-    localStorage.removeItem('popupRestored'); // Убираем флаг восстановления при новом клике
+    localStorage.removeItem('popupRestored');
 
-    // Сохраняем в Redux
-    dispatch(setSelectedIngredient(ingredient));
+    void dispatch(setSelectedIngredient(ingredient));
 
-    // Переходим на маршрут с ингредиентом
-    navigate(`/ingredients/${ingredient._id}`, {
+    void navigate(`/ingredients/${ingredient._id}`, {
       state: { background: location, from: location.pathname },
     });
   };
 
   // Компонент для отдельного ингредиента с drag-and-drop и счётчиком
-  const IngredientCard = ({ ingredient }: { ingredient: TIngredient }) => {
+  const IngredientCard = ({
+    ingredient,
+  }: {
+    ingredient: TIngredient;
+  }): React.JSX.Element => {
     const elementRef = useRef<HTMLDivElement>(null);
 
-    // Находим актуальный счётчик для этого ингредиента
     const ingredientWithCount = ingredientsWithCounts.find(
       (item: TIngredient & { count?: number }) => item._id === ingredient._id
     );
-    const count = ingredientWithCount?.count || 0;
+    const count = ingredientWithCount?.count ?? 0;
 
     const [{ isDragging }, drag] = useDrag({
       type: 'ingredient',
@@ -106,13 +103,11 @@ export const IngredientsDetailsUI = ({ setCategoryRef }: IngredientsDetailsUIPro
           {ingredient.name}
         </div>
 
-        {/* Отображаем счётчик только если он больше 0 */}
         {count > 0 && <div className={styles.counter}>{count}</div>}
       </div>
     );
   };
 
-  // Группируем ингредиенты по типам
   const groupedIngredients = ingredients.reduce<Record<string, TIngredient[]>>(
     (acc, item) => {
       const key = item.type;

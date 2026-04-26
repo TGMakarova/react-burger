@@ -7,8 +7,11 @@ type ModalOverlayProps = {
   children: React.ReactNode;
 };
 
-export const ModalOverlay = ({ onClose, children }: ModalOverlayProps) => {
-  const handleOverlayClick = (e: React.MouseEvent) => {
+export const ModalOverlay = ({
+  onClose,
+  children,
+}: ModalOverlayProps): React.JSX.Element => {
+  const handleOverlayClick = (e: React.MouseEvent): void => {
     // Закрываем Modal при клике именно на оверлей
     if (e.target === e.currentTarget) {
       onClose();

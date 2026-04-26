@@ -34,20 +34,6 @@
   max-width: 480px;
 }
 
-/* Для обратной совместимости - если используешь mail_container в ProfilePage */
-.mail_container {
-  max-width: 480px;
-  display: flex;
-  flex-direction: column;
-  padding-top: 24px;
-  padding-bottom: 24px;
-  gap: 24px;
-  /* border: 1px solid yellow; - для отладки */
-}
-
-.error_message {
-}
-
 .nav_link {
   text-decoration: none;
   transition: color 0.2s ease;
@@ -78,7 +64,3 @@
   cursor: not-allowed;
   opacity: 0.6; /* опционально */
 }
-
-
-
-

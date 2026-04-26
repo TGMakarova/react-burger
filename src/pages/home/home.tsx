@@ -32,15 +32,15 @@ export const Home = (): React.JSX.Element => {
       const ingredient = ingredients.find((item) => item._id === savedIngredientId);
 
       if (ingredient && !location.pathname.includes('/ingredients/')) {
-        dispatch(setSelectedIngredient(ingredient));
+        void dispatch(setSelectedIngredient(ingredient));
 
-        navigate(`/ingredients/${savedIngredientId}`, {
+        void navigate(`/ingredients/${savedIngredientId}`, {
           state: { background: { pathname: savedBackgroundPath } },
           replace: true,
         });
       }
     }
-  }, [ingredients]);
+  }, [ingredients, dispatch, location.pathname, navigate]);
 
   if (loading) {
     return (

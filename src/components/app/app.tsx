@@ -25,12 +25,18 @@ import type { RootState, AppDispatch } from '../../services/store';
 
 import styles from './app.module.css';
 
-export function App() {
+// Добавьте интерфейс для location state
+type LocationState = {
+  from?: string;
+  background?: Location;
+};
+
+export function App(): React.JSX.Element {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
-  const background = location.state?.background;
+  const background = (location.state as LocationState)?.background;
 
   const { isAuthChecked, isLoading, isLoggedIn } = useSelector(
     (state: RootState) => state.auth
@@ -38,7 +44,7 @@ export function App() {
 
   // Загрузка ингредиентов при запуске приложения
   useEffect(() => {
-    dispatch(fetchIngredients());
+    void dispatch(fetchIngredients());
   }, [dispatch]);
 
   // Проверка токена при загрузке приложения
@@ -46,7 +52,7 @@ export function App() {
     const isRestoringOrder = sessionStorage.getItem('restoringOrder') === 'true';
 
     if (!isRestoringOrder) {
-      dispatch(checkAuth());
+      void dispatch(checkAuth());
     } else {
       sessionStorage.removeItem('restoringOrder');
     }
@@ -62,18 +68,18 @@ export function App() {
         !window.location.pathname.includes('/login')
       ) {
         localStorage.removeItem('returnTo');
-        navigate(returnTo, { replace: true });
+        void navigate(returnTo, { replace: true });
       }
     }
   }, [isAuthChecked, isLoggedIn, navigate]);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = (): void => {
     localStorage.removeItem('popupIngredientId');
     localStorage.removeItem('popupBackgroundPath');
     localStorage.removeItem('popupRestored');
 
-    const returnPath = location.state?.from || '/';
-    navigate(returnPath, { replace: true });
+    const returnPath = (location.state as LocationState)?.from ?? '/';
+    void navigate(returnPath, { replace: true });
   };
 
   // Пока проверяем токен - показываем загрузку
@@ -93,7 +99,7 @@ export function App() {
     <>
       <AppHeader />
 
-      <Routes location={background || location}>
+      <Routes location={background ?? location}>
         {/* Публичные маршруты */}
         <Route path="/" element={<Home />} />
         <Route path="ingredients/:id" element={<IngredientPage />} />

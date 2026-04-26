@@ -23,8 +23,10 @@ export const submitOrder = createAsyncThunk(
     try {
       const data = await burgerApi.createOrder(ingredientsIds);
       return data.order.number;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка оформления заказа');
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Ошибка оформления заказа';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -58,8 +60,9 @@ const orderSlice = createSlice({
 export const { clearOrder } = orderSlice.actions;
 
 // Селекторы
-export const selectOrderNumber = (state: RootState) => state.order.orderNumber;
-export const selectOrderLoading = (state: RootState) => state.order.loading;
-export const selectOrderError = (state: RootState) => state.order.error;
+export const selectOrderNumber = (state: RootState): number | null =>
+  state.order.orderNumber;
+export const selectOrderLoading = (state: RootState): boolean => state.order.loading;
+export const selectOrderError = (state: RootState): string | null => state.order.error;
 
 export default orderSlice.reducer;

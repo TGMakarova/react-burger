@@ -16,7 +16,7 @@ type IngredientDetailsProps = {
 };
 
 export const IngredientDetails = ({
-  children,
+  children: _children,
   header,
   isOpen,
   onClose,
@@ -27,10 +27,10 @@ export const IngredientDetails = ({
     (state: RootState) => state.selectedIngredient.ingredient
   );
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     dispatch(clearSelectedIngredient());
     onClose();
-    navigate(-1); // Возвращаемся назад
+    void navigate(-1); // Возвращаемся назад
   };
 
   if (!ingredient) {

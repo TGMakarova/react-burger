@@ -1,4 +1,5 @@
 import type { Middleware } from '@reduxjs/toolkit';
+import type { TIngredient } from '@utils/types';
 
 // Тип RootState с вашим authSlice
 type RootState = {
@@ -10,15 +11,20 @@ type RootState = {
     error: string | null;
   };
   burgerConstructor: {
-    bun: any;
-    ingredients: any[];
+    bun: TIngredient | null;
+    ingredients: TIngredient[];
   };
 };
 
+// Тип для action
+type ActionWithType = {
+  type: string;
+  payload?: unknown;
+  meta?: Record<string, unknown>;
+};
+
 // Type guard для проверки action
-function isAnyAction(
-  action: unknown
-): action is { type: string; payload?: unknown; meta?: any } {
+function isAnyAction(action: unknown): action is ActionWithType {
   return (
     action !== null &&
     typeof action === 'object' &&
@@ -63,7 +69,7 @@ export const apiMiddleware: Middleware = (store) => (next) => (action) => {
   if (isAnyAction(action) && action.type === 'order/sendOrder/pending') {
     const state = store.getState() as RootState;
     const isLoggedIn = state.auth.isLoggedIn;
-    const token = getAccessToken(); // Получаем токен из localStorage
+    const token = getAccessToken();
 
     console.log('[API] Проверка авторизации перед заказом:', {
       isLoggedIn,

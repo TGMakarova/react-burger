@@ -26,6 +26,8 @@ export default defineConfig(
       '.storybook/**/*',
       'vitest-setup.ts',
       'test-bad.tsx',
+      'src/stories_old/**/*',
+      '**/*.module.css',
     ],
   },
   js.configs.recommended,

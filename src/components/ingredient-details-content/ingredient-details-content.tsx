@@ -6,7 +6,7 @@ export const IngredientDetailsContent = ({
   ingredient,
 }: {
   ingredient: TIngredient;
-}) => {
+}): React.JSX.Element => {
   return (
     <div className={styles.ingredient_element}>
       <img

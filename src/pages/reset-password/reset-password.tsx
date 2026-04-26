@@ -13,21 +13,20 @@ import type { AppDispatch, RootState } from '../../services/store';
 
 import styles from './reset-password.module.css';
 
-export const ResetPassword = (): React.ReactNode => {
+export const ResetPassword = (): React.JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
-  const [password, setPassword] = useState('');
-  const [token, setToken] = useState('');
-  const [error, setError] = useState('');
+  const [password, setPassword] = useState<string>('');
+  const [token, setToken] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const navigate = useNavigate();
 
-  // Берём состояние загрузки из Redux
   const isLoading = useSelector((state: RootState) => state.auth.isLoading);
 
   useEffect(() => {
     const hasRequestedReset = localStorage.getItem('passwordResetRequested') === 'true';
 
     if (!hasRequestedReset) {
-      navigate('/forgot-password');
+      void navigate('/forgot-password');
     }
   }, [navigate]);
 
@@ -47,7 +46,9 @@ export const ResetPassword = (): React.ReactNode => {
     return true;
   };
 
-  const handleSubmitResetPassword = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmitResetPassword = async (
+    e: FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -57,17 +58,25 @@ export const ResetPassword = (): React.ReactNode => {
     setError('');
 
     try {
-      // Используем Redux экшен вместо прямого вызова API
       await dispatch(resetPassword({ password, token })).unwrap();
       localStorage.removeItem('passwordResetRequested');
-      navigate('/login');
-    } catch (error: any) {
-      setError(error.message || 'Не удалось изменить пароль. Попробуйте позже.');
+      void navigate('/login');
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Не удалось изменить пароль. Попробуйте позже.';
+      setError(errorMessage);
     }
   };
 
   return (
-    <form className={styles.login_container} onSubmit={handleSubmitResetPassword}>
+    <form
+      className={styles.login_container}
+      onSubmit={(e) => {
+        void handleSubmitResetPassword(e);
+      }}
+    >
       <h1 className={styles.header}>Восстановление пароля</h1>
 
       {error && <div className={styles.error_message}>{error}</div>}
@@ -77,14 +86,16 @@ export const ResetPassword = (): React.ReactNode => {
           icon="ShowIcon"
           name="password"
           placeholder="Введите новый пароль"
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPassword(e.target.value)
+          }
           value={password}
           disabled={isLoading}
         />
         <Input
           name="token"
           placeholder="Введите код из письма"
-          onChange={(e) => setToken(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setToken(e.target.value)}
           value={token}
           disabled={isLoading}
         />
@@ -107,7 +118,9 @@ export const ResetPassword = (): React.ReactNode => {
         </p>
         <p
           className={`${styles.grid_item_2} text text_type_main-default text_color_inactive`}
-          onClick={() => navigate('/login')}
+          onClick={() => {
+            void navigate('/login');
+          }}
         >
           Войти
         </p>

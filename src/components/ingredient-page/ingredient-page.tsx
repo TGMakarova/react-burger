@@ -4,10 +4,11 @@ import { useParams, useLocation } from 'react-router-dom';
 import { IngredientDetailsContent } from '../ingredient-details-content/ingredient-details-content';
 
 import type { RootState } from '@/services/store';
+import type { TIngredient } from '@utils/types';
 
 import styles from './ingredient-page.module.css';
 
-export const IngredientPage = () => {
+export const IngredientPage = (): React.JSX.Element => {
   const { id } = useParams();
   const location = useLocation();
 
@@ -16,9 +17,9 @@ export const IngredientPage = () => {
   const error = useSelector((state: RootState) => state.ingredients.error);
 
   // Проверяем, не передан ли ингредиент через state (при клике из модала)
-  const ingredientFromState = location.state?.ingredient;
+  const ingredientFromState = location.state as { ingredient?: TIngredient } | undefined;
 
-  let ingredient = ingredientFromState;
+  let ingredient: TIngredient | undefined = ingredientFromState?.ingredient;
   if (!ingredient && ingredients.length > 0) {
     ingredient = ingredients.find((item) => item._id === id);
   }

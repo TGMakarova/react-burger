@@ -15,16 +15,16 @@ type OtherDetailsProps = {
 export const OtherDetails = ({
   children,
   orderNumber,
-  error,
+  error: _error, // помечаем как неиспользуемый, если не нужен
   ...modalProps
-}: OtherDetailsProps) => {
+}: OtherDetailsProps): React.JSX.Element | null => {
   // Если есть ошибка, показываем её
-  if (error) {
+  if (_error) {
     return (
       <Modal {...modalProps}>
         <div className={styles.error_content}>
           <h2 className="text text_type_main-medium mb-6">Ошибка</h2>
-          <p className="text text_type_main-default mb-10">{error}</p>
+          <p className="text text_type_main-default mb-10">{_error}</p>
         </div>
       </Modal>
     );
@@ -34,7 +34,7 @@ export const OtherDetails = ({
   if (orderNumber) {
     return (
       <Modal {...modalProps}>
-        <OtherDetailsContent orderNumber={orderNumber} />
+        <OtherDetailsContent orderNumber={orderNumber} error={null} />
       </Modal>
     );
   }

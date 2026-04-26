@@ -9,13 +9,12 @@ import type { AppDispatch, RootState } from '../../services/store';
 
 import styles from './forgot-password.module.css';
 
-export const ForgotPassword = (): React.ReactNode => {
+export const ForgotPassword = (): React.JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const navigate = useNavigate();
 
-  // Берём состояние загрузки из Redux
   const isLoading = useSelector((state: RootState) => state.auth.isLoading);
 
   const validateForm = (): boolean => {
@@ -31,7 +30,9 @@ export const ForgotPassword = (): React.ReactNode => {
     return true;
   };
 
-  const handleSubmitForgotPassword = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmitForgotPassword = async (
+    e: FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -41,21 +42,29 @@ export const ForgotPassword = (): React.ReactNode => {
     setError('');
 
     try {
-      // Используем Redux экшен вместо прямого вызова API
       await dispatch(forgotPassword({ email })).unwrap();
       localStorage.setItem('passwordResetRequested', 'true');
-      navigate('/reset-password');
-    } catch (error: any) {
-      setError(error.message || 'Не удалось отправить запрос. Попробуйте позже.');
+      void navigate('/reset-password');
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Не удалось отправить запрос. Попробуйте позже.';
+      setError(errorMessage);
     }
   };
 
-  const handleLoginClick = () => {
-    navigate('/login');
+  const handleLoginClick = (): void => {
+    void navigate('/login');
   };
 
   return (
-    <form className={styles.login_container} onSubmit={handleSubmitForgotPassword}>
+    <form
+      className={styles.login_container}
+      onSubmit={(e) => {
+        void handleSubmitForgotPassword(e);
+      }}
+    >
       <h1 className={styles.header}>Восстановление пароля</h1>
 
       {error && <div className={styles.error_message}>{error}</div>}
@@ -64,7 +73,7 @@ export const ForgotPassword = (): React.ReactNode => {
         <EmailInput
           name="email"
           placeholder="Укажите e-mail"
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
           value={email}
           disabled={isLoading}
         />
@@ -87,7 +96,9 @@ export const ForgotPassword = (): React.ReactNode => {
         </p>
         <p
           className={`${styles.grid_item_2} text text_type_main-default text_color_inactive`}
-          onClick={handleLoginClick}
+          onClick={() => {
+            void handleLoginClick();
+          }}
         >
           Войти
         </p>

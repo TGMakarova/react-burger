@@ -22,13 +22,16 @@ export const fetchIngredients = createAsyncThunk(
   'ingredients/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await getIngredientsApi(); // { data: TIngredient[] }
-      return response.data; // ✅ возвращаем TIngredient[]
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка загрузки ингредиентов');
+      const response = await getIngredientsApi();
+      return response.data;
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Ошибка загрузки ингредиентов';
+      return rejectWithValue(errorMessage);
     }
   }
 );
+
 const ingredientsSlice = createSlice({
   name: 'ingredients',
   initialState,
@@ -48,14 +51,17 @@ const ingredientsSlice = createSlice({
       )
       .addCase(fetchIngredients.rejected, (state, action) => {
         state.loading = false;
-        state.error = (action.payload as string) || 'Ошибка загрузки ингредиентов';
+        state.error = (action.payload as string) ?? 'Ошибка загрузки ингредиентов';
       });
   },
 });
 
 // Селекторы
-export const selectIngredients = (state: RootState) => state.ingredients.items;
-export const selectIngredientsLoading = (state: RootState) => state.ingredients.loading;
-export const selectIngredientsError = (state: RootState) => state.ingredients.error;
+export const selectIngredients = (state: RootState): TIngredient[] =>
+  state.ingredients.items;
+export const selectIngredientsLoading = (state: RootState): boolean =>
+  state.ingredients.loading;
+export const selectIngredientsError = (state: RootState): string | null =>
+  state.ingredients.error;
 
 export default ingredientsSlice.reducer;

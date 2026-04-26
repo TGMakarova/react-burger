@@ -3,10 +3,14 @@ import { CheckMarkIcon } from '@krgaa/react-developer-burger-ui-components';
 import styles from './other-details-content.module.css';
 
 type OtherDetailsContentProps = {
-  orderNumber?: number | null;
+  orderNumber: number | null;
+  error: string | null;
 };
 
-export const OtherDetailsContent = ({ orderNumber }: OtherDetailsContentProps) => {
+export const OtherDetailsContent = ({
+  orderNumber,
+  error: _error, // ← добавляем префикс _, показывая что параметр не используется
+}: OtherDetailsContentProps): React.JSX.Element => {
   return (
     <div className={styles.other_details_content}>
       <h1 className={`${styles.other_details_id} text text_type_digits-large`}>

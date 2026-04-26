@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 
-export const useAuth = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+type UseAuthReturn = {
+  isAuthenticated: boolean;
+};
+
+export const useAuth = (): UseAuthReturn => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');

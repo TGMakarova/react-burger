@@ -36,7 +36,7 @@ export const checkAuth = createAsyncThunk(
     try {
       const response = await burgerApi.getUser();
       return response.user;
-    } catch (error) {
+    } catch (_error) {
       localStorage.removeItem('accessToken');
       return rejectWithValue('Invalid token');
     }
@@ -50,8 +50,10 @@ export const updateUser = createAsyncThunk(
     try {
       const response = await burgerApi.updateUser({ name, email });
       return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка обновления данных');
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Ошибка обновления данных';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -65,8 +67,9 @@ export const login = createAsyncThunk(
     try {
       const response = await burgerApi.login(email, password);
       return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка входа');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Ошибка входа';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -77,8 +80,10 @@ export const forgotPassword = createAsyncThunk(
     try {
       const response = await burgerApi.forgotPassword(email);
       return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка восстановления пароля');
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Ошибка восстановления пароля';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -92,8 +97,9 @@ export const register = createAsyncThunk(
     try {
       const response = await burgerApi.register(name, email, password);
       return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка регистрации');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Ошибка регистрации';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -107,8 +113,9 @@ export const resetPassword = createAsyncThunk(
     try {
       const response = await burgerApi.resetPassword(password, token);
       return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка сброса пароля');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Ошибка сброса пароля';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -119,8 +126,9 @@ export const logoutUser = createAsyncThunk(
     try {
       const response = await burgerApi.logout();
       return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Ошибка выхода');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Ошибка выхода';
+      return rejectWithValue(errorMessage);
     }
   }
 );

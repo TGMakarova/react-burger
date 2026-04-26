@@ -18,20 +18,19 @@ export const ProfilePage = (): React.JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  // Берём пользователя из Redux store
   const {
     user,
     isLoggedIn,
     isLoading: isAuthLoading,
   } = useSelector((state: RootState) => state.auth);
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isEdited, setIsEdited] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [isEdited, setIsEdited] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+  const [successMessage, setSuccessMessage] = useState<string>('');
 
   // Заполняем форму данными из store
   useEffect(() => {
@@ -44,7 +43,7 @@ export const ProfilePage = (): React.JSX.Element => {
   // Проверка авторизации
   useEffect(() => {
     if (!isAuthLoading && !isLoggedIn) {
-      navigate('/login', { replace: true });
+      void navigate('/login', { replace: true });
     }
   }, [isLoggedIn, isAuthLoading, navigate]);
 
@@ -61,7 +60,7 @@ export const ProfilePage = (): React.JSX.Element => {
     }
   }, [name, email, password, user]);
 
-  const handleCancel = () => {
+  const handleCancel = (): void => {
     if (user) {
       setName(user.name);
       setEmail(user.email);
@@ -72,7 +71,7 @@ export const ProfilePage = (): React.JSX.Element => {
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = async (): Promise<void> => {
     // Валидация
     if (name.trim().length < 2) {
       setError('Имя должно содержать минимум 2 символа');
@@ -94,7 +93,6 @@ export const ProfilePage = (): React.JSX.Element => {
     setSuccessMessage('');
 
     try {
-      // Используем Redux экшен для обновления
       const result = await dispatch(
         updateUser({
           name: name.trim(),
@@ -108,12 +106,13 @@ export const ProfilePage = (): React.JSX.Element => {
         setSuccessMessage('Данные успешно обновлены!');
         setTimeout(() => setSuccessMessage(''), 3000);
       }
-    } catch (error: any) {
-      // ✅ Удалён console.error
-      if (error.message?.includes('409')) {
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Не удалось сохранить изменения';
+      if (errorMessage?.includes('409')) {
         setError('Пользователь с таким email уже существует');
       } else {
-        setError(error.message || 'Не удалось сохранить изменения');
+        setError(errorMessage);
       }
     } finally {
       setIsSaving(false);
@@ -137,7 +136,7 @@ export const ProfilePage = (): React.JSX.Element => {
       <Input
         name="name"
         placeholder="Имя"
-        onChange={(e) => setName(e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
         value={name}
         disabled={isSaving}
       />
@@ -145,7 +144,7 @@ export const ProfilePage = (): React.JSX.Element => {
       <EmailInput
         name="email"
         placeholder="Логин"
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
         value={email}
         disabled={isSaving}
       />
@@ -153,7 +152,9 @@ export const ProfilePage = (): React.JSX.Element => {
       <PasswordInput
         name="password"
         placeholder="Новый пароль"
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setPassword(e.target.value)
+        }
         value={password}
         disabled={isSaving}
       />
@@ -170,7 +171,9 @@ export const ProfilePage = (): React.JSX.Element => {
           </Button>
           <Button
             type="primary"
-            onClick={handleSave}
+            onClick={() => {
+              void handleSave();
+            }}
             disabled={isSaving}
             htmlType="button"
           >

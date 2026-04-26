@@ -8,7 +8,9 @@ type PublicRouteProps = {
   children: ReactNode;
 };
 
-export default function PublicRoute({ children }: PublicRouteProps) {
+export default function PublicRoute({
+  children,
+}: PublicRouteProps): React.JSX.Element | null {
   const location = useLocation();
   const { isLoggedIn, isAuthChecked } = useSelector((state: RootState) => state.auth);
 

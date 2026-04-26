@@ -214,15 +214,15 @@ const ingredients: TIngredient[] = [
   },
 ];
 
-export const groupedIngredients: Record<string, TIngredient[]> = ingredients.reduce(
-  (acc: Record<string, TIngredient[]>, ingredient) => {
+export const groupedIngredients = ingredients.reduce<Record<string, TIngredient[]>>(
+  (acc, ingredient) => {
     if (!acc[ingredient.type]) {
       acc[ingredient.type] = [];
     }
     acc[ingredient.type].push(ingredient);
     return acc;
   },
-  {} as Record<string, TIngredient[]>
+  {}
 );
 
 console.log(groupedIngredients);

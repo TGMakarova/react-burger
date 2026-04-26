@@ -16,9 +16,14 @@ type ModalProps = {
   header?: string | null;
 };
 
-export const Modal = ({ isOpen, onClose, children, header }: ModalProps) => {
+export const Modal = ({
+  isOpen,
+  onClose,
+  children,
+  header,
+}: ModalProps): React.JSX.Element | null => {
   useEffect(() => {
-    const handleEscClose = (e: KeyboardEvent) => {
+    const handleEscClose = (e: KeyboardEvent): void => {
       if (e.key === 'Escape') {
         onClose();
       }

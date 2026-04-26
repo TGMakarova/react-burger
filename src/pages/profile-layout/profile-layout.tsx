@@ -1,42 +1,36 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Outlet, NavLink } from 'react-router-dom';
 
-import { logoutUser } from '../../services/slices/authSlice'; // ✅ импортируем экшен
+import { logoutUser } from '../../services/slices/authSlice';
 import { clearConstructor } from '../../services/slices/burgerConstructorSlice';
 
 import type { AppDispatch, RootState } from '../../services/store';
 
 import styles from './profile-layout.module.css';
 
-export function ProfileLayout() {
+export function ProfileLayout(): React.JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  // ✅ Берём состояние загрузки из Redux
   const isLoading = useSelector((state: RootState) => state.auth.isLoading);
 
-  const handleLogout = async () => {
+  const handleLogout = async (): Promise<void> => {
     if (isLoading) return;
 
     try {
-      // ✅ Используем Redux экшен вместо прямого вызова API
       await dispatch(logoutUser()).unwrap();
 
-      // Очищаем конструктор
-      dispatch(clearConstructor());
+      void dispatch(clearConstructor());
 
-      // Очищаем все данные
       localStorage.clear();
       sessionStorage.clear();
 
-      // Перенаправляем на логин
-      navigate('/login', { replace: true });
-    } catch (error) {
-      // Даже при ошибке очищаем и перенаправляем
-      dispatch(clearConstructor());
+      void navigate('/login', { replace: true });
+    } catch (_error) {
+      void dispatch(clearConstructor());
       localStorage.clear();
       sessionStorage.clear();
-      navigate('/login', { replace: true });
+      void navigate('/login', { replace: true });
     }
   };
 
@@ -63,7 +57,9 @@ export function ProfileLayout() {
           </NavLink>
           <button
             className={`${styles.logout_button} text text_type_main-medium text_color_inactive`}
-            onClick={handleLogout}
+            onClick={() => {
+              void handleLogout();
+            }}
             disabled={isLoading}
           >
             {isLoading ? 'Выход...' : 'Выход'}

@@ -1,33 +1,32 @@
 import {
-  Button,
   EmailInput,
   PasswordInput,
+  Button,
 } from '@krgaa/react-developer-burger-ui-components';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-import { login } from '../../services/slices/authSlice'; // ✅ импортируем экшен
+import { login } from '../../services/slices/authSlice';
 
 import type { AppDispatch, RootState } from '../../services/store';
 
 import styles from './login.module.css';
 
-export function LoginPage() {
+export function LoginPage(): React.JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
 
-  // ✅ Берём состояние загрузки из Redux
   const isLoading = useSelector((state: RootState) => state.auth.isLoading);
 
-  // ✅ Получаем путь для возврата
-  const getReturnPath = () => {
-    const fromState = location.state?.from?.pathname;
+  const getReturnPath = (): string => {
+    const locationState = location.state as { from?: { pathname?: string } } | undefined;
+    const fromState = locationState?.from?.pathname;
     if (fromState) return fromState;
 
     const savedPath = localStorage.getItem('returnTo');
@@ -36,7 +35,9 @@ export function LoginPage() {
     return '/';
   };
 
-  const handleSubmitLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmitLogin = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
 
     if (isLoading) return;
@@ -44,10 +45,9 @@ export function LoginPage() {
     setError('');
 
     try {
-      // ✅ Используем Redux экшен вместо прямого вызова burgerApi
       const result = await dispatch(login({ email, password })).unwrap();
+      void result;
 
-      // ✅ Восстанавливаем сохраненный путь
       const returnPath = getReturnPath();
       const savedConstructor = localStorage.getItem('savedConstructor');
 
@@ -56,13 +56,17 @@ export function LoginPage() {
       if (savedConstructor && returnPath.includes('/orders')) {
         sessionStorage.setItem('restoringOrder', 'true');
         localStorage.removeItem('savedConstructor');
-        navigate(returnPath, { replace: true });
+        void navigate(returnPath, { replace: true });
         return;
       }
 
-      navigate(returnPath, { replace: true });
-    } catch (error: any) {
-      setError(error.message || 'Ошибка авторизации. Проверьте email и пароль');
+      void navigate(returnPath, { replace: true });
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Ошибка авторизации. Проверьте email и пароль';
+      setError(errorMessage);
     }
   };
 
@@ -70,17 +74,24 @@ export function LoginPage() {
     <div className={styles.login_container}>
       <h1 className={styles.header}>Вход</h1>
 
-      <form onSubmit={handleSubmitLogin} className={styles.mail_container}>
+      <form
+        onSubmit={(e) => {
+          void handleSubmitLogin(e);
+        }}
+        className={styles.mail_container}
+      >
         <EmailInput
           name="email"
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
           value={email}
         />
 
         <PasswordInput
           icon="ShowIcon"
           name="password"
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPassword(e.target.value)
+          }
           value={password}
         />
 
@@ -100,7 +111,9 @@ export function LoginPage() {
           </p>
           <p
             className={`${styles.grid_item_2} text text_type_main-default text_color_inactive`}
-            onClick={() => navigate('/register')}
+            onClick={() => {
+              void navigate('/register');
+            }}
           >
             Зарегистрироваться
           </p>
@@ -111,7 +124,9 @@ export function LoginPage() {
           </p>
           <p
             className={`${styles.grid_item_2} text text_type_main-default text_color_inactive`}
-            onClick={() => navigate('/forgot-password')}
+            onClick={() => {
+              void navigate('/forgot-password');
+            }}
           >
             Восстановить пароль
           </p>

@@ -271,6 +271,10 @@ class BurgerApi {
   createOrder(ingredients: string[]): Promise<{ order: TOrder }> {
     return this.post<{ order: TOrder }>('/orders', { ingredients });
   }
+
+  getFeed(): Promise<{ orders: TOrder[]; total: number; totalToday: number }> {
+    return this.get('/orders/all');
+  }
 }
 
 export const getIngredientsApi = (): Promise<{ data: TIngredient[] }> =>

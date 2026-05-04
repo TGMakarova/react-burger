@@ -104,6 +104,7 @@ export function App(): React.JSX.Element {
         <Route path="/" element={<Home />} />
         <Route path="ingredients/:id" element={<IngredientPage />} />
         <Route path="feed" element={<FeedPage />} />
+        {/* <Route path="feed/:id" element={<FeedOrderPage />} /> */}
 
         {/* Маршруты для неавторизованных пользователей */}
         <Route

@@ -25,8 +25,8 @@
   flex-direction: column;
   gap: 20px;
   max-height: calc(100vh - 150px);
-  overflow-y: auto;
   padding-right: 8px;
+  overflow-y: auto;
 }
 
 .orders_list::-webkit-scrollbar {
@@ -34,17 +34,17 @@
 }
 
 .orders_list::-webkit-scrollbar-track {
-  background: #2F2F37;
+  background: #2f2f37;
 }
 
 .orders_list::-webkit-scrollbar-thumb {
-  background: #8585AD;
+  background: #8585ad;
 }
 
 .order_card {
-  background: #1C1C21;
-  border-radius: 40px;
   padding: 24px;
+  background: #1c1c21;
+  border-radius: 40px;
   cursor: pointer;
   transition: transform 0.2s;
 }
@@ -72,13 +72,13 @@
 }
 
 .circle_block {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: linear-gradient(63.18deg, #801AB3 0%, #4C4CFF 100%);
-  padding: 2px;
   position: relative;
   flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  padding: 2px;
+  background: linear-gradient(63.18deg, #801ab3 0%, #4c4cff 100%);
+  border-radius: 50%;
 }
 
 .circle_block:not(:first-child) {
@@ -112,37 +112,39 @@
 .ingredient_image {
   width: 100%;
   height: 100%;
+  background-color: #1c1c21;
   border-radius: 50%;
   object-fit: cover;
-  background-color: #1C1C21;
 }
 
 /* Оверлей только с текстом, без фона */
+
 .count_overlay {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 20px;
-  font-weight: bold;
-  color: white;
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
-  pointer-events: none;
   z-index: 2;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+  text-shadow: 0 0 5px rgb(0 0 0 / 80%);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 /* Оверлей для оставшихся ингредиентов */
+
 .remaining_overlay {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 18px;
-  font-weight: bold;
-  color: white;
-  text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
-  pointer-events: none;
   z-index: 2;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  text-shadow: 0 0 5px rgb(0 0 0 / 80%);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 .price_display {
@@ -161,9 +163,8 @@
 
 .two_columns_right {
   display: grid;
-  gap: 40px;
   grid-template-columns: 1fr 1fr;
-
   align-items: flex-start;
+  gap: 40px;
   width: 100%;
 }

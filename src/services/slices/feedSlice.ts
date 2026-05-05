@@ -5,7 +5,7 @@ import type { RootState } from '../store';
 type TOrder = {
   _id: string;
   ingredients: string[];
-  status: string;
+  status: 'done' | 'pending' | 'created';
   number: number;
   createdAt: string;
   updatedAt: string;

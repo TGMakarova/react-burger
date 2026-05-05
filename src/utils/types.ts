@@ -16,7 +16,7 @@ export type TIngredient = {
 export type TOrder = {
   _id: string;
   ingredients: string[];
-  status: string;
+  status: 'done' | 'pending' | 'created';
   name: string;
   createdAt: string;
   updatedAt: string;

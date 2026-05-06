@@ -268,9 +268,15 @@ class BurgerApi {
     return this.get<{ data: TIngredient[] }>('/ingredients');
   }
 
-  createOrder(ingredients: string[]): Promise<{ order: TOrder }> {
-    return this.post<{ order: TOrder }>('/orders', { ingredients });
-  }
+  
+createOrder(ingredients: string[]): Promise<{ order: TOrder }> {
+  return this.requestWithAuth<{ order: TOrder }>('/orders', {
+    method: 'POST',
+    body: JSON.stringify({ ingredients }),
+  });
+}
+
+
 
   getFeed(): Promise<{ orders: TOrder[]; total: number; totalToday: number }> {
     return this.get('/orders/all');

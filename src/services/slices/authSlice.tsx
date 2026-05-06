@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import type { RootState } from '../store';
 
 import { burgerApi } from '@utils/burger-api';
 
@@ -275,4 +276,5 @@ const authSlice = createSlice({
 
 export const { setAuthChecked, setUser, setLoading, setError, logout } =
   authSlice.actions;
+  export const selectUser = (state: RootState) => state.auth.user; 
 export default authSlice.reducer;

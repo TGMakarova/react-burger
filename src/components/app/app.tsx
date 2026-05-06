@@ -9,7 +9,7 @@ import { LoginPage } from '@/pages/login/login';
 import { NotFoundPage } from '@/pages/not-found-page/not-found-page';
 import { OrderDetailPage } from '@/pages/order-detail-page/order-detail-page';
 import { OrderPage } from '@/pages/order-page/order-page';
-import { ProfileOrderPage } from '@/pages/orders/orders';
+import { ProfileOrderPage }  from '@/pages/orders/orders';
 import { ProfileLayout } from '@/pages/profile-layout/profile-layout';
 import { ProfilePage } from '@/pages/profile/profile';
 import { RegisterPage } from '@/pages/register/register';

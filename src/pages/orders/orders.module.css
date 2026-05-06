@@ -1,73 +1,86 @@
-.profile-orders-page {
-  max-width: 800px;
+.profile_orders_page {
+  max-width: 844px;
+  width: 100%;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 0;
 }
 
-.orders-list {
+.orders_column {
+  width: 100%;
+}
+
+.orders_list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  padding-right: 8px;
 }
 
-.order-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 16px;
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.2s;
-  display: block;
+.orders_list::-webkit-scrollbar {
+  width: 8px;
 }
 
-.order-card:hover {
-  background-color: #f5f5f5;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.orders_list::-webkit-scrollbar-track {
+  background: #2f2f37;
 }
 
-.order-header {
+.orders_list::-webkit-scrollbar-thumb {
+  background: #8585ad;
+}
+
+.loading {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  font-size: 24px;
+  color: #8585ad;
 }
 
-.order-number {
-  font-weight: bold;
-  font-size: 16px;
+.wsStatus {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  padding: 8px 12px;
+  border-radius: 40px;
+  font-size: 12px;
+  z-index: 100;
+  background: #1c1c21;
 }
 
-.order-status {
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 14px;
+.wsConnected {
+  color: #00cccc;
 }
 
-.status-Доставлен {
-  color: #2e7d32;
-  background-color: #e8f5e9;
+.wsDisconnected {
+  color: #ff5252;
 }
 
-.status-Впути {
-  color: #ed6c02;
-  background-color: #fff4e5;
+.profile_orders_page {
+  max-width: 844px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 40px 0;
 }
 
-.status-Оформлен {
-  color: #0288d1;
-  background-color: #e1f5fe;
+.orders_column {
+  width: 100%;
 }
 
-.order-date,
-.order-total {
-  margin-top: 8px;
-  font-size: 14px;
-  color: #666;
+.orders_list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  padding-right: 8px;
 }
 
 .loading {
   text-align: center;
   padding: 40px;
-  font-size: 18px;
-  color: #666;
+  font-size: 24px;
+  color: #8585ad;
 }

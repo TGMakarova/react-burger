@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+
 import { burgerApi } from '../../utils/burger-api';
+
 import type { RootState } from '../store';
 
 type TOrder = {
@@ -65,7 +67,7 @@ const feedSlice = createSlice({
 });
 
 // Селекторы
-export const selectFeed = (state: RootState) => state.feed.orders;
-export const selectFeedLoading = (state: RootState) => state.feed.loading;
+export const selectFeed = (state: RootState): TOrder[] => state.feed.orders;
+export const selectFeedLoading = (state: RootState): boolean => state.feed.loading;
 
 export default feedSlice.reducer;

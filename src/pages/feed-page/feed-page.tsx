@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
-import { useState } from 'react';
-import { Modal } from '../../components/modal/modal'
-import { OrderDetailPage } from '@/pages/order-detail-page/order-detail-page'; 
-import { useDispatch, useSelector } from 'react-redux';
-import styles from './feed-page.module.css';
 import { CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+import { formatDate } from '@/utils/formatDate';
+
 import {
   fetchFeed,
   selectFeed,
@@ -14,31 +14,18 @@ import {
   selectIngredients,
   selectIngredientsLoading,
 } from '../../services/slices/ingredientsSlice';
-import type { TIngredient } from '../../utils/types';
-import type { AppDispatch } from '../../services/store';
-import { formatDate } from '@/utils/formatDate';
-import type { TOrder } from '@/utils/types';
 
+import type { AppDispatch } from '../../services/store';
+import type { TIngredient, TOrder } from '../../utils/types';
+
+import styles from './feed-page.module.css';
 
 export const FeedPage = (): React.JSX.Element => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const ingredients = useSelector(selectIngredients);
-  const [selectedOrder, setSelectedOrder] = useState<TOrder | null>(null); // Храним весь объект заказа
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Закрываем модальное окно
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedOrder(null);
-  };
-
-  // Открываем модальное окно при клике на изображение
-  const handleImageClick = (order: TOrder, e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault(); // Предотвращаем переход по ссылке
-    e.stopPropagation(); // Останавливаем всплытие события
-    setSelectedOrder(order);
-    setIsModalOpen(true);
-  };
 
   const ingredientsLoading = useSelector(selectIngredientsLoading);
   const orders = useSelector(selectFeed);
@@ -46,13 +33,17 @@ export const FeedPage = (): React.JSX.Element => {
   const pendingOrders = orders.filter((order) => order.status === 'pending');
   const feedLoading = useSelector(selectFeedLoading);
 
-  const formatOrderNumber = (number: number, digits: number = 6): string => {
-    return `#${number.toString().padStart(digits, '0')}`;
-  };
-
+  // Загружаем заказы при монтировании
   useEffect(() => {
-    dispatch(fetchFeed());
+    void dispatch(fetchFeed());
   }, [dispatch]);
+
+  // Открываем модальное окно при клике на карточку
+  const handleCardClick = (order: TOrder, e: React.MouseEvent<HTMLDivElement>): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    void navigate(`/feed/${order._id}`, { state: { background: location } });
+  };
 
   // Функция для получения полных данных с подсчетом количества
   const getOrderIngredientsWithCount = (
@@ -65,13 +56,11 @@ export const FeedPage = (): React.JSX.Element => {
     orderIngredientIds.forEach((ingredientId) => {
       const ingredient = ingredients.find((ing) => ing._id === ingredientId);
       if (ingredient) {
-        // Для булки не считаем количество, всегда 1
         if (ingredient.type === 'bun') {
           if (!ingredientsMap.has(ingredientId)) {
             ingredientsMap.set(ingredientId, { ...ingredient, count: 1 });
           }
         } else {
-          // Для остальных ингредиентов считаем нормально
           if (ingredientsMap.has(ingredientId)) {
             const existing = ingredientsMap.get(ingredientId)!;
             existing.count += 1;
@@ -90,11 +79,8 @@ export const FeedPage = (): React.JSX.Element => {
     ingredientsMap: Map<string, TIngredient & { count: number }>
   ): (TIngredient & { count: number })[] => {
     const ingredientsList = Array.from(ingredientsMap.values());
-
-    // Булку ставим первой, остальные как есть
     const bun = ingredientsList.find((ing) => ing.type === 'bun');
     const others = ingredientsList.filter((ing) => ing.type !== 'bun');
-
     return bun ? [bun, ...others] : others;
   };
 
@@ -114,30 +100,27 @@ export const FeedPage = (): React.JSX.Element => {
   }
 
   const maxVisible = 6;
-  const getOrdersByColumns = () => {
-    // Берем только номера заказов
+
+  const getOrdersByColumns = (): {
+    col1_completed: number[];
+    col2_completed: number[];
+    col3_pending: number[];
+    col4_pending: number[];
+  } => {
     const completedNumbers = completedOrders.map((order) => order.number);
     const pendingNumbers = pendingOrders.map((order) => order.number);
-
-    // Обрезаем до 20 (если больше 20 - "отсекаем")
     const limitedCompleted = completedNumbers.slice(0, 20);
     const limitedPending = pendingNumbers.slice(0, 20);
-
-    // Выполненные: первая колонка (первые 10), вторая колонка (следующие 10)
     const col1_completed = limitedCompleted.slice(0, 10);
     const col2_completed = limitedCompleted.slice(10, 20);
-
-    // Невыполненные: третья колонка (первые 10), четвертая колонка (следующие 10)
     const col3_pending = limitedPending.slice(0, 10);
     const col4_pending = limitedPending.slice(10, 20);
-
     return { col1_completed, col2_completed, col3_pending, col4_pending };
   };
-  
-  const getTodayOrders = (allOrders: typeof orders) => {
+
+  const getTodayOrders = (allOrders: typeof orders): TOrder[] => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     return allOrders.filter((order) => {
       const orderDate = new Date(order.createdAt);
       orderDate.setHours(0, 0, 0, 0);
@@ -167,11 +150,8 @@ export const FeedPage = (): React.JSX.Element => {
                 <div
                   key={order._id}
                   className={styles.order_card}
+                  onClick={(e) => handleCardClick(order, e)}
                   style={{
-                    color: 'inherit',
-                    textDecoration: 'none',
-                    fontFamily: 'inherit',
-                    fontSize: 'inherit',
                     cursor: 'pointer',
                   }}
                 >
@@ -189,18 +169,12 @@ export const FeedPage = (): React.JSX.Element => {
                   <div className={styles.order_footer}>
                     <div className={styles.circles_block}>
                       {visibleIngredients.map((ingredient, index) => (
-                        <div 
-                          key={ingredient._id} 
-                          className={styles.circle_block}
-                          onClick={(e) => handleImageClick(order, e)}
-                          style={{ cursor: 'pointer' }}
-                        >
+                        <div key={ingredient._id} className={styles.circle_block}>
                           <img
                             src={ingredient.image}
                             alt={ingredient.name}
                             className={styles.ingredient_image}
                           />
-                          {/* Показываем счетчик только НЕ для булки и если count > 1 */}
                           {ingredient.type !== 'bun' && ingredient.count > 1 && (
                             <div className={styles.count_overlay}>
                               +{ingredient.count}
@@ -234,7 +208,6 @@ export const FeedPage = (): React.JSX.Element => {
           </div>
 
           <div className={styles.four_columns_right}>
-            {/* Колонка 1 - выполненные (первые 10) */}
             <div className={styles.order_column}>
               {getOrdersByColumns().col1_completed.map((number) => (
                 <p
@@ -246,7 +219,6 @@ export const FeedPage = (): React.JSX.Element => {
               ))}
             </div>
 
-            {/* Колонка 2 - выполненные (следующие 10, если больше 10) */}
             <div className={styles.order_column}>
               {getOrdersByColumns().col2_completed.map((number) => (
                 <p
@@ -258,7 +230,6 @@ export const FeedPage = (): React.JSX.Element => {
               ))}
             </div>
 
-            {/* Колонка 3 - в работе (первые 10) */}
             <div className={styles.order_column}>
               {getOrdersByColumns().col3_pending.map((number) => (
                 <p
@@ -270,7 +241,6 @@ export const FeedPage = (): React.JSX.Element => {
               ))}
             </div>
 
-            {/* Колонка 4 - в работе (следующие 10, если больше 10) */}
             <div className={styles.order_column}>
               {getOrdersByColumns().col4_pending.map((number) => (
                 <p
@@ -282,14 +252,15 @@ export const FeedPage = (): React.JSX.Element => {
               ))}
             </div>
           </div>
-          <p className={`text text_type_main-medium mt-2 mb-1" ${styles.deviation}`}>
+
+          <p className={`text text_type_main-medium mt-2 mb-1 ${styles.deviation}`}>
             Выполнено за все время:
           </p>
           <span className={`text text_type_digits-large ${styles.no_margin}`}>
             {totalCompletedCount}
           </span>
           <div className={styles.interval}></div>
-          <p className={`text text_type_main-medium mt-2 mb-1" ${styles.deviation}`}>
+          <p className={`text text_type_main-medium mt-2 mb-1 ${styles.deviation}`}>
             Выполнено за сегодня:
           </p>
           <span className={`text text_type_digits-large ${styles.no_margin}`}>
@@ -297,13 +268,6 @@ export const FeedPage = (): React.JSX.Element => {
           </span>
         </div>
       </div>
-
-      {/* Модальное окно с деталями заказа */}
-      {isModalOpen && selectedOrder && (
-  <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-    <OrderDetailPage orderId={selectedOrder._id} />
-  </Modal>
-)}
     </div>
   );
 };

@@ -7,10 +7,10 @@ import {
 } from '../middleware/apiMiddleware';
 import authReducer from '../slices/authSlice'; // 👈 ДОБАВИТЬ ЭТУ СТРОКУ
 import burgerConstructorReducer from '../slices/burgerConstructorSlice';
+import feedReducer from '../slices/feedSlice';
 import ingredientsReducer from '../slices/ingredientsSlice';
 import orderReducer from '../slices/orderSlice';
 import selectedIngredientReducer from '../slices/selectedIngredientSlice';
-import feedReducer from '../slices/feedSlice';
 
 export const store = configureStore({
   reducer: {
@@ -36,4 +36,3 @@ export const store = configureStore({
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-

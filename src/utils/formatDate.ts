@@ -3,9 +3,11 @@ export const formatDate = (dateString: string): string => {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const inputDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  
-  const diffDays = Math.floor((today.getTime() - inputDate.getTime()) / (1000 * 60 * 60 * 24));
-  
+
+  const diffDays = Math.floor(
+    (today.getTime() - inputDate.getTime()) / (1000 * 60 * 60 * 24)
+  );
+
   let dayString = '';
   if (diffDays === 0) {
     dayString = 'Сегодня';
@@ -16,9 +18,9 @@ export const formatDate = (dateString: string): string => {
   } else {
     dayString = `${diffDays} дней назад`;
   }
-  
+
   const hours = date.getHours().toString().padStart(2, '0');
   const minutes = date.getMinutes().toString().padStart(2, '0');
-  
+
   return `${dayString}, ${hours}:${minutes}`;
 };

@@ -7,6 +7,8 @@ import { ForgotPassword } from '@/pages/forgot-password/forgot-password';
 import { Home } from '@/pages/home/home';
 import { LoginPage } from '@/pages/login/login';
 import { NotFoundPage } from '@/pages/not-found-page/not-found-page';
+import { OrderDetailPage } from '@/pages/order-detail-page/order-detail-page';
+import { OrderPage } from '@/pages/order-page/order-page';
 import { ProfileOrderPage } from '@/pages/orders/orders';
 import { ProfileLayout } from '@/pages/profile-layout/profile-layout';
 import { ProfilePage } from '@/pages/profile/profile';
@@ -104,7 +106,7 @@ export function App(): React.JSX.Element {
         <Route path="/" element={<Home />} />
         <Route path="ingredients/:id" element={<IngredientPage />} />
         <Route path="feed" element={<FeedPage />} />
-        {/* <Route path="feed/:id" element={<FeedOrderPage />} /> */}
+        <Route path="feed/:id" element={<OrderPage />} />
 
         {/* Маршруты для неавторизованных пользователей */}
         <Route
@@ -151,6 +153,7 @@ export function App(): React.JSX.Element {
         >
           <Route index element={<ProfilePage />} />
           <Route path="orders" element={<ProfileOrderPage />} />
+          <Route path="orders/:id" element={<OrderDetailPage />} />
         </Route>
 
         {/* 404 страница */}
@@ -166,7 +169,17 @@ export function App(): React.JSX.Element {
               <IngredientDetails
                 isOpen={true}
                 onClose={handleCloseModal}
-                header={'Детали ингредиента'}
+                header="Детали ингредиента"
+              />
+            }
+          />
+          <Route
+            path="feed/:id"
+            element={
+              <OrderDetailPage
+                isOpen={true}
+                onClose={handleCloseModal}
+                orderId={location.pathname.split('/').pop()}
               />
             }
           />

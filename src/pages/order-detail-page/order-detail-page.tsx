@@ -1,8 +1,9 @@
-import { CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
+// pages/order-detail-page/order-detail-page.tsx
 import { useSelector } from 'react-redux';
+import { useParams, useLocation } from 'react-router-dom';
+import { CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
 
 import { formatDate } from '@/utils/formatDate';
-
 import { Modal } from '../../components/modal/modal';
 
 import type { RootState } from '@/services/store';
@@ -21,28 +22,36 @@ type IngredientWithCount = TIngredient & { count: number };
 
 export const OrderDetailPage = ({
   order: propOrder,
-  orderId,
+  orderId: propOrderId,
   isOpen,
   onClose,
 }: OrderDetailPageProps): React.JSX.Element | null => {
-  const orders = useSelector((state: RootState) => state.feed.orders);
+  const location = useLocation();
+  const { id: paramsId } = useParams();
+  
+  const orderId = propOrderId || paramsId || location.pathname.split('/').pop();
+  
+  // Получаем заказ из state (для модального окна профиля)
+  const orderFromState = location.state?.order;
+  const finalOrder = propOrder || orderFromState;
+  
+  // Получаем данные из store для фида
+  const feedOrders = useSelector((state: RootState) => state.feed.orders);
   const ingredients = useSelector((state: RootState) => state.ingredients.items);
-  const ingredientsLoading = useSelector(
-    (state: RootState) => state.ingredients.loading
-  );
-  const feedLoading = useSelector((state: RootState) => state.feed.loading);
-
-  // Поиск заказа
-  let order = propOrder;
-
-  if (orderId) {
-    order ??= orders.find((o) => o._id === orderId);
-    order ??= orders.find((o) => String(o._id) === String(orderId));
-    order ??= orders.find((o) => o.number === Number(orderId));
+  const ingredientsLoading = useSelector((state: RootState) => state.ingredients.loading);
+  
+  // Ищем заказ в фиде, если не передан через пропсы или state
+  let foundOrder = finalOrder;
+  if (!foundOrder && feedOrders?.length && orderId) {
+    foundOrder = feedOrders.find(
+      (o) => o._id === orderId || String(o.number) === orderId
+    );
   }
 
+  const isLoading = ingredientsLoading;
+
   const content = ((): React.JSX.Element => {
-    if (feedLoading || ingredientsLoading) {
+    if (isLoading) {
       return (
         <div className={styles.loading}>
           <p className="text text_type_main-medium">Загрузка данных...</p>
@@ -50,7 +59,7 @@ export const OrderDetailPage = ({
       );
     }
 
-    if (!order) {
+    if (!foundOrder) {
       return (
         <div className={styles.error}>
           <p className="text text_type_main-medium">Заказ не найден</p>
@@ -86,7 +95,7 @@ export const OrderDetailPage = ({
       return ingredientsList.reduce((total, ing) => total + ing.price * ing.count, 0);
     };
 
-    const orderIngredients = getOrderIngredientsWithCount(order.ingredients);
+    const orderIngredients = getOrderIngredientsWithCount(foundOrder.ingredients);
     const totalPrice = calculateTotalPrice(orderIngredients);
 
     const getStatusText = (status: string): string => {
@@ -118,15 +127,15 @@ export const OrderDetailPage = ({
     return (
       <div className={styles.container}>
         <p className={`text text_type_digits-default ${styles.order_number}`}>
-          #{String(order.number).padStart(6, '0')}
+          #{String(foundOrder.number).padStart(6, '0')}
         </p>
 
-        <h2 className="text text_type_main-medium mt-3 mb-2">{order.name}</h2>
+        <h2 className="text text_type_main-medium mt-3 mb-2">{foundOrder.name}</h2>
 
         <p
-          className={`text text_type_main-default ${styles.status} ${getStatusClass(order.status)}`}
+          className={`text text_type_main-default ${styles.status} ${getStatusClass(foundOrder.status)}`}
         >
-          {getStatusText(order.status)}
+          {getStatusText(foundOrder.status)}
         </p>
 
         <p className="text text_type_main-medium mt-5 mb-3">Состав:</p>
@@ -152,7 +161,7 @@ export const OrderDetailPage = ({
 
         <div className={styles.footer}>
           <p className="text text_type_main-default text_color_inactive">
-            {formatDate(order.createdAt)}
+            {formatDate(foundOrder.createdAt)}
           </p>
           <div className={styles.price}>
             <span className="text text_type_digits-medium">{totalPrice}</span>

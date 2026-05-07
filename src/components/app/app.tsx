@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
@@ -9,7 +9,7 @@ import { LoginPage } from '@/pages/login/login';
 import { NotFoundPage } from '@/pages/not-found-page/not-found-page';
 import { OrderDetailPage } from '@/pages/order-detail-page/order-detail-page';
 import { OrderPage } from '@/pages/order-page/order-page';
-import { ProfileOrderPage }  from '@/pages/orders/orders';
+import { ProfileOrderPage } from '@/pages/orders/orders';
 import { ProfileLayout } from '@/pages/profile-layout/profile-layout';
 import { ProfilePage } from '@/pages/profile/profile';
 import { RegisterPage } from '@/pages/register/register';
@@ -17,17 +17,18 @@ import { ResetPassword } from '@/pages/reset-password/reset-password';
 
 import { checkAuth } from '../../services/slices/authSlice';
 import { fetchIngredients } from '../../services/slices/ingredientsSlice';
+import { wsConnectProfile, wsDisconnectProfile } from '../../services/slices/profileFeedSlice';
 import { AppHeader } from '../app-header/app-header';
 import { IngredientDetails } from '../ingredient-details/ingredient-details';
 import { IngredientPage } from '../ingredient-page/ingredient-page';
 import ProtectedRoute from '../protected-route/protected-route';
 import PublicRoute from '../public-route/public-route';
-
+import { ProfileOrderPageID } from '@/pages/profile-order-page/profile-order-page';
+import { BURGER_WS_URL } from '@/utils/burger-api';
 import type { RootState, AppDispatch } from '../../services/store';
 
 import styles from './app.module.css';
 
-// Добавьте интерфейс для location state
 type LocationState = {
   from?: string;
   background?: Location;
@@ -39,10 +40,18 @@ export function App(): React.JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
 
   const background = (location.state as LocationState)?.background;
+  
+  // ✅ Проверяем, является ли текущий путь страницей профиля (не модалкой)
+  const isProfileOrderPage = location.pathname.includes('/profile/orders/') && !background;
 
   const { isAuthChecked, isLoading, isLoggedIn } = useSelector(
     (state: RootState) => state.auth
   );
+  
+  const wsConnected = useSelector((state: RootState) => state.profileFeed.wsConnected);
+  
+  const hasConnected = useRef(false);
+  const reconnectTimer = useRef<NodeJS.Timeout | null>(null);
 
   // Загрузка ингредиентов при запуске приложения
   useEffect(() => {
@@ -59,6 +68,39 @@ export function App(): React.JSX.Element {
       sessionStorage.removeItem('restoringOrder');
     }
   }, [dispatch]);
+
+  // 🌐 ГЛОБАЛЬНОЕ ПОДКЛЮЧЕНИЕ WEBSOCKET ДЛЯ ПРОФИЛЯ
+  useEffect(() => {
+    if (isAuthChecked && isLoggedIn && !hasConnected.current) {
+      let token = localStorage.getItem('accessToken');
+      
+      if (token) {
+        let cleanToken = token.replace('Bearer ', '').replace(/^"|"$/g, '');
+        const wsUrl = `${BURGER_WS_URL}/orders?token=${cleanToken}`;
+        
+        console.log('🔌 Подключение WebSocket для профиля (ОДИН РАЗ)');
+        dispatch(wsConnectProfile(wsUrl));
+        hasConnected.current = true;
+      } else {
+        console.warn('⚠️ Нет токена! WebSocket для профиля не подключен');
+      }
+    }
+    
+    return () => {
+      if (reconnectTimer.current) {
+        clearTimeout(reconnectTimer.current);
+      }
+    };
+  }, [dispatch, isAuthChecked, isLoggedIn]);
+
+  // ✅ Отдельный эффект для отслеживания выхода пользователя
+  useEffect(() => {
+    if (isAuthChecked && !isLoggedIn && hasConnected.current) {
+      console.log('🔌 Пользователь вышел, отключаем WebSocket');
+      dispatch(wsDisconnectProfile());
+      hasConnected.current = false;
+    }
+  }, [isAuthChecked, isLoggedIn, dispatch]);
 
   // Восстановление URL после авторизации
   useEffect(() => {
@@ -153,38 +195,39 @@ export function App(): React.JSX.Element {
         >
           <Route index element={<ProfilePage />} />
           <Route path="orders" element={<ProfileOrderPage />} />
-          <Route path="orders/:id" element={<OrderDetailPage />} />
+          {/* ✅ ДЛЯ ОТДЕЛЬНОЙ СТРАНИЦЫ */}
+          <Route path="orders/:id" element={<ProfileOrderPageID />} />
         </Route>
 
         {/* 404 страница */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
-      {/* Модальное окно поверх основного контента */}
-      {background && (
-        <Routes>
-          <Route
-            path="ingredients/:id"
-            element={
-              <IngredientDetails
-                isOpen={true}
-                onClose={handleCloseModal}
-                header="Детали ингредиента"
-              />
-            }
-          />
-          <Route
-            path="feed/:id"
-            element={
-              <OrderDetailPage
-                isOpen={true}
-                onClose={handleCloseModal}
-                orderId={location.pathname.split('/').pop()}
-              />
-            }
-          />
-        </Routes>
-      )}
+     {/* Модальное окно - только для ингредиентов и feed */}
+{background && (
+  <Routes>
+    <Route
+      path="ingredients/:id"
+      element={
+        <IngredientDetails
+          isOpen={true}
+          onClose={handleCloseModal}
+          header="Детали ингредиента"
+        />
+      }
+    />
+    <Route
+      path="feed/:id"
+      element={
+        <OrderDetailPage
+          isOpen={true}
+          onClose={handleCloseModal}
+        />
+      }
+    />
+    {/* profile/orders/:id - НЕ ДОЛЖЕН БЫТЬ ЗДЕСЬ */}
+  </Routes>
+)}
     </>
   );
 }

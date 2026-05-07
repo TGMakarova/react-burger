@@ -84,3 +84,62 @@
   font-size: 24px;
   color: #8585ad;
 }
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #8585ad;
+}
+
+.error {
+  text-align: center;
+  padding: 40px;
+}
+
+.reloadButton {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #4c4cff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.reloadButton:hover {
+  background-color: #3a3ad1;
+}
+
+.profile_orders_page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.orders_column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.orders_list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loginButton {
+  margin-top: 10px;
+  margin-left: 10px;
+  padding: 10px 20px;
+  background-color: #8585ad;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.loginButton:hover {
+  background-color: #6a6a8e;
+}

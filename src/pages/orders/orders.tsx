@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -8,6 +7,7 @@ import {
   selectProfileFeedLoading,
   selectProfileWsConnected,
 } from '@/services/slices/profileFeedSlice';
+
 import {
   selectIngredients,
   selectIngredientsLoading,
@@ -16,6 +16,8 @@ import {
 import type { TOrder } from '../../utils/types';
 
 import styles from './orders.module.css';
+
+// Удаляем неиспользуемый тип IngredientWithCount
 
 export const ProfileOrderPage = (): React.JSX.Element => {
   const navigate = useNavigate();
@@ -30,10 +32,9 @@ export const ProfileOrderPage = (): React.JSX.Element => {
   const handleCardClick = (order: TOrder, e: React.MouseEvent<HTMLDivElement>): void => {
     e.preventDefault();
     e.stopPropagation();
-    
-    // ✅ Передаём background для модального режима
-    navigate(`/profile/orders/${order.number}`, {
-      state: { background: location }
+
+    void navigate(`/profile/orders/${order.number}`, {
+      state: { background: location },
     });
   };
 
@@ -52,7 +53,7 @@ export const ProfileOrderPage = (): React.JSX.Element => {
       </div>
 
       <h1 className="text text_type_main-large mb-6">Мои заказы</h1>
-      
+
       <div className={styles.orders_column}>
         <div className={styles.orders_list}>
           {orders.length === 0 ? (

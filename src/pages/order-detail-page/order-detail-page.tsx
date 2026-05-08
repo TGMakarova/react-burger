@@ -1,9 +1,9 @@
-// pages/order-detail-page/order-detail-page.tsx
+import { CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
 import { useSelector } from 'react-redux';
 import { useParams, useLocation } from 'react-router-dom';
-import { CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
 
 import { formatDate } from '@/utils/formatDate';
+
 import { Modal } from '../../components/modal/modal';
 
 import type { RootState } from '@/services/store';
@@ -20,6 +20,10 @@ type OrderDetailPageProps = {
 
 type IngredientWithCount = TIngredient & { count: number };
 
+type LocationState = {
+  order?: TOrder;
+};
+
 export const OrderDetailPage = ({
   order: propOrder,
   orderId: propOrderId,
@@ -28,20 +32,23 @@ export const OrderDetailPage = ({
 }: OrderDetailPageProps): React.JSX.Element | null => {
   const location = useLocation();
   const { id: paramsId } = useParams();
-  
-  const orderId = propOrderId || paramsId || location.pathname.split('/').pop();
-  
+
+  const orderId = propOrderId ?? paramsId ?? location.pathname.split('/').pop();
+
   // Получаем заказ из state (для модального окна профиля)
-  const orderFromState = location.state?.order;
-  const finalOrder = propOrder || orderFromState;
-  
+  const locationState = location.state as LocationState | undefined;
+  const orderFromState = locationState?.order;
+  const finalOrder = propOrder ?? orderFromState;
+
   // Получаем данные из store для фида
   const feedOrders = useSelector((state: RootState) => state.feed.orders);
   const ingredients = useSelector((state: RootState) => state.ingredients.items);
-  const ingredientsLoading = useSelector((state: RootState) => state.ingredients.loading);
-  
+  const ingredientsLoading = useSelector(
+    (state: RootState) => state.ingredients.loading
+  );
+
   // Ищем заказ в фиде, если не передан через пропсы или state
-  let foundOrder = finalOrder;
+  let foundOrder: TOrder | undefined = finalOrder;
   if (!foundOrder && feedOrders?.length && orderId) {
     foundOrder = feedOrders.find(
       (o) => o._id === orderId || String(o.number) === orderId

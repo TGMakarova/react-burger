@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
+
 import { burgerApi } from '../../utils/burger-api';
+
 import type { RootState } from '../store';
 
 type TOrder = {
@@ -69,10 +71,24 @@ const feedSlice = createSlice({
       state.wsError = action.payload;
       state.wsConnected = false;
     },
-    wsMessage: (state, action: PayloadAction<{ orders: TOrder[]; total: number; totalToday: number }>) => {
-      state.orders = action.payload.orders;
-      state.total = action.payload.total;
-      state.totalToday = action.payload.totalToday;
+    wsMessage: (
+      state,
+      action: PayloadAction<unknown> // Изменено с конкретного типа на unknown
+    ) => {
+      const payload = action.payload as {
+        orders?: TOrder[];
+        total?: number;
+        totalToday?: number;
+      };
+      if (payload.orders) {
+        state.orders = payload.orders;
+      }
+      if (payload.total !== undefined) {
+        state.total = payload.total;
+      }
+      if (payload.totalToday !== undefined) {
+        state.totalToday = payload.totalToday;
+      }
       state.wsConnected = true;
     },
   },
@@ -95,7 +111,8 @@ const feedSlice = createSlice({
   },
 });
 
-export const { wsConnect, wsDisconnect, wsOpen, wsClose, wsError, wsMessage } = feedSlice.actions;
+export const { wsConnect, wsDisconnect, wsOpen, wsClose, wsError, wsMessage } =
+  feedSlice.actions;
 
 export const selectFeed = (state: RootState): TOrder[] => state.feed.orders;
 export const selectFeedLoading = (state: RootState): boolean => state.feed.loading;

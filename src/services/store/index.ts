@@ -1,17 +1,23 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { socketMiddleware } from '../middleware/socketMiddleware';
 
 import {
   apiMiddleware,
   localStorageMiddleware,
   performanceMiddleware,
 } from '../middleware/apiMiddleware';
+import { socketMiddleware } from '../middleware/socketMiddleware';
 import authReducer from '../slices/authSlice';
 import burgerConstructorReducer from '../slices/burgerConstructorSlice';
-import feedReducer, { wsConnect, wsDisconnect, wsOpen, wsClose, wsError, wsMessage } from '../slices/feedSlice';
+import feedReducer, {
+  wsConnect,
+  wsDisconnect,
+  wsOpen,
+  wsClose,
+  wsError,
+  wsMessage,
+} from '../slices/feedSlice';
 import ingredientsReducer from '../slices/ingredientsSlice';
 import orderReducer from '../slices/orderSlice';
-import selectedIngredientReducer from '../slices/selectedIngredientSlice';
 import profileFeedReducer, {
   wsConnectProfile,
   wsDisconnectProfile,
@@ -20,6 +26,8 @@ import profileFeedReducer, {
   wsErrorProfile,
   wsMessageProfile,
 } from '../slices/profileFeedSlice';
+import profileOrdersReducer from '../slices/profileOrderSlice';
+import selectedIngredientReducer from '../slices/selectedIngredientSlice';
 
 // Настройка WebSocket для публичной ленты
 const feedWsActions = {
@@ -41,9 +49,8 @@ const profileFeedWsActions = {
   onMessage: wsMessageProfile,
 };
 
-// 👇 СОЗДАЁМ оба middleware
 const feedMiddleware = socketMiddleware(feedWsActions);
-const profileFeedMiddleware = socketMiddleware(profileFeedWsActions); 
+const profileFeedMiddleware = socketMiddleware(profileFeedWsActions);
 
 export const store = configureStore({
   reducer: {
@@ -54,6 +61,7 @@ export const store = configureStore({
     auth: authReducer,
     feed: feedReducer,
     profileFeed: profileFeedReducer,
+    profileOrders: profileOrdersReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -65,7 +73,7 @@ export const store = configureStore({
       .concat(localStorageMiddleware)
       .concat(performanceMiddleware)
       .concat(feedMiddleware)
-      .concat(profileFeedMiddleware), 
+      .concat(profileFeedMiddleware),
 
   devTools: process.env.NODE_ENV !== 'production',
 });

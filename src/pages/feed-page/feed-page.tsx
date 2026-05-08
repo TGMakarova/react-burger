@@ -3,12 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { OrderCard } from '@/components/order-card/order-card';
+
 import {
-  fetchFeed,
   selectFeed,
   selectFeedLoading,
-  selectFeedTotal,        
-  selectFeedTotalToday,   
+  selectFeedTotal,
+  selectFeedTotalToday,
   wsConnect,
   wsDisconnect,
   selectWsConnected,
@@ -32,8 +32,8 @@ export const FeedPage = (): React.JSX.Element => {
   const ingredientsLoading = useSelector(selectIngredientsLoading);
   const orders = useSelector(selectFeed);
   const feedLoading = useSelector(selectFeedLoading);
-  const total = useSelector(selectFeedTotal);           
-  const totalToday = useSelector(selectFeedTotalToday); 
+  const total = useSelector(selectFeedTotal);
+  const totalToday = useSelector(selectFeedTotalToday);
   const wsConnected = useSelector(selectWsConnected);
 
   const completedOrders = orders.filter((order) => order.status === 'done');
@@ -42,20 +42,17 @@ export const FeedPage = (): React.JSX.Element => {
   // Подключаемся к WebSocket при монтировании
   useEffect(() => {
     const wsUrl = 'wss://new-stellarburgers.education-services.ru/orders/all';
-    dispatch(wsConnect(wsUrl));
-
-    // Fallback: если WebSocket не работает, загружаем через REST
-    // void dispatch(fetchFeed());
+    void dispatch(wsConnect(wsUrl));
 
     return () => {
-      dispatch(wsDisconnect());
+      void dispatch(wsDisconnect());
     };
   }, [dispatch]);
 
   const handleCardClick = (order: TOrder, e: React.MouseEvent<HTMLDivElement>): void => {
     e.preventDefault();
     e.stopPropagation();
-    navigate(`/feed/${order._id}`, { state: { background: location } });
+    void navigate(`/feed/${order._id}`, { state: { background: location } });
   };
 
   if (ingredientsLoading || (feedLoading && orders.length === 0)) {
@@ -104,7 +101,7 @@ export const FeedPage = (): React.JSX.Element => {
                 order={order}
                 ingredients={ingredients}
                 onClick={handleCardClick}
-                showStatus={false} 
+                showStatus={false}
               />
             ))}
           </div>
@@ -165,9 +162,9 @@ export const FeedPage = (): React.JSX.Element => {
 
           <p className="text text_type_main-medium mt-2 mb-1">Выполнено за все время:</p>
           <span className="text text_type_digits-large">{total}</span>
-          
+
           <div className={styles.interval}></div>
-          
+
           <p className="text text_type_main-medium mt-2 mb-1">Выполнено за сегодня:</p>
           <span className="text text_type_digits-large">{totalToday}</span>
         </div>

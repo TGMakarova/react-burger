@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
+import { ProfileOrderDetail } from '@/components/profile-order-detail/profile-order-detail'; // ✅ ИМПОРТ
 import { FeedPage } from '@/pages/feed-page/feed-page';
 import { ForgotPassword } from '@/pages/forgot-password/forgot-password';
 import { Home } from '@/pages/home/home';
@@ -11,21 +12,24 @@ import { OrderDetailPage } from '@/pages/order-detail-page/order-detail-page';
 import { OrderPage } from '@/pages/order-page/order-page';
 import { ProfileOrderPage } from '@/pages/orders/orders';
 import { ProfileLayout } from '@/pages/profile-layout/profile-layout';
+import { ProfileOrderPageID } from '@/pages/profile-order-page/profile-order-page';
 import { ProfilePage } from '@/pages/profile/profile';
 import { RegisterPage } from '@/pages/register/register';
 import { ResetPassword } from '@/pages/reset-password/reset-password';
+import { BURGER_WS_URL } from '@/utils/burger-api';
 
 import { checkAuth } from '../../services/slices/authSlice';
 import { fetchIngredients } from '../../services/slices/ingredientsSlice';
-import { wsConnectProfile, wsDisconnectProfile } from '../../services/slices/profileFeedSlice';
+import {
+  wsConnectProfile,
+  wsDisconnectProfile,
+} from '../../services/slices/profileFeedSlice';
 import { AppHeader } from '../app-header/app-header';
 import { IngredientDetails } from '../ingredient-details/ingredient-details';
 import { IngredientPage } from '../ingredient-page/ingredient-page';
 import ProtectedRoute from '../protected-route/protected-route';
 import PublicRoute from '../public-route/public-route';
-import { ProfileOrderPageID } from '@/pages/profile-order-page/profile-order-page';
-import { ProfileOrderDetail } from '@/components/profile-order-detail/profile-order-detail'; // ✅ ИМПОРТ
-import { BURGER_WS_URL } from '@/utils/burger-api';
+
 import type { RootState, AppDispatch } from '../../services/store';
 
 import styles from './app.module.css';
@@ -41,11 +45,11 @@ export function App(): React.JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
 
   const background = (location.state as LocationState)?.background;
-  
+
   const { isAuthChecked, isLoading, isLoggedIn } = useSelector(
     (state: RootState) => state.auth
   );
-  
+
   const hasConnected = useRef(false);
   const reconnectTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -68,12 +72,12 @@ export function App(): React.JSX.Element {
   // 🌐 ГЛОБАЛЬНОЕ ПОДКЛЮЧЕНИЕ WEBSOCKET ДЛЯ ПРОФИЛЯ
   useEffect(() => {
     if (isAuthChecked && isLoggedIn && !hasConnected.current) {
-      let token = localStorage.getItem('accessToken');
-      
+      const token = localStorage.getItem('accessToken');
+
       if (token) {
-        let cleanToken = token.replace('Bearer ', '').replace(/^"|"$/g, '');
+        const cleanToken = token.replace('Bearer ', '').replace(/^"|"$/g, '');
         const wsUrl = `${BURGER_WS_URL}/orders?token=${cleanToken}`;
-        
+
         console.log('🔌 Подключение WebSocket для профиля (ОДИН РАЗ)');
         dispatch(wsConnectProfile(wsUrl));
         hasConnected.current = true;
@@ -81,7 +85,7 @@ export function App(): React.JSX.Element {
         console.warn('⚠️ Нет токена! WebSocket для профиля не подключен');
       }
     }
-    
+
     return () => {
       if (reconnectTimer.current) {
         clearTimeout(reconnectTimer.current);
@@ -222,22 +226,12 @@ export function App(): React.JSX.Element {
           />
           <Route
             path="feed/:id"
-            element={
-              <OrderDetailPage
-                isOpen={true}
-                onClose={handleCloseModal}
-              />
-            }
+            element={<OrderDetailPage isOpen={true} onClose={handleCloseModal} />}
           />
           {/* ✅ ДОБАВЛЯЕМ МОДАЛКУ ДЛЯ ПРОФИЛЯ */}
           <Route
             path="profile/orders/:id"
-            element={
-              <ProfileOrderDetail
-                isOpen={true}
-                onClose={handleCloseModal}
-              />
-            }
+            element={<ProfileOrderDetail isOpen={true} onClose={handleCloseModal} />}
           />
         </Routes>
       )}

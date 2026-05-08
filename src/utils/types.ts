@@ -22,3 +22,11 @@ export type TOrder = {
   updatedAt: string;
   number: number;
 };
+
+export type WebSocketMessage = {
+  orders?: TOrder[];
+  total?: number;
+  totalToday?: number;
+  success?: boolean;
+  message?: string;
+};

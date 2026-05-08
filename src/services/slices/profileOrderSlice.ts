@@ -1,11 +1,14 @@
-import  { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+
 import type { TOrder } from '../../utils/types';
-interface ProfileOrdersState {
+import type { RootState } from '../store';
+
+export type ProfileOrdersState = {
   orders: TOrder[];
   loading: boolean;
   error: string | null;
   connected: boolean;
-}
+};
 
 const initialState: ProfileOrdersState = {
   orders: [],
@@ -18,7 +21,7 @@ const profileOrdersSlice = createSlice({
   name: 'profileOrders',
   initialState,
   reducers: {
-    connect: (state, action: PayloadAction<string>) => {
+    connect: (state, _action: PayloadAction<string>) => {
       state.loading = true;
     },
     disconnect: (state) => {
@@ -41,8 +44,19 @@ const profileOrdersSlice = createSlice({
   },
 });
 
-export const { connect, disconnect, onOpen, onError, onMessage } = profileOrdersSlice.actions;
-export const selectProfileOrders = (state: any) => state.profileOrders.orders;
-export const selectProfileOrdersLoading = (state: any) => state.profileOrders.loading;
+export const { connect, disconnect, onOpen, onError, onMessage } =
+  profileOrdersSlice.actions;
+
+export const selectProfileOrders = (state: RootState): TOrder[] =>
+  state.profileOrders.orders;
+
+export const selectProfileOrdersLoading = (state: RootState): boolean =>
+  state.profileOrders.loading;
+
+export const selectProfileOrdersConnected = (state: RootState): boolean =>
+  state.profileOrders.connected;
+
+export const selectProfileOrdersError = (state: RootState): string | null =>
+  state.profileOrders.error;
 
 export default profileOrdersSlice.reducer;

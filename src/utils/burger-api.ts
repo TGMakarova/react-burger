@@ -2,6 +2,7 @@ import type { TIngredient, TOrder } from './types';
 
 export const BURGER_API_URL = 'https://new-stellarburgers.education-services.ru/api';
 export const BURGER_WS_URL = 'wss://new-stellarburgers.education-services.ru';
+
 // ========== БАЗОВАЯ ФУНКЦИЯ ПРОВЕРКИ ОТВЕТА ==========
 const checkResponse = async <T>(response: Response): Promise<T> => {
   const data = (await response.json()) as T;
@@ -52,6 +53,21 @@ type UserResponse = {
     email: string;
     name: string;
   };
+};
+
+type FeedResponse = {
+  orders: TOrder[];
+  total: number;
+  totalToday: number;
+};
+
+type OrderResponse = {
+  order: TOrder;
+};
+
+type ProfileOrdersResponse = {
+  orders: TOrder[];
+  success: boolean;
 };
 
 // ========== КЛАСС API ==========
@@ -268,52 +284,47 @@ class BurgerApi {
     return this.get<{ data: TIngredient[] }>('/ingredients');
   }
 
-  
-createOrder(ingredients: string[]): Promise<{ order: TOrder }> {
-  return this.requestWithAuth<{ order: TOrder }>('/orders', {
-    method: 'POST',
-    body: JSON.stringify({ ingredients }),
-  });
-}
-
-
-
-  getFeed(): Promise<{ orders: TOrder[]; total: number; totalToday: number }> {
-    return this.get('/orders/all');
+  createOrder(ingredients: string[]): Promise<{ order: TOrder }> {
+    return this.requestWithAuth<{ order: TOrder }>('/orders', {
+      method: 'POST',
+      body: JSON.stringify({ ingredients }),
+    });
   }
-  
-}
 
+  getFeed(): Promise<FeedResponse> {
+    return this.get<FeedResponse>('/orders/all');
+  }
+}
 
 // ✅ Функция для получения заказа по номеру
-export const getOrderByNumber = async (number: number): Promise<{ order: TOrder }> => {
-  const response = await fetch(`${BURGER_API_URL}/orders/${number}`);   // ← ИСПРАВЛЕНО
-  
+export const getOrderByNumber = async (number: number): Promise<OrderResponse> => {
+  const response = await fetch(`${BURGER_API_URL}/orders/${number}`);
+
   if (!response.ok) {
     throw new Error(`Ошибка ${response.status}: ${response.statusText}`);
   }
-  
-  const data = await response.json();
+
+  const data = (await response.json()) as OrderResponse;
   return data;
 };
 
 // ✅ Функция для получения заказов профиля
-export const getProfileOrders = async (): Promise<{ orders: TOrder[]; success: boolean }> => {
+export const getProfileOrders = async (): Promise<ProfileOrdersResponse> => {
   const token = localStorage.getItem('accessToken');
-  
-  const response = await fetch(`${BURGER_API_URL}/orders`, {           // ← ИСПРАВЛЕНО
+
+  const response = await fetch(`${BURGER_API_URL}/orders`, {
     method: 'GET',
     headers: {
-      'Authorization': token || '',
-      'Content-Type': 'application/json'
-    }
+      Authorization: token ?? '', // Используем ?? вместо ||
+      'Content-Type': 'application/json',
+    },
   });
-  
+
   if (!response.ok) {
     throw new Error(`Ошибка ${response.status}: ${response.statusText}`);
   }
-  
-  const data = await response.json();
+
+  const data = (await response.json()) as ProfileOrdersResponse;
   return data;
 };
 

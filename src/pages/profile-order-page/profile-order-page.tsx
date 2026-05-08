@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
 import type { RootState } from '../../services/store';
@@ -10,9 +10,8 @@ import { selectIngredients } from '../../services/slices/ingredientsSlice';
 import styles from './profile-order-page.module.css';
 
 export const ProfileOrderPageID = (): React.JSX.Element => {
+  const navigate = useNavigate();
   const location = useLocation();
-  console.log('🔥 ProfileOrderPageID - СТРАНИЦА');
-  
   const { id } = useParams<{ id: string }>();
   
   const wsOrders = useSelector((state: RootState) => state.profileFeed.orders);
@@ -57,7 +56,7 @@ export const ProfileOrderPageID = (): React.JSX.Element => {
   
   if (loading) {
     return (
-      <div className={styles.pageWrapper}>
+      <div className={styles.pageContainer}>
         <div className={styles.spinner} />
         <div>Загрузка заказа...</div>
       </div>
@@ -66,10 +65,16 @@ export const ProfileOrderPageID = (): React.JSX.Element => {
   
   if (!order) {
     return (
-      <div className={styles.pageWrapper}>
+      <div className={styles.pageContainer}>
         <h1 className="text text_type_main-large mb-6">Заказ не найден</h1>
-        <p>Номер заказа: {orderNumber}</p>
-        <button onClick={() => window.location.reload()}>Обновить</button>
+        <p className="mb-6">Номер заказа: {orderNumber}</p>
+        <button 
+          onClick={() => navigate('/profile/orders')} 
+          className="text text_type_main-default"
+          style={{ color: '#4C4CFF', cursor: 'pointer' }}
+        >
+          ← Вернуться к списку заказов
+        </button>
       </div>
     );
   }
@@ -99,17 +104,19 @@ export const ProfileOrderPageID = (): React.JSX.Element => {
     created: 'Создан',
   }[order.status] || order.status;
   
-  // ✅ Рендерим как обычную страницу - без затемнения
+  const statusColor = order.status === 'done' ? styles.statusDone : styles.statusPending;
+  
+  // ✅ Обычная страница - без затемнения, просто контент
   return (
-    <div className={styles.pageWrapper}>
-      <div className={styles.pageContent}>
+    <div className={styles.pageContainer}>
+      <div className={styles.content}>
         <p className="text text_type_digits-default mb-6">
           #{String(order.number).padStart(6, '0')}
         </p>
         
         <h2 className="text text_type_main-medium mb-2">{order.name}</h2>
         
-        <p className={`text text_type_main-default mb-6 ${styles.status}`}>
+        <p className={`text text_type_main-default mb-6 ${statusColor}`}>
           {statusText}
         </p>
         

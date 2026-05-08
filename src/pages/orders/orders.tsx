@@ -30,8 +30,10 @@ export const ProfileOrderPage = (): React.JSX.Element => {
   const handleCardClick = (order: TOrder, e: React.MouseEvent<HTMLDivElement>): void => {
     e.preventDefault();
     e.stopPropagation();
+    
+    // ✅ Передаём background для модального режима
     navigate(`/profile/orders/${order.number}`, {
-     
+      state: { background: location }
     });
   };
 

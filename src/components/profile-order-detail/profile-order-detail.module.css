@@ -1,0 +1,25 @@
+
+/* other-details.module.css */
+
+/* Основной контейнер для контента */
+.other_details_content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px 40px;
+  min-width: 520px;
+  min-height: 460px;
+}
+
+/* Контейнер для ошибки */
+.error_content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 40px;
+  min-height: 300px;
+}

@@ -24,6 +24,7 @@ import { IngredientPage } from '../ingredient-page/ingredient-page';
 import ProtectedRoute from '../protected-route/protected-route';
 import PublicRoute from '../public-route/public-route';
 import { ProfileOrderPageID } from '@/pages/profile-order-page/profile-order-page';
+import { ProfileOrderDetail } from '@/components/profile-order-detail/profile-order-detail'; // ✅ ИМПОРТ
 import { BURGER_WS_URL } from '@/utils/burger-api';
 import type { RootState, AppDispatch } from '../../services/store';
 
@@ -41,14 +42,9 @@ export function App(): React.JSX.Element {
 
   const background = (location.state as LocationState)?.background;
   
-  // ✅ Проверяем, является ли текущий путь страницей профиля (не модалкой)
-  const isProfileOrderPage = location.pathname.includes('/profile/orders/') && !background;
-
   const { isAuthChecked, isLoading, isLoggedIn } = useSelector(
     (state: RootState) => state.auth
   );
-  
-  const wsConnected = useSelector((state: RootState) => state.profileFeed.wsConnected);
   
   const hasConnected = useRef(false);
   const reconnectTimer = useRef<NodeJS.Timeout | null>(null);
@@ -195,39 +191,56 @@ export function App(): React.JSX.Element {
         >
           <Route index element={<ProfilePage />} />
           <Route path="orders" element={<ProfileOrderPage />} />
-          {/* ✅ ДЛЯ ОТДЕЛЬНОЙ СТРАНИЦЫ */}
-          <Route path="orders/:id" element={<ProfileOrderPageID />} />
         </Route>
+
+        {/* ✅ ОТДЕЛЬНАЯ СТРАНИЦА ЗАКАЗА В ПРОФИЛЕ (не внутри ProfileLayout) */}
+        <Route
+          path="profile/orders/:id"
+          element={
+            <ProtectedRoute>
+              <ProfileOrderPageID />
+            </ProtectedRoute>
+          }
+        />
 
         {/* 404 страница */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
-     {/* Модальное окно - только для ингредиентов и feed */}
-{background && (
-  <Routes>
-    <Route
-      path="ingredients/:id"
-      element={
-        <IngredientDetails
-          isOpen={true}
-          onClose={handleCloseModal}
-          header="Детали ингредиента"
-        />
-      }
-    />
-    <Route
-      path="feed/:id"
-      element={
-        <OrderDetailPage
-          isOpen={true}
-          onClose={handleCloseModal}
-        />
-      }
-    />
-    {/* profile/orders/:id - НЕ ДОЛЖЕН БЫТЬ ЗДЕСЬ */}
-  </Routes>
-)}
+      {/* ✅ Модальное окно - для ингредиентов, feed и profile */}
+      {background && (
+        <Routes>
+          <Route
+            path="ingredients/:id"
+            element={
+              <IngredientDetails
+                isOpen={true}
+                onClose={handleCloseModal}
+                header="Детали ингредиента"
+              />
+            }
+          />
+          <Route
+            path="feed/:id"
+            element={
+              <OrderDetailPage
+                isOpen={true}
+                onClose={handleCloseModal}
+              />
+            }
+          />
+          {/* ✅ ДОБАВЛЯЕМ МОДАЛКУ ДЛЯ ПРОФИЛЯ */}
+          <Route
+            path="profile/orders/:id"
+            element={
+              <ProfileOrderDetail
+                isOpen={true}
+                onClose={handleCloseModal}
+              />
+            }
+          />
+        </Routes>
+      )}
     </>
   );
 }

@@ -1,51 +1,26 @@
-/* profile-order-page.module.css */
-.pageWrapper {
-  /* Явно убираем затемнение */
-  background-color: #131316;
-  min-height: 100vh;
-  padding: 40px 20px;
-  /* Убираем любой backdrop или overlay */
-  backdrop-filter: none;
-  position: static;
-  z-index: auto;
-}
-
-.pageContent {
-  max-width: 800px;
+.pageContainer {
+  max-width: 640px;
   margin: 0 auto;
-  background: #1C1C21;
-  border-radius: 40px;
-  padding: 40px;
-  /* Убираем тени которые могут создавать эффект модалки */
-  box-shadow: none;
-  position: relative;
+  padding: 40px 20px;
+  min-height: calc(100vh - 88px); /* Вычитаем высоту хедера */
+  background-color: transparent; /* Убираем тёмный фон модалки */
 }
 
-/* Остальные стили без изменений */
-.status {
-  color: #00CCCC;
+/* Убираем фон и скругления у контента */
+.content {
+  background-color: transparent; /* Убираем серый фон */
+  border-radius: 0; /* Убираем скругление углов */
+  padding: 0; /* Убираем внутренние отступы */
+  box-shadow: none; /* Убираем тень */
 }
 
 .ingredientsList {
+  max-height: 320px;
+  overflow-y: auto;
+  margin-bottom: 40px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  max-height: 400px;
-  overflow-y: auto;
-  margin-bottom: 40px;
-  padding-right: 8px;
-}
-
-.ingredientsList::-webkit-scrollbar {
-  width: 8px;
-}
-
-.ingredientsList::-webkit-scrollbar-track {
-  background: #2F2F37;
-}
-
-.ingredientsList::-webkit-scrollbar-thumb {
-  background: #8585AD;
 }
 
 .ingredientItem {
@@ -60,18 +35,19 @@
   object-fit: cover;
   border-radius: 50%;
   background: #131316;
+  border: 2px solid #4C4CFF;
 }
 
 .name {
   flex: 1;
-  font-size: 16px;
+  composes: text text_type_main-default from global;
 }
 
 .price {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 16px;
+  composes: text text_type_digits-default from global;
 }
 
 .footer {
@@ -80,17 +56,24 @@
   align-items: center;
 }
 
+.statusDone {
+  color: #00CCCC;
+}
+
+.statusPending {
+  color: #F2F2F3;
+}
+
 .spinner {
   width: 50px;
   height: 50px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #4c4cff;
+  border: 4px solid rgba(76, 76, 255, 0.2);
+  border-top-color: #4C4CFF;
   border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 50px auto;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 20px;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
 }

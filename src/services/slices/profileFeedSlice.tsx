@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 
+import { BURGER_API_URL } from '@/utils/burger-api';
+
 import type { TOrder } from '../../utils/types';
 import type { RootState } from '../store';
 
@@ -13,13 +15,6 @@ type ProfileFeedState = {
   wsError: string | null;
 };
 
-type FetchResponse = {
-  orders?: TOrder[];
-  total?: number;
-  totalToday?: number;
-  success?: boolean;
-};
-
 const initialState: ProfileFeedState = {
   orders: [],
   total: 0,
@@ -30,28 +25,43 @@ const initialState: ProfileFeedState = {
   wsError: null,
 };
 
-// REST API (fallback)
-export const fetchProfileFeed = createAsyncThunk(
-  'profileFeed/fetch',
-  async (_, { rejectWithValue }) => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch(
-        'https://new-stellarburgers.education-services.ru/api/orders',
-        {
-          headers: {
-            Authorization: token ?? '',
-          },
-        }
-      );
-      const data = (await response.json()) as FetchResponse;
-      return data;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Ошибка загрузки';
-      return rejectWithValue(errorMessage);
+// Определяем тип для ответа API
+type ApiResponse = {
+  orders: TOrder[];
+  total: number;
+  totalToday: number;
+};
+
+// REST API (запасной вариант)
+export const fetchProfileFeed = createAsyncThunk<
+  ApiResponse,
+  void,
+  { rejectValue: string }
+>('profileFeed/fetch', async (_, { rejectWithValue }) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+
+    // ✅ Проверяем наличие токена и возвращаем ошибку если его нет
+    if (!token) {
+      return rejectWithValue('Токен авторизации не найден');
     }
+
+    const response = await fetch(`${BURGER_API_URL}/orders`, {
+      headers: {
+        Authorization: token,
+      },
+    });
+
+    if (!response.ok) {
+      return rejectWithValue(`HTTP ошибка! статус: ${response.status}`);
+    }
+
+    const data = (await response.json()) as ApiResponse;
+    return data;
+  } catch (err) {
+    return rejectWithValue(err instanceof Error ? err.message : 'Ошибка загрузки');
   }
-);
+});
 
 const profileFeedSlice = createSlice({
   name: 'profileFeed',
@@ -76,21 +86,13 @@ const profileFeedSlice = createSlice({
       state.wsError = action.payload;
       state.wsConnected = false;
     },
-    wsMessageProfile: (state, action: PayloadAction<unknown>) => {
-      const payload = action.payload as {
-        orders?: TOrder[];
-        total?: number;
-        totalToday?: number;
-      };
-      if (payload.orders) {
-        state.orders = payload.orders;
-      }
-      if (payload.total !== undefined) {
-        state.total = payload.total;
-      }
-      if (payload.totalToday !== undefined) {
-        state.totalToday = payload.totalToday;
-      }
+    wsMessageProfile: (
+      state,
+      action: PayloadAction<{ orders: TOrder[]; total: number; totalToday: number }>
+    ) => {
+      state.orders = action.payload.orders;
+      state.total = action.payload.total;
+      state.totalToday = action.payload.totalToday;
       state.wsConnected = true;
     },
   },
@@ -102,13 +104,14 @@ const profileFeedSlice = createSlice({
       })
       .addCase(fetchProfileFeed.fulfilled, (state, action) => {
         state.loading = false;
-        state.orders = action.payload.orders ?? [];
-        state.total = action.payload.total ?? 0;
-        state.totalToday = action.payload.totalToday ?? 0;
+        state.orders = action.payload.orders;
+        state.total = action.payload.total;
+        state.totalToday = action.payload.totalToday;
       })
       .addCase(fetchProfileFeed.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        // ✅ Безопасно обрабатываем payload
+        state.error = action.payload ?? 'Неизвестная ошибка';
       });
   },
 });
@@ -122,19 +125,14 @@ export const {
   wsMessageProfile,
 } = profileFeedSlice.actions;
 
-// Селекторы с возвращаемыми типами
 export const selectProfileFeed = (state: RootState): TOrder[] =>
   state.profileFeed.orders;
-
 export const selectProfileFeedLoading = (state: RootState): boolean =>
   state.profileFeed.loading;
-
 export const selectProfileFeedTotal = (state: RootState): number =>
   state.profileFeed.total;
-
 export const selectProfileFeedTotalToday = (state: RootState): number =>
   state.profileFeed.totalToday;
-
 export const selectProfileWsConnected = (state: RootState): boolean =>
   state.profileFeed.wsConnected;
 

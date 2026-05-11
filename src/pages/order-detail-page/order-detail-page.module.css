@@ -127,8 +127,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error {
@@ -136,24 +140,3 @@
   padding: 40px;
 }
 
-.errorDetails {
-  margin-top: 20px;
-  padding: 15px;
-  background-color: rgba(255, 0, 0, 0.1);
-  border-radius: 8px;
-}
-
-.reloadButton {
-  margin-top: 15px;
-  padding: 8px 16px;
-  background-color: #4c4cff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.reloadButton:hover {
-  background-color: #3a3ad1;
-}

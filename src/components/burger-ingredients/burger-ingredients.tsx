@@ -1,10 +1,8 @@
 import { Tab } from '@krgaa/react-developer-burger-ui-components';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useSelector } from 'react-redux';
 
+import { useSelector } from '../../hooks/customHooks';
 import { IngredientsDetailsUI } from '../ingredients-details-ui/ingredients-details-ui';
-
-import type { RootState } from '../../services/store';
 
 import styles from './burger-ingredients.module.css';
 
@@ -18,7 +16,7 @@ export const BurgerIngredients = (): React.JSX.Element => {
     items: ingredients,
     loading,
     error,
-  } = useSelector((state: RootState) => state.ingredients);
+  } = useSelector((state) => state.ingredients);
 
   const categoryRefs = useRef<{
     bun: HTMLDivElement | null;

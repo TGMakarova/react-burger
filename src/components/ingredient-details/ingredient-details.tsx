@@ -1,12 +1,10 @@
-import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { clearSelectedIngredient } from '@/services/slices/selectedIngredientSlice';
 
+import { useSelector, useDispatch } from '../../hooks/customHooks';
 import { IngredientDetailsContent } from '../ingredient-details-content/ingredient-details-content';
 import { Modal } from '../modal/modal';
-
-import type { RootState, AppDispatch } from '@/services/store';
 
 type IngredientDetailsProps = {
   isOpen: boolean;
@@ -21,11 +19,9 @@ export const IngredientDetails = ({
   isOpen,
   onClose,
 }: IngredientDetailsProps): React.JSX.Element => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const ingredient = useSelector(
-    (state: RootState) => state.selectedIngredient.ingredient
-  );
+  const ingredient = useSelector((state) => state.selectedIngredient.ingredient);
 
   const handleClose = (): void => {
     dispatch(clearSelectedIngredient());

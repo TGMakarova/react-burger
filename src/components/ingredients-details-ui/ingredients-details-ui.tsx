@@ -1,13 +1,13 @@
 import { CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
 import { useRef, useEffect } from 'react';
 import { useDrag } from 'react-dnd';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { selectIngredientsWithCounts } from '@/services/slices/burgerConstructorSlice';
 import { setSelectedIngredient } from '@/services/slices/selectedIngredientSlice';
 
-import type { AppDispatch, RootState } from '@/services/store';
+import { useDispatch, useSelector } from '../../hooks/customHooks';
+
 import type { TIngredient } from '@utils/types';
 
 import styles from './ingredients-details-ui.module.css';
@@ -22,11 +22,11 @@ type IngredientsDetailsUIProps = {
 export const IngredientsDetailsUI = ({
   setCategoryRef,
 }: IngredientsDetailsUIProps): React.JSX.Element => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const ingredients = useSelector((state: RootState) => state.ingredients.items);
+  const ingredients = useSelector((state) => state.ingredients.items);
   const ingredientsWithCounts = useSelector(selectIngredientsWithCounts);
 
   const bunTitleRef = useRef<HTMLDivElement>(null);

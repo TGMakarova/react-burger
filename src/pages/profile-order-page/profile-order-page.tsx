@@ -1,13 +1,12 @@
 import { CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { formatDate } from '@/utils/formatDate';
 
+import { useSelector } from '../../hooks/customHooks';
 import { selectIngredients } from '../../services/slices/ingredientsSlice';
 
-import type { RootState } from '../../services/store';
 import type { TOrder, TIngredient } from '../../utils/types';
 
 import styles from './profile-order-page.module.css';
@@ -16,11 +15,11 @@ type IngredientWithCount = TIngredient & { count: number };
 
 export const ProfileOrderPageID = (): React.JSX.Element => {
   const navigate = useNavigate();
-  const _location = useLocation(); // Добавляем подчеркивание для неиспользуемой переменной
+
   const { id } = useParams<{ id: string }>();
 
-  const wsOrders = useSelector((state: RootState) => state.profileFeed.orders);
-  const wsConnected = useSelector((state: RootState) => state.profileFeed.wsConnected);
+  const wsOrders = useSelector((state) => state.profileFeed.orders);
+  const wsConnected = useSelector((state) => state.profileFeed.wsConnected);
   const ingredients = useSelector(selectIngredients);
 
   const [order, setOrder] = useState<TOrder | null>(null);

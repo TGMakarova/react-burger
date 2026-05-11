@@ -1,12 +1,11 @@
 import { CurrencyIcon } from '@krgaa/react-developer-burger-ui-components';
-import { useSelector } from 'react-redux';
 import { useParams, useLocation } from 'react-router-dom';
 
 import { formatDate } from '@/utils/formatDate';
 
 import { Modal } from '../../components/modal/modal';
+import { useSelector } from '../../hooks/customHooks';
 
-import type { RootState } from '@/services/store';
 import type { TOrder, TIngredient } from '@/utils/types';
 
 import styles from './order-detail-page.module.css';
@@ -41,11 +40,9 @@ export const OrderDetailPage = ({
   const finalOrder = propOrder ?? orderFromState;
 
   // Получаем данные из store для фида
-  const feedOrders = useSelector((state: RootState) => state.feed.orders);
-  const ingredients = useSelector((state: RootState) => state.ingredients.items);
-  const ingredientsLoading = useSelector(
-    (state: RootState) => state.ingredients.loading
-  );
+  const feedOrders = useSelector((state) => state.feed.orders);
+  const ingredients = useSelector((state) => state.ingredients.items);
+  const ingredientsLoading = useSelector((state) => state.ingredients.loading);
 
   // Ищем заказ в фиде, если не передан через пропсы или state
   let foundOrder: TOrder | undefined = finalOrder;

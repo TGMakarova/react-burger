@@ -4,17 +4,15 @@ import {
   Button,
 } from '@krgaa/react-developer-burger-ui-components';
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 
+import { useDispatch, useSelector } from '../../hooks/customHooks';
 import { login } from '../../services/slices/authSlice';
-
-import type { AppDispatch, RootState } from '../../services/store';
 
 import styles from './login.module.css';
 
 export function LoginPage(): React.JSX.Element {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -22,7 +20,7 @@ export function LoginPage(): React.JSX.Element {
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
 
-  const isLoading = useSelector((state: RootState) => state.auth.isLoading);
+  const isLoading = useSelector((state) => state.auth.isLoading);
 
   const getReturnPath = (): string => {
     const locationState = location.state as { from?: { pathname?: string } } | undefined;

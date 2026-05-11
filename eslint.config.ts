@@ -1,5 +1,3 @@
-// Файл eslint.config.js
-
 import js from '@eslint/js';
 import { defineConfig } from 'eslint/config';
 import cssModulesPlugin from 'eslint-plugin-css-modules';
@@ -54,7 +52,7 @@ export default defineConfig(
       globals: globals.browser,
     },
     plugins: {
-      'css-modules': cssModulesPlugin,
+      'css-modules': cssModulesPlugin, // ✅ Плагин теперь в правильном месте
       perfectionist,
       react,
       'react-refresh': reactRefresh,
@@ -76,6 +74,17 @@ export default defineConfig(
       '@typescript-eslint/no-unsafe-return': 'error',
       '@typescript-eslint/no-unsafe-argument': 'error',
       '@typescript-eslint/no-empty-object-type': 'error',
+
+      // ========== ЗАПРЕТ СТАРЫХ ХУКОВ ==========
+      'no-restricted-imports': 'off',
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        {
+          name: 'react-redux',
+          importNames: ['useSelector', 'useDispatch'],
+          message: 'Используй `useAppSelector` и `useAppDispatch` из `@/services/hooks`',
+        },
+      ],
 
       // ========== ЗАЩИТА ОТ ОБХОДА ТИПИЗАЦИИ ==========
       '@typescript-eslint/ban-ts-comment': [
@@ -103,7 +112,6 @@ export default defineConfig(
       '@typescript-eslint/no-misused-promises': 'error',
 
       // ========== ПРАВИЛА ДЛЯ ФУНКЦИЙ ==========
-      // Вместо двух правил - оставляем одно, более подходящее для React
       '@typescript-eslint/explicit-function-return-type': [
         'error',
         {
@@ -114,7 +122,6 @@ export default defineConfig(
           allowConciseArrowFunctionExpressionsStartingWithVoid: false,
         },
       ],
-      // Отключаем explicit-module-boundary-types, так как explicit-function-return-type уже покрывает этот случай
       '@typescript-eslint/explicit-module-boundary-types': 'off',
 
       // ========== ОСТАЛЬНЫЕ ПРАВИЛА ==========
@@ -148,16 +155,16 @@ export default defineConfig(
         },
       ],
 
-      // CSS Modules
+      // ========== CSS MODULES ==========
       'css-modules/no-undef-class': 'error',
       'css-modules/no-unused-class': 'warn',
 
-      // Import
+      // ========== IMPORT ==========
       'import/no-unresolved': 'error',
       'import/no-unused-modules': 'error',
       'import/order': 'off',
 
-      // Perfectionist
+      // ========== PERFECTIONIST ==========
       'perfectionist/sort-imports': [
         'error',
         {
@@ -179,17 +186,7 @@ export default defineConfig(
             'side-effect-style',
             'style',
           ],
-          internalPattern: [
-            '^/',
-            '@/',
-            '^@components/',
-            '^@contexts/',
-            '^@hocs/',
-            '^@hooks/',
-            '^@pages/',
-            '^@services/',
-            '^@utils/',
-          ],
+          internalPattern: ['^/', '@/'],
           customGroups: {
             value: {
               'base-components': ['/*/*/[!-]*/*.*'],
@@ -200,13 +197,13 @@ export default defineConfig(
         },
       ],
 
-      // React
+      // ========== REACT ==========
       'react/jsx-uses-react': 'off',
       'react/prop-types': 'off',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'react-hooks/exhaustive-deps': 'off',
 
-      // Unused imports
+      // ========== UNUSED IMPORTS ==========
       'unused-imports/no-unused-imports': 'error',
     },
     settings: {

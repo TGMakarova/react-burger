@@ -4,23 +4,21 @@ import {
   Input,
 } from '@krgaa/react-developer-burger-ui-components';
 import { useState, useEffect, type FormEvent } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+import { useDispatch, useSelector } from '../../hooks/customHooks';
 import { resetPassword } from '../../services/slices/authSlice';
-
-import type { AppDispatch, RootState } from '../../services/store';
 
 import styles from './reset-password.module.css';
 
 export const ResetPassword = (): React.JSX.Element => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
   const [password, setPassword] = useState<string>('');
   const [token, setToken] = useState<string>('');
   const [error, setError] = useState<string>('');
   const navigate = useNavigate();
 
-  const isLoading = useSelector((state: RootState) => state.auth.isLoading);
+  const isLoading = useSelector((state) => state.auth.isLoading);
 
   useEffect(() => {
     const hasRequestedReset = localStorage.getItem('passwordResetRequested') === 'true';

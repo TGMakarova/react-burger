@@ -5,24 +5,22 @@ import {
   Button,
 } from '@krgaa/react-developer-burger-ui-components';
 import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+import { useDispatch, useSelector } from '../../hooks/customHooks';
 import { updateUser } from '../../services/slices/authSlice';
-
-import type { AppDispatch, RootState } from '../../services/store';
 
 import styles from './profile.module.css';
 
 export const ProfilePage = (): React.JSX.Element => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const {
     user,
     isLoggedIn,
     isLoading: isAuthLoading,
-  } = useSelector((state: RootState) => state.auth);
+  } = useSelector((state) => state.auth);
 
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');

@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { OrderCard } from '@/components/order-card/order-card';
+import { BURGER_WS_URL } from '@/utils/burger-api';
 
+import { useDispatch, useSelector } from '../../hooks/customHooks';
 import {
   selectFeed,
   selectFeedLoading,
@@ -18,13 +19,12 @@ import {
   selectIngredientsLoading,
 } from '../../services/slices/ingredientsSlice';
 
-import type { AppDispatch } from '../../services/store';
 import type { TOrder } from '../../utils/types';
 
 import styles from './feed-page.module.css';
 
 export const FeedPage = (): React.JSX.Element => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -41,7 +41,7 @@ export const FeedPage = (): React.JSX.Element => {
 
   // Подключаемся к WebSocket при монтировании
   useEffect(() => {
-    const wsUrl = 'wss://new-stellarburgers.education-services.ru/orders/all';
+    const wsUrl = `${BURGER_WS_URL}/orders/all`;
     void dispatch(wsConnect(wsUrl));
 
     return () => {

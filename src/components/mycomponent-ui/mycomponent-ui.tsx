@@ -6,15 +6,14 @@ import {
 } from '@krgaa/react-developer-burger-ui-components';
 import { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { useDispatch, useSelector } from 'react-redux';
 
+import { useDispatch, useSelector } from '../../hooks/customHooks';
 import {
   removeIngredient,
   moveIngredient,
 } from '../../services/slices/burgerConstructorSlice';
 
 import type { ConstructorIngredient } from '../../services/slices/burgerConstructorSlice';
-import type { AppDispatch, RootState } from '../../services/store';
 import type { TIngredient } from '@utils/types.ts';
 
 import styles from './mycomponent-ui.module.css';
@@ -29,7 +28,7 @@ export const MyComponentUI = ({
   onOrderClick,
   isLoading,
 }: MyComponentUIProps): React.JSX.Element => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
 
   // Пустая функция-заглушка для ConstructorElement
   const noop = (): void => {
@@ -37,7 +36,7 @@ export const MyComponentUI = ({
   };
 
   const { bun, ingredients: storeIngredients } = useSelector(
-    (state: RootState) => state.burgerConstructor
+    (state) => state.burgerConstructor
   );
 
   const displayBun = bun;

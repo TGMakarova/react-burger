@@ -1,9 +1,8 @@
-import { useSelector } from 'react-redux';
 import { useParams, useLocation } from 'react-router-dom';
 
+import { useSelector } from '../../hooks/customHooks';
 import { IngredientDetailsContent } from '../ingredient-details-content/ingredient-details-content';
 
-import type { RootState } from '@/services/store';
 import type { TIngredient } from '@utils/types';
 
 import styles from './ingredient-page.module.css';
@@ -12,9 +11,9 @@ export const IngredientPage = (): React.JSX.Element => {
   const { id } = useParams();
   const location = useLocation();
 
-  const ingredients = useSelector((state: RootState) => state.ingredients.items);
-  const loading = useSelector((state: RootState) => state.ingredients.loading);
-  const error = useSelector((state: RootState) => state.ingredients.error);
+  const ingredients = useSelector((state) => state.ingredients.items);
+  const loading = useSelector((state) => state.ingredients.loading);
+  const error = useSelector((state) => state.ingredients.error);
 
   // Проверяем, не передан ли ингредиент через state (при клике из модала)
   const ingredientFromState = location.state as { ingredient?: TIngredient } | undefined;

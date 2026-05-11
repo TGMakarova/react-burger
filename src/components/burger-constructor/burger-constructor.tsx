@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { useDrop } from 'react-dnd';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
+import { useDispatch, useSelector } from '../../hooks/customHooks';
 import {
   addIngredient,
   clearConstructor,
@@ -13,23 +13,20 @@ import { MyComponentUI } from '../mycomponent-ui/mycomponent-ui';
 import { OtherDetails } from '../other-details/other-details';
 
 import type { ConstructorIngredient } from '../../services/slices/burgerConstructorSlice';
-import type { AppDispatch, RootState } from '../../services/store';
 import type { TIngredient } from '@utils/types';
 
 import styles from './burger-constructor.module.css';
 
 export const BurgerConstructor = (): React.JSX.Element => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const dropRef = useRef<HTMLElement>(null);
 
   // Получаем данные из Redux store
-  const { bun, ingredients } = useSelector(
-    (state: RootState) => state.burgerConstructor
-  );
+  const { bun, ingredients } = useSelector((state) => state.burgerConstructor);
 
-  const { orderNumber, loading, error } = useSelector((state: RootState) => state.order);
+  const { orderNumber, loading, error } = useSelector((state) => state.order);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isRestored, setIsRestored] = useState(false);

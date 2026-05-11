@@ -1,19 +1,18 @@
+import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
 import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { BurgerIngredients } from '@/components/burger-ingredients/burger-ingredients';
 import { setSelectedIngredient } from '@/services/slices/selectedIngredientSlice';
-import { BurgerConstructor } from '@components/burger-constructor/burger-constructor';
 
-import type { AppDispatch, RootState } from '@/services/store/index';
+import { useDispatch, useSelector } from '../../hooks/customHooks';
 
 import styles from './home.module.css';
 
 export const Home = (): React.JSX.Element => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -21,7 +20,7 @@ export const Home = (): React.JSX.Element => {
     loading,
     error,
     items: ingredients,
-  } = useSelector((state: RootState) => state.ingredients);
+  } = useSelector((state) => state.ingredients);
 
   // Восстанавливаем попап после перезагрузки
   useEffect(() => {

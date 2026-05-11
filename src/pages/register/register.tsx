@@ -5,24 +5,22 @@ import {
   Input,
 } from '@krgaa/react-developer-burger-ui-components';
 import { useState, type FormEvent } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+import { useDispatch, useSelector } from '../../hooks/customHooks';
 import { register } from '../../services/slices/authSlice';
-
-import type { AppDispatch, RootState } from '../../services/store';
 
 import styles from './register.module.css';
 
 export const RegisterPage = (): React.JSX.Element => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
 
-  const isLoading = useSelector((state: RootState) => state.auth.isLoading);
+  const isLoading = useSelector((state) => state.auth.isLoading);
 
   const validateForm = (): boolean => {
     if (!name.trim()) {

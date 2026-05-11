@@ -1,4 +1,3 @@
-import { useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { OrderCard } from '@/components/order-card/order-card';
@@ -8,6 +7,7 @@ import {
   selectProfileWsConnected,
 } from '@/services/slices/profileFeedSlice';
 
+import { useSelector } from '../../hooks/customHooks';
 import {
   selectIngredients,
   selectIngredientsLoading,

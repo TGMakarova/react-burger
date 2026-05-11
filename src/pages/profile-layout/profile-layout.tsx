@@ -1,18 +1,16 @@
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Outlet, NavLink } from 'react-router-dom';
 
+import { useDispatch, useSelector } from '../../hooks/customHooks';
 import { logoutUser } from '../../services/slices/authSlice';
 import { clearConstructor } from '../../services/slices/burgerConstructorSlice';
-
-import type { AppDispatch, RootState } from '../../services/store';
 
 import styles from './profile-layout.module.css';
 
 export function ProfileLayout(): React.JSX.Element {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const isLoading = useSelector((state: RootState) => state.auth.isLoading);
+  const isLoading = useSelector((state) => state.auth.isLoading);
 
   const handleLogout = async (): Promise<void> => {
     if (isLoading) return;

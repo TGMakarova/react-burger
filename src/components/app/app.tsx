@@ -1,8 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 
-import { ProfileOrderDetail } from '@/components/profile-order-detail/profile-order-detail'; // ✅ ИМПОРТ
+import { ProfileOrderDetail } from '@/components/profile-order-detail/profile-order-detail';
 import { FeedPage } from '@/pages/feed-page/feed-page';
 import { ForgotPassword } from '@/pages/forgot-password/forgot-password';
 import { Home } from '@/pages/home/home';
@@ -18,6 +17,7 @@ import { RegisterPage } from '@/pages/register/register';
 import { ResetPassword } from '@/pages/reset-password/reset-password';
 import { BURGER_WS_URL } from '@/utils/burger-api';
 
+import { useDispatch, useSelector } from '../../hooks/customHooks';
 import { checkAuth } from '../../services/slices/authSlice';
 import { fetchIngredients } from '../../services/slices/ingredientsSlice';
 import {
@@ -30,25 +30,33 @@ import { IngredientPage } from '../ingredient-page/ingredient-page';
 import ProtectedRoute from '../protected-route/protected-route';
 import PublicRoute from '../public-route/public-route';
 
-import type { RootState, AppDispatch } from '../../services/store';
-
 import styles from './app.module.css';
 
+// 📝 Расширяем тип LocationState
 type LocationState = {
   from?: string;
-  background?: Location;
+  background?: {
+    pathname: string;
+    search?: string;
+    hash?: string;
+    state?: unknown;
+    key?: string;
+  };
 };
+
+// 📝 Тип для location.state с возможностью быть null
+type CustomLocationState = LocationState | null;
 
 export function App(): React.JSX.Element {
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
 
-  const background = (location.state as LocationState)?.background;
+  // 📝 Безопасное приведение типов
+  const state = location.state as CustomLocationState;
+  const background = state?.background;
 
-  const { isAuthChecked, isLoading, isLoggedIn } = useSelector(
-    (state: RootState) => state.auth
-  );
+  const { isAuthChecked, isLoading, isLoggedIn } = useSelector((state) => state.auth);
 
   const hasConnected = useRef(false);
   const reconnectTimer = useRef<NodeJS.Timeout | null>(null);
@@ -122,7 +130,27 @@ export function App(): React.JSX.Element {
     localStorage.removeItem('popupBackgroundPath');
     localStorage.removeItem('popupRestored');
 
-    const returnPath = (location.state as LocationState)?.from ?? '/';
+    // Определяем путь возврата
+    let returnPath = '/';
+
+    if (background) {
+      // Если есть background - возвращаемся на него
+      returnPath = background.pathname;
+    } else if (state?.from) {
+      // ✅ Теперь безопасно, так как state типизирован
+      returnPath = state.from;
+    } else {
+      // Пытаемся определить по текущему пути
+      if (location.pathname.includes('/feed/')) {
+        returnPath = '/feed';
+      } else if (location.pathname.includes('/profile/orders/')) {
+        returnPath = '/profile/orders';
+      } else if (location.pathname.includes('/ingredients/')) {
+        returnPath = '/';
+      }
+    }
+
+    // ✅ Добавляем void для обработки промиса
     void navigate(returnPath, { replace: true });
   };
 

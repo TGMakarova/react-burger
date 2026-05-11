@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
 import { OrderDetailPage } from '@/pages/order-detail-page/order-detail-page';
 import { getOrderByNumber } from '@/utils/burger-api';
 
+import { useSelector } from '../../hooks/customHooks';
 import { Modal } from '../modal/modal';
 
-import type { RootState } from '@/services/store';
 import type { TOrder } from '@/utils/types';
 
 type ProfileOrderDetailProps = {
@@ -21,7 +20,7 @@ export const ProfileOrderDetail = ({
 }: ProfileOrderDetailProps): React.JSX.Element => {
   const { id } = useParams<{ id: string }>();
 
-  const wsOrders = useSelector((state: RootState) => state.profileFeed.orders);
+  const wsOrders = useSelector((state) => state.profileFeed.orders);
   const [order, setOrder] = useState<TOrder | null>(null);
   const [loading, setLoading] = useState(true);
 

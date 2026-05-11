@@ -1,21 +1,19 @@
 import { Button, EmailInput } from '@krgaa/react-developer-burger-ui-components';
 import { useState, type FormEvent } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
+import { useDispatch, useSelector } from '../../hooks/customHooks';
 import { forgotPassword } from '../../services/slices/authSlice';
-
-import type { AppDispatch, RootState } from '../../services/store';
 
 import styles from './forgot-password.module.css';
 
 export const ForgotPassword = (): React.JSX.Element => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch();
   const [email, setEmail] = useState<string>('');
   const [error, setError] = useState<string>('');
   const navigate = useNavigate();
 
-  const isLoading = useSelector((state: RootState) => state.auth.isLoading);
+  const isLoading = useSelector((state) => state.auth.isLoading);
 
   const validateForm = (): boolean => {
     if (!email.trim()) {

@@ -10,7 +10,7 @@ export type ProfileOrdersState = {
   connected: boolean;
 };
 
-const initialState: ProfileOrdersState = {
+export const initialState: ProfileOrdersState = {
   orders: [],
   loading: false,
   error: null,
@@ -27,6 +27,7 @@ const profileOrdersSlice = createSlice({
     disconnect: (state) => {
       state.connected = false;
       state.orders = [];
+      
     },
     onOpen: (state) => {
       state.loading = false;
@@ -36,10 +37,12 @@ const profileOrdersSlice = createSlice({
     onError: (state, action: PayloadAction<string>) => {
       state.error = action.payload;
       state.loading = false;
+      state.connected = false;
     },
     onMessage: (state, action: PayloadAction<{ orders: TOrder[] }>) => {
       state.orders = action.payload.orders;
       state.loading = false;
+      state.error = null; 
     },
   },
 });

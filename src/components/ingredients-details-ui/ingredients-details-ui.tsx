@@ -87,6 +87,8 @@ export const IngredientsDetailsUI = ({
     return (
       <div
         ref={elementRef}
+        data-testid="ingredient-catalog-item"
+        data-ingredient-type={ingredient.type}
         className={`${styles.ingredients_element} ${isDragging ? styles.ingredients_element_dragging : ''}`}
         onClick={() => handleIngredientClick(ingredient)}
       >

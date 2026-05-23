@@ -65,14 +65,16 @@ export const MyComponentUI = ({
         </div>
       ) : (
         <div className={styles.bun_top}>
-          <ConstructorElement
-            handleClose={noop}
-            isLocked={true}
-            price={displayBun.price}
-            text={`${displayBun.name} (верх)`}
-            thumbnail={displayBun.image}
-            type="top"
-          />
+          <div data-testid="ingredient-bun">
+            <ConstructorElement
+              handleClose={noop}
+              isLocked={true}
+              price={displayBun.price}
+              text={`${displayBun.name} (верх)`}
+              thumbnail={displayBun.image}
+              type="top"
+            />
+          </div>
         </div>
       )}
 
@@ -107,14 +109,16 @@ export const MyComponentUI = ({
         </div>
       ) : (
         <div className={styles.bun_bottom}>
-          <ConstructorElement
-            handleClose={noop}
-            isLocked={true}
-            price={displayBun.price}
-            text={`${displayBun.name} (низ)`}
-            thumbnail={displayBun.image}
-            type="bottom"
-          />
+          <div data-testid="ingredient-bun">
+            <ConstructorElement
+              handleClose={noop}
+              isLocked={true}
+              price={displayBun.price}
+              text={`${displayBun.name} (низ)`}
+              thumbnail={displayBun.image}
+              type="bottom"
+            />
+          </div>
         </div>
       )}
 
@@ -126,6 +130,7 @@ export const MyComponentUI = ({
         </div>
 
         <Button
+          data-testid="order-button"
           htmlType="button"
           type="primary"
           size="large"
@@ -198,6 +203,7 @@ const DraggableIngredient = ({
   return (
     <div
       ref={ref}
+      data-testid="ingredient-item"
       className={`${styles.ingredient_item} ${isDragging ? styles.ingredient_item_dragging : ''}`}
     >
       <DragIcon type="secondary" />

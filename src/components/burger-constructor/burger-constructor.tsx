@@ -190,6 +190,7 @@ export const BurgerConstructor = (): React.JSX.Element => {
   return (
     <section
       ref={dropRef}
+      data-testid="constructor-dropzone"
       className={`${styles.burger_constructor} ${isHover ? styles.hover : ''}`}
     >
       <MyComponentUI

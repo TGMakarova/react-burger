@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 
 import { store } from './services/store';
-
+(window as any).store = store;
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(

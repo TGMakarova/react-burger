@@ -4,7 +4,7 @@ vi.mock('@utils/burger-api', () => ({
   getIngredientsApi: vi.fn(),
 }));
 
-// 2. Затем все остальные импорты
+
 import { describe, it, expect, beforeEach } from 'vitest';
 import type { MockedFunction } from 'vitest';
 import ingredientsReducer, {

@@ -19,7 +19,11 @@ export const ModalOverlay = ({
   };
 
   return (
-    <div className={styles.overlay} onClick={handleOverlayClick}>
+    <div
+      className={styles.overlay}
+      data-testid="modal-overlay"
+      onClick={handleOverlayClick}
+    >
       {children}
     </div>
   );

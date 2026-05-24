@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 
-import { burgerApi } from '../../utils/burger-api';
+import { burgerApi } from '@utils/burger-api';
 
 import type { RootState } from '../store';
 
@@ -24,7 +24,7 @@ type FeedState = {
   wsError: string | null;
 };
 
-const initialState: FeedState = {
+export const initialState: FeedState = {
   orders: [],
   total: 0,
   totalToday: 0,

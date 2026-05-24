@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-import { burgerApi } from '../../utils/burger-api';
+import { burgerApi } from '@utils/burger-api';
 
 import type { RootState } from '../store';
 import type { PayloadAction } from '@reduxjs/toolkit';
@@ -11,7 +11,7 @@ type OrderState = {
   error: string | null;
 };
 
-const initialState: OrderState = {
+export const initialState: OrderState = {
   orderNumber: null,
   loading: false,
   error: null,

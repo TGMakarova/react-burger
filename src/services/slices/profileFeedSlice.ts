@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 
-import { BURGER_API_URL } from '@/utils/burger-api';
+import { BURGER_API_URL } from '@utils/burger-api';
 
 import type { TOrder } from '../../utils/types';
 import type { RootState } from '../store';
@@ -15,7 +15,7 @@ type ProfileFeedState = {
   wsError: string | null;
 };
 
-const initialState: ProfileFeedState = {
+export const initialState: ProfileFeedState = {
   orders: [],
   total: 0,
   totalToday: 0,

@@ -6,6 +6,7 @@ import sassDts from 'vite-plugin-sass-dts';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vitest/config';
 
+
 // https://vitejs.dev/config/
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -24,7 +25,8 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./vitest-setup.ts'],
+    setupFiles: ['./src/setupTests.ts', './vitest-setup.ts'],
+    
     projects: [{
       extends: true,
       plugins: [

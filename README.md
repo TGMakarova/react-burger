@@ -37,5 +37,6 @@
 		'@utils': path.resolve(__dirname, './src/utils'),
 	},
 ```
+
 Работа изначально писалась на TypeSctipt.
 Ссылка на деплой https://TGMakarova.github.io/react-burger
